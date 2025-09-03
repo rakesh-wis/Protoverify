@@ -101,20 +101,20 @@ const MODULE = [
 
 @NgModule({
   imports: [
-    MODULE,               // only real NgModules here
+    ...MODULE,               // only real NgModules here
     VerificationModule,   // include this if the popover stays there
   ],
   declarations: [
-    PIPES,
-    DIRECTIVES,
-    COMPONENTS,
+    ...PIPES,
+    ...DIRECTIVES,
+    ...COMPONENTS,
     // VerificationStatusPopoverComponent, // only if NOT declared in VerificationModule
   ],
   exports: [
-    PIPES,
-    DIRECTIVES,
-    COMPONENTS,
-    MODULE,
+    ...PIPES,
+    ...DIRECTIVES,
+    ...COMPONENTS,
+    ...MODULE,
     VerificationModule,   // if you imported it above
     // VerificationStatusPopoverComponent, // only if declared here
   ],
