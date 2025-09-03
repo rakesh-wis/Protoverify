@@ -1,0 +1,87 @@
+<div class="container-fluid h-100">
+	<div class="d-flex py-3 px-2 justify-content-between">
+		<img src="assets/images/sidebar-logo-black.svg" class="img-fluid" width="160" />
+		<div class="d-flex justify-content-end p-4">
+			<mat-icon class="text-custom-black-50">mail_outline</mat-icon>
+			<span class="text-custom-black-50 ms-2">support&#64;protostaff.com</span>
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-lg-8 col-md-10 col-sm-12">
+			<div class="row align-items-center">
+				<form [formGroup]="dataForm" (ngSubmit)="onSubmit()">
+					<div class="my-1 text-center">
+						<img src="assets/images/veriify-mobile-otp.svg" class="img-fluid" />
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-12 text-center py-3">
+							<h3 class="text-custom-black fs-4 fw-normal mb-1">Mobile OTP Verification</h3>
+							<p class="text-custom-black-50">An OTP has been sent to {{ form['mobileNumber'].value }}</p>
+						</div>
+						<div class="col-lg-5 col-md-6 col-sm-12 py-3">
+							<div class="form-group text-center">
+								<!-- <input type="text" class="form-control bg-white-200" id="tempOtp" placeholder=""
+									(keypress)="numberOnly($event)" formControlName="tempOtp" maxlength="5" /> -->
+								<app-otp-input
+									[formControlOtp]="dataForm.get('tempOtp')"
+									[inputLength]="5"
+									[allowNumbersOnly]="true"
+								></app-otp-input>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center pt-3">
+						<div class="col-lg-4 col-md-6 col-sm-12">
+							<div class="clearfix mb-3">
+								<button
+									type="submit"
+									[disabled]="dataForm.invalid"
+									class="btn btn-custom-primary border-radius w-100"
+								>
+									Submit
+								</button>
+							</div>
+							<div class="clearfix text-center">
+								<p class="text-custom-black-50">
+									Did not receive the OTP?
+									<span
+										class="text-primary fw-bolder text-uppercase"
+										role="button"
+										(click)="resend()"
+									>
+										Resend
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div class="text-custom-black-50 text-uppercase my-2">
+					<div class="d-flex align-items-center justify-content-center" role="button" (click)="goBack()">
+						<mat-icon class="text-custom-black-50" role="button">keyboard_backspace</mat-icon>
+						<span>Back to login</span>
+					</div>
+				</div>
+				<div class="text-center my-3">
+					<div>
+						<label class="text-custom-black-50">
+							By clicking submit you are agreeing to the following
+						</label>
+					</div>
+					<div>
+						<label
+							class="text-custom-black fw-bolder text-underline"
+							role="button"
+							routerLink="/terms-and-conditions"
+						>
+							<u>Terms & conditions</u>
+						</label>
+					</div>
+				</div>
+				<div class="text-center">
+					<span class="text-custom-black-50">© Protoverify 2023</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

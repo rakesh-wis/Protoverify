@@ -1,0 +1,11 @@
+<p>plan-features works!</p>
+<mat-form-field appearance="fill">
+	<mat-label>Select</mat-label>
+	<mat-select [formControl]="pokemonControl">
+		<mat-optgroup *ngFor="let group of ItemsGroups" [label]="group.label" [disabled]="group.disabled">
+			<mat-option *ngFor="let feature of group.features" [value]="feature.value">
+				<mat-checkbox class="plan-item-checkbox">{{ feature.label }}</mat-checkbox>
+			</mat-option>
+		</mat-optgroup>
+	</mat-select>
+</mat-form-field>

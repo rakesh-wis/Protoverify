@@ -1,0 +1,621 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Add Past Employment</span>
+			<span *ngIf="modelData">Update Past Employment</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row justify-content-center">
+				<div class="col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Organization Name*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="organizationName"
+							placeholder=""
+							formControlName="organizationName"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.organizationName">
+							<ng-container
+								*ngIf="
+									form['organizationName'].hasError(error.type) &&
+									(form['organizationName'].dirty || form['organizationName'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Employee ID*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="employeeId"
+							placeholder=""
+							formControlName="employeeId"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.employeeId">
+							<ng-container
+								*ngIf="
+									form['employeeId'].hasError(error.type) &&
+									(form['employeeId'].dirty || form['employeeId'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Designation*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="designation"
+							placeholder=""
+							formControlName="designation"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['designation'].hasError(error.type) &&
+									(form['designation'].dirty || form['designation'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Date of Joining*</label>
+						<mat-form-field class="form-material-control bg-transparent px-1 w-100">
+							<input matInput [max]="maxDate" [matDatepicker]="datepicker" formControlName="fromDate" />
+							<mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+							<mat-datepicker #datepicker>
+								<mat-datepicker-actions>
+									<button mat-button matDatepickerCancel>Cancel</button>
+									<button
+										class="btn btn-primary w-25"
+										matDateRangePickerApply
+										(click)="setDate(datepicker, 'fromDate')"
+									>
+										Apply
+									</button>
+								</mat-datepicker-actions>
+							</mat-datepicker>
+						</mat-form-field>
+						<div class="text-left" *ngFor="let error of errorMessages.fromDate">
+							<ng-container
+								*ngIf="
+									form['fromDate'].hasError(error.type) &&
+									(form['fromDate'].dirty || form['fromDate'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group" *ngIf="!isCurrentlyWorking">
+						<label class="form-label text-custom-black"> Date of Exit </label>
+						<mat-form-field class="form-material-control bg-transparent px-1 w-100">
+							<input
+								matInput
+								[min]="form['fromDate'].value"
+								[max]="maxDate"
+								[matDatepicker]="datepicker"
+								formControlName="toDate"
+							/>
+							<mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+							<mat-datepicker #datepicker>
+								<mat-datepicker-actions>
+									<button mat-button matDatepickerCancel>Cancel</button>
+									<button
+										class="btn btn-primary w-25"
+										matDateRangePickerApply
+										(click)="setDate(datepicker, 'toDate')"
+									>
+										Apply
+									</button>
+								</mat-datepicker-actions>
+							</mat-datepicker>
+						</mat-form-field>
+						<div class="text-left" *ngFor="let error of errorMessages.toDate">
+							<ng-container
+								*ngIf="
+									form['toDate'].hasError(error.type) &&
+									(form['toDate'].dirty || form['toDate'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12">
+				<p class="gap-1">
+					<input type="checkbox" (click)="handleCurrentlyWorking($event)" />
+					<label class="form-label text-custom-black ms-2"> Currently working </label>
+				</p>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Past drawn salary in ₹/Annum*</label>
+
+						<input
+							type="text"
+							class="form-control"
+							id="firstName"
+							placeholder=""
+							formControlName="salary"
+							(keypress)="numberOnly($event)"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.salary">
+							<ng-container
+								*ngIf="
+									form['salary'].hasError(error.type) &&
+									(form['salary'].dirty || form['salary'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Employment Type* </label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select type"
+							formControlName="employmentType"
+						>
+							<option [value]="item" *ngFor="let item of employmentType">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.employmentType">
+							<ng-container
+								*ngIf="
+									form['employmentType'].hasError(error.type) &&
+									(form['employmentType'].dirty || form['employmentType'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Reason for Discontinuance from Service*</label>
+
+						<input
+							type="text"
+							class="form-control"
+							id="reasonOfDiscontinuance"
+							placeholder=""
+							formControlName="reasonOfDiscontinuance"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.reasonOfDiscontinuance">
+							<ng-container
+								*ngIf="
+									form['reasonOfDiscontinuance'].hasError(error.type) &&
+									(form['reasonOfDiscontinuance'].dirty || form['reasonOfDiscontinuance'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Any Exit Formalities Pending* </label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select type"
+							formControlName="anyExitFormalitiesPending"
+							(change)="toggleExitingFormalitiesPendingFromWhom()"
+						>
+							<option [value]="item" *ngFor="let item of exitingFormalitiesList">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.anyExitFormalitiesPending">
+							<ng-container
+								*ngIf="
+									form['anyExitFormalitiesPending'].hasError(error.type) &&
+									(form['anyExitFormalitiesPending'].dirty ||
+										form['anyExitFormalitiesPending'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> If Pending then with whom* </label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select type"
+							formControlName="formalitiesFromWhom"
+						>
+							<option [value]="item" *ngFor="let item of formalitiesFromWhomList">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.formalitiesFromWhom">
+							<ng-container
+								*ngIf="
+									form['formalitiesFromWhom'].hasError(error.type) &&
+									(form['formalitiesFromWhom'].dirty || form['formalitiesFromWhom'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<label class="form-label text-custom-black fw-bold">HR Details : </label>
+			<div class="row justify-content-start">
+				<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="hrDetails">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Name* </label>
+						<input type="text" class="form-control" id="hrName" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.hrDetails.name">
+							<ng-container
+								*ngIf="
+									dataForm.get('hrDetails.name').hasError(error.type) &&
+									(dataForm.get('hrDetails.name').dirty || dataForm.get('hrDetails.name').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="hrDetails">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Email ID* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="hremail"
+							placeholder=""
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.hrDetails.email">
+							<ng-container
+								*ngIf="
+									dataForm.get('hrDetails.email').hasError(error.type) &&
+									(dataForm.get('hrDetails.email').dirty || dataForm.get('hrDetails.email').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="hrDetails">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Contact Number* </label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('hrDetails.mobileNumber')"
+							[formControlCountryCode]="dataForm.get('hrDetails.countryCode')"
+							[errorValidator]="errorMessages.hrDetails.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+			</div>
+			<!-- <label class="form-label text-custom-black fw-bold">Reporting Manager Details : </label>
+			<div class="row justify-content-start" formGroupName="reportingManager">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Name </label>
+						<input type="text" class="form-control" id="hrName" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.reportingManager.name">
+							<ng-container
+								*ngIf="
+									dataForm.get('hrDetails.name').hasError(error.type) &&
+									(dataForm.get('hrDetails.name').dirty || dataForm.get('hrDetails.name').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Email ID </label>
+						<input
+							type="email"
+							class="form-control"
+							id="manageremail"
+							placeholder=""
+							formControlName="email"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.reportingManager.email">
+							<ng-container
+								*ngIf="
+									dataForm.get('reportingManager.email').hasError(error.type) &&
+									(dataForm.get('reportingManager.email').dirty ||
+										dataForm.get('reportingManager.email').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Contact Number </label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('reportingManager.mobileNumber')"
+							[formControlCountryCode]="dataForm.get('reportingManager.countryCode')"
+							[errorValidator]="errorMessages.reportingManager.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+			</div> -->
+			<div formArrayName="media">
+				<div class="row justify-content-between align-items-end">
+					<div
+						class="col-lg-6 col-md-6 col-sm-12"
+						[formGroupName]="i"
+						*ngFor="let _ of media.controls; let i = index"
+					>
+						<div class="form-group">
+							<label class="form-label text-custom-black">
+								{{ _.value.label }}
+							</label>
+							<input
+								hidden
+								#fileInput
+								type="file"
+								onclick="this.value = null"
+								class="form-control"
+								[name]="_.value.label"
+								(change)="uploadFileMedia($event, i)"
+								accept="image/jpg,image/png,image/jpeg"
+							/>
+
+							<div class="input-group file-input-group">
+								<input
+									type="text"
+									readonly
+									class="form-control"
+									aria-label="{{ _.value.label }}"
+									[placeholder]="_.value.label"
+									onclick="this.value = null"
+									[ngClass]="
+										!_.value.filePath &&
+										![
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role)
+											? 'border-end-1 rounded-end'
+											: 'border-end-0'
+									"
+								/>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0"
+									*ngIf="_.value.filePath"
+									(click)="downloadDocument(_.value.filePath)"
+									ngbTooltip="Download"
+									[ngClass]="{
+										'border-end-1 rounded-end': ![
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role),
+										'border-end-0':
+											[
+												roles.PROTO_SUPER_ADMIN,
+												roles.PROTO_ADMIN,
+												roles.PROTO_USER,
+												roles.PROTO_OPERATION,
+												roles.EMPLOYEE
+											].includes(currentUser?.role) &&
+											dataForm?.value?.status !== verificationLevel?.CLEAR_REPORT,
+										'border-end-1 rounded-end':
+											[roles.EMPLOYEE].includes(currentUser?.role) &&
+											dataForm?.value?.status === verificationLevel?.CLEAR_REPORT
+									}"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+								</span>
+								<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="fileInput.click()"
+										*ngIf="!_.value.filePath"
+										ngbTooltip="Upload File"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+										</iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end border-end"
+										(click)="setControl(_.value, true, i)"
+										*ngIf="_.value.filePath"
+										ngbTooltip="Remove"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+										</iconify-icon>
+									</span>
+								</ng-container>
+								<ng-container *ngIf="![roles.EMPLOYEE, roles.PROTO_LAWYER].includes(currentUser?.role)">
+									<ng-container *appIsGranted="'EDIT'">
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="fileInput.click()"
+											*ngIf="!_.value.filePath"
+											ngbTooltip="Upload File"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+											</iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="setControl(_.value, true, i)"
+											*ngIf="_.value.filePath"
+											ngbTooltip="Remove"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+											</iconify-icon>
+										</span>
+									</ng-container>
+								</ng-container>
+							</div>
+						</div>
+						<div class="text-left" [formGroupName]="i" *ngFor="let error of errorMessages.filePath">
+							<ng-container
+								*ngIf="
+									_.controls['filePath'].hasError(error.type) &&
+									(_.controls['filePath'].dirty || _.controls['filePath'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+					<div
+						class="col-lg-6 col-md-6 col-sm-12"
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_LAWYER,
+								roles.PROTO_OPERATION,
+								roles.CLIENT_SUPER_ADMIN,
+								roles.CLIENT_ADMIN,
+								roles.CLIENT_USER,
+								roles.CLIENT_USER_VIEW
+							].includes(currentUser?.role)
+						"
+					>
+						<div class="form-group">
+							<label class="text-primary mb-1">Supporting Document(Email Screenshot)</label>
+							<input
+								hidden
+								#fileInput3
+								type="file"
+								class="form-control"
+								onclick="this.value = null"
+								accept="image/png,image/jpg,image/jpeg"
+								(change)="uploadFile($event, 'supportingDocument')"
+							/>
+							<div class="input-group file-input-group">
+								<input
+									type="text"
+									readonly
+									class="form-control"
+									aria-label="Supporting Document"
+									[placeholder]="'Supporting Document'"
+									onclick="this.value = null"
+									[ngClass]="
+										!form['supportingDocument'].value &&
+										![
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role)
+											? 'border-end-1 rounded-end'
+											: 'border-end-0'
+									"
+								/>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 border-end-0"
+									*ngIf="form['supportingDocument'].value"
+									(click)="showImage(form['supportingDocument'].value)"
+									ngbTooltip="View"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+								</span>
+								<ng-container>
+									<ng-container *appIsGranted="'EDIT'">
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="fileInput3.click()"
+											*ngIf="!form['supportingDocument'].value"
+											ngbTooltip="Upload File"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+											</iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="clearFile('supportingDocument')"
+											*ngIf="form['supportingDocument'].value"
+											ngbTooltip="Remove"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+											</iconify-icon>
+										</span>
+									</ng-container>
+								</ng-container>
+							</div>
+							<div class="text-left" *ngFor="let error of errorMessages?.supportingDocument">
+								<ng-container
+									*ngIf="
+										form['supportingDocument'].hasError(error.type) &&
+										(form['supportingDocument'].dirty || form['supportingDocument'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

@@ -1,0 +1,491 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col d-flex align-items-center gap-3">
+			<img [src]="icon" [alt]="verificationName" *ngIf="icon" />
+			<h2 class="text-custom-black fs-3 fw-bold m-0" *ngIf="verificationName">{{ verificationName }}</h2>
+			<h2 class="text-custom-black fs-3 fw-bold m-0" *ngIf="!verificationName">Verification</h2>
+		</div>
+	</div>
+
+	<div class="bg-white rounded-3 px-3 py-4 mt-5">
+		<div class="row align-items-center">
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label class="form-label text-custom-black">Filter</label>
+					<select
+						class="form-select bg-transparent text-capitalize"
+						aria-label="select example"
+						(change)="applyFilters()"
+						[(ngModel)]="statusFilter"
+					>
+						<!-- <option value="select status" >All</option> -->
+						<option [value]="item.name" *ngFor="let item of statusList">
+							<span>{{ item.label }}</span>
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-3 col-sm-12 mt-3">
+				<button class="btn btn-outline-primary w-100" (click)="clearFilter()">Clear Filter</button>
+			</div>
+		</div>
+		<div class="mt-4">
+			<div class="row">
+				<div class="col">
+					<div
+						*ngIf="
+							candidateOpenVerificationList[0]?.count > 0 && !vendorBasedChecks.includes(type);
+							else noDataForCandidateOpen
+						"
+					>
+						<div class="status-tag">
+							<p class="text-primary">Candidate Open</p>
+							<div>{{ candidateOpenVerificationList[0]?.count }}</div>
+						</div>
+						<div class="verification-container-parent mt-3 py-2">
+							<div class="d-flex justify-content-between align-items-center gap-2 p-2">
+								<div class="form-check d-flex align-items-center gap-2">
+									<input
+										class="form-check-input form-custom-check-input"
+										type="checkbox"
+										[id]="'allCandidateOpen'"
+										(change)="selectAll($event, 'candidate-open')"
+										#allCandidateOpenCheckbox
+									/>
+									<p class="mb-0">Select All</p>
+								</div>
+								<button
+									[disabled]="!statusMapping?.candidateOpen?.isSelected"
+									class="btn btn-outline-primary px-3 py-2 w-auto"
+									(click)="exportBulk('candidate-open')"
+								>
+									Export
+								</button>
+							</div>
+							<div
+								class="verification-container px-2 d-flex flex-column gap-2"
+								infinite-scroll
+								[infiniteScrollThrottle]="200"
+								[infiniteScrollDistance]="1"
+								[scrollWindow]="false"
+								(scrolled)="onScroll('candidate-open')"
+								[alwaysCallback]="false"
+							>
+								<div>
+									<div
+										*ngFor="let item of candidateOpenVerificationList[0]?.rows"
+										class="verification-box rounded-3 shadow p-3 position-relative hand-cursor mb-4"
+										(click)="navigatesToCheck(item.id, item.name)"
+									>
+										<div class="d-flex gap-3">
+											<input
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[id]="item.id"
+												(click)="stopPropagation($event)"
+												(change)="singleSelect($event, item, 'candidate-open')"
+												[checked]="item?.selected"
+											/>
+											<div>
+												<p class="fs-5 fw-bold mb-1">{{ item.name }}</p>
+												<p class="m-0">{{ item.client }}</p>
+											</div>
+										</div>
+										<div class="d-flex align-items-center mt-2 gap-2">
+											<img [src]="icon" [alt]="verificationName" />
+											<p class="m-0 fs-6 text-custom-black mt-1 fw-bold">
+												{{ verificationName }}
+											</p>
+										</div>
+										<div
+											class="mt-3 d-flex align-items-center btn-container justify-content-around"
+										>
+											<span
+												role="button"
+												class="btn btn-outline-primary status-btn d-flex align-items-center justify-content-center unclickable-button"
+												[ngClass]="{
+													medium: item.tatStatus === 'medium',
+													critical: item.tatStatus === 'critical',
+													high: item.tatStatus === 'high'
+												}"
+												(click)="stopPropagation($event)"
+											>
+												{{ item?.tatStatus }}
+											</span>
+											<span
+												role="button"
+												class="btn btn-outline-primary status-btn d-flex align-items-center justify-content-center unclickable-button"
+												(click)="stopPropagation($event)"
+											>
+												{{ item?.tat }}
+											</span>
+										</div>
+										<div
+											*ngIf="
+												type == 'reference_check' ||
+												type == 'past_employment' ||
+												type == 'educational'
+											"
+											class="position-absolute top-0 right-0 view-icon"
+											(click)="viewCheckDetails($event, item.id)"
+										>
+											<iconify-icon
+												icon="material-symbols:info-outline"
+												class="text-primary"
+											></iconify-icon>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<ng-template #noDataForCandidateOpen>
+						<!-- Content to show when count is 0 or the list is empty -->
+						<div class="status-tag">
+							<p class="text-primary">Candidate Open</p>
+							<div>0</div>
+						</div>
+					</ng-template>
+				</div>
+				<div class="col">
+					<div *ngIf="opsOpenVerificationList[0]?.count > 0; else noDataForOpsOpen">
+						<div class="status-tag">
+							<p class="text-primary">Ops Open</p>
+							<div>{{ opsOpenVerificationList[0]?.count }}</div>
+						</div>
+
+						<div class="verification-container-parent mt-3 py-2">
+							<div class="d-flex justify-content-between align-items-center gap-2 p-2">
+								<div class="form-check d-flex align-items-center gap-2">
+									<input
+										class="form-check-input form-custom-check-input"
+										type="checkbox"
+										[id]="'allOpsOpen'"
+										(change)="selectAll($event, 'ops-open')"
+										#allOpsOpenCheckbox
+									/>
+									<p class="mb-0">Select All</p>
+								</div>
+								<button
+									[disabled]="!statusMapping?.opsOpen?.isSelected"
+									class="btn btn-outline-primary px-3 py-2 w-auto"
+									(click)="exportBulk('ops-open')"
+								>
+									Export
+								</button>
+							</div>
+							<div
+								class="verification-container px-2 d-flex flex-column gap-2"
+								infinite-scroll
+								[infiniteScrollThrottle]="200"
+								[infiniteScrollDistance]="1"
+								[scrollWindow]="false"
+								(scrolled)="onScroll('ops-open')"
+								[alwaysCallback]="false"
+							>
+								<div>
+									<div
+										*ngFor="let item of opsOpenVerificationList[0]?.rows"
+										class="verification-box rounded-3 shadow p-3 position-relative hand-cursor mb-4"
+										(click)="navigatesToCheck(item.id, item.name)"
+									>
+										<div class="d-flex gap-3">
+											<input
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[id]="item.id"
+												(click)="stopPropagation($event)"
+												(change)="singleSelect($event, item, 'ops-open')"
+												[checked]="item?.selected"
+											/>
+											<div>
+												<p class="fs-5 fw-bold mb-1">{{ item.name }}</p>
+												<p class="m-0">{{ item.client }}</p>
+											</div>
+										</div>
+
+										<div class="d-flex align-items-center mt-2 gap-2">
+											<img [src]="icon" [alt]="verificationName" />
+											<p class="m-0 fs-6 text-custom-black mt-1 fw-bold">
+												{{ verificationName }}
+											</p>
+										</div>
+
+										<div
+											class="mt-3 d-flex align-items-center btn-container justify-content-around"
+										>
+											<span
+												role="button"
+												class="btn btn-outline-primary status-btn d-flex align-items-center justify-content-center unclickable-button"
+												[ngClass]="{
+													medium: item.tatStatus === 'medium',
+													critical: item.tatStatus === 'critical',
+													high: item.tatStatus === 'high'
+												}"
+												(click)="stopPropagation($event)"
+											>
+												{{ item?.tatStatus }}
+											</span>
+											<span
+												role="button"
+												class="btn btn-outline-primary status-btn d-flex align-items-center justify-content-center unclickable-button"
+												(click)="stopPropagation($event)"
+											>
+												{{ item?.tat }}
+											</span>
+										</div>
+										<div
+											*ngIf="
+												type == 'reference_check' ||
+												type == 'past_employment' ||
+												type == 'educational'
+											"
+											class="position-absolute top-0 right-0 view-icon"
+											(click)="viewCheckDetails($event, item.id)"
+										>
+											<iconify-icon
+												icon="material-symbols:info-outline"
+												class="text-primary"
+											></iconify-icon>
+										</div>
+										<div
+											class="position-absolute top-0 right-0 view-icon"
+											*ngIf="type == 'court_check' && item.kycDetails.length === 0"
+										>
+											<iconify-icon
+												class="fs-5 text-danger"
+												icon="material-symbols:flag"
+											></iconify-icon>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<ng-template #noDataForOpsOpen>
+						<!-- Content to show when count is 0 or the list is empty -->
+						<div class="status-tag">
+							<p class="text-primary">Ops Open</p>
+							<div>0</div>
+						</div>
+					</ng-template>
+				</div>
+				<div class="col">
+					<div *ngIf="vendorOpenVerificationList[0]?.count > 0; else noDataForVendorOpen">
+						<div class="status-tag">
+							<p class="text-primary">{{ categoryLabel }}</p>
+							<div>{{ vendorOpenVerificationList[0]?.count }}</div>
+						</div>
+						<div class="verification-container-parent mt-3 py-2">
+							<div class="d-flex justify-content-between align-items-center gap-2 p-2">
+								<div class="form-check d-flex align-items-center gap-2">
+									<input
+										class="form-check-input form-custom-check-input"
+										type="checkbox"
+										[id]="'allVendorOpen'"
+										(change)="selectAll($event, 'vendor-open')"
+										#allVendorOpenCheckbox
+									/>
+									<p class="mb-0">Select All</p>
+								</div>
+								<button
+									[disabled]="!statusMapping?.vendorOpen?.isSelected"
+									class="btn btn-outline-primary px-3 py-2 w-auto"
+									(click)="exportBulk('vendor-open')"
+								>
+									Export
+								</button>
+							</div>
+							<div
+								class="verification-container px-2 d-flex flex-column gap-2"
+								infinite-scroll
+								[infiniteScrollThrottle]="200"
+								[infiniteScrollDistance]="1"
+								[scrollWindow]="false"
+								(scrolled)="onScroll('vendor-open')"
+								[alwaysCallback]="false"
+							>
+								<div>
+									<div
+										*ngFor="let item of vendorOpenVerificationList[0]?.rows"
+										class="verification-box rounded-3 shadow p-3 position-relative hand-cursor mb-4"
+										(click)="navigatesToCheck(item.id, item.name)"
+									>
+										<div class="d-flex gap-3">
+											<input
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[id]="item.id"
+												(click)="stopPropagation($event)"
+												(change)="singleSelect($event, item, 'vendor-open')"
+												[checked]="item?.selected"
+											/>
+											<div>
+												<p class="fs-5 fw-bold mb-1">{{ item.name }}</p>
+												<p class="m-0">{{ item.client }}</p>
+											</div>
+										</div>
+
+										<div class="d-flex align-items-center mt-2 gap-2">
+											<img [src]="icon" [alt]="verificationName" />
+											<p class="m-0 fs-6 text-custom-black mt-1 fw-bold">
+												{{ verificationName }}
+											</p>
+										</div>
+
+										<div
+											class="mt-3 d-flex align-items-center btn-container justify-content-around"
+										>
+											<span
+												role="button"
+												class="btn btn-outline-primary status-btn d-flex align-items-center justify-content-center unclickable-button"
+												[ngClass]="{
+													medium: item.tatStatus === 'medium',
+													critical: item.tatStatus === 'critical',
+													high: item.tatStatus === 'high'
+												}"
+												(click)="stopPropagation($event)"
+											>
+												{{ item?.tatStatus }}
+											</span>
+											<span
+												class="btn btn-outline-primary status-btn d-flex align-items-center justify-content-center unclickable-button"
+												(click)="stopPropagation($event)"
+											>
+												{{ item?.tat }}
+											</span>
+										</div>
+										<div
+											*ngIf="
+												type == 'reference_check' ||
+												type == 'past_employment' ||
+												type == 'educational'
+											"
+											class="position-absolute top-0 right-0 view-icon"
+											(click)="viewCheckDetails($event, item.id)"
+										>
+											<iconify-icon
+												icon="material-symbols:info-outline"
+												class="text-primary"
+											></iconify-icon>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<ng-template #noDataForVendorOpen>
+						<div *ngIf="!nonVendorBasedChecks.includes(type)">
+							<!-- Content to show when count is 0 or the list is empty -->
+							<div class="status-tag">
+								<p class="text-primary">{{ categoryLabel }}</p>
+								<div>0</div>
+							</div>
+						</div>
+					</ng-template>
+				</div>
+				<div class="col">
+					<div *ngIf="completedVerificationList[0]?.count > 0; else noDataForCompleted">
+						<div class="status-tag completed">
+							<p class="text-primary">Completed</p>
+							<div>{{ completedVerificationList[0]?.count }}</div>
+						</div>
+
+						<div class="verification-container-parent mt-3 py-2">
+							<div class="d-flex justify-content-between align-items-center gap-2 p-2">
+								<div class="form-check d-flex align-items-center gap-2">
+									<input
+										class="form-check-input form-custom-check-input"
+										type="checkbox"
+										[id]="'allCompleted'"
+										(change)="selectAll($event, 'completed')"
+										#allCompletedCheckbox
+									/>
+									<p class="mb-0">Select All</p>
+								</div>
+								<button
+									[disabled]="!statusMapping?.completed?.isSelected"
+									class="btn btn-outline-primary px-3 py-2 w-auto"
+									(click)="exportBulk('completed')"
+								>
+									Export
+								</button>
+							</div>
+							<div
+								class="verification-container px-2 d-flex flex-column gap-2"
+								infinite-scroll
+								[infiniteScrollThrottle]="200"
+								[infiniteScrollDistance]="1"
+								[scrollWindow]="false"
+								(scrolled)="onScroll('completed')"
+								[alwaysCallback]="false"
+							>
+								<div>
+									<div
+										*ngFor="let item of completedVerificationList[0]?.rows"
+										class="verification-box rounded-3 shadow p-3 position-relative hand-cursor mb-4"
+										(click)="navigatesToCheck(item.id, item.name)"
+									>
+										<div class="d-flex gap-3">
+											<input
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[id]="item.id"
+												(click)="stopPropagation($event)"
+												(change)="singleSelect($event, item, 'completed')"
+												[checked]="item?.selected"
+											/>
+											<div>
+												<p class="fs-5 fw-bold mb-1">{{ item.name }}</p>
+												<p class="m-0">{{ item.client }}</p>
+											</div>
+										</div>
+
+										<div class="d-flex align-items-center mt-2 gap-2">
+											<img [src]="icon" [alt]="verificationName" />
+											<p class="m-0 fs-6 text-custom-black mt-1 fw-bold">
+												{{ verificationName }}
+											</p>
+										</div>
+
+										<div
+											class="mt-3 d-flex align-items-center btn-container justify-content-around"
+										>
+											<div class="d-flex align-items-center gap-2">
+												<img src="/assets/icons/verified-outline-custom.svg" alt="" />
+												<p class="fs-6 text-custom-black m-0 custom-primary-dark fw-bolder">
+													Verified
+												</p>
+											</div>
+											<div
+												*ngIf="
+													type == 'reference_check' ||
+													type == 'past_employment' ||
+													type == 'educational'
+												"
+												class="position-absolute top-0 right-0 view-icon"
+												(click)="viewCheckDetails($event, item.id)"
+											>
+												<iconify-icon
+													icon="material-symbols:info-outline"
+													class="text-primary"
+												></iconify-icon>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<ng-template #noDataForCompleted>
+						<!-- Content to show when count is 0 or the list is empty -->
+						<div class="status-tag">
+							<p class="text-primary">Completed</p>
+							<div>0</div>
+						</div>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,13 @@
+.ng-dropdown-panel .scroll-host {
+	overflow: hidden;
+	overflow-y: auto;
+	position: relative;
+	display: block;
+}
+.ng-dropdown-panel .ng-dropdown-panel-items {
+	display: block;
+	height: auto;
+	box-sizing: border-box;
+	max-height: 240px;
+	overflow-y: auto;
+}

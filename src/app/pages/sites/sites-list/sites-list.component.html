@@ -1,0 +1,269 @@
+<!-- <div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-primary fs-3 fw-bold">Locations</h2>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12 text-end py-2">
+			<button type="button" class="btn btn-primary w-100" (click)="add()">Add Locations</button>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="input-group flex-nowrap">
+				<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+					<mat-icon mat-list-icon>search</mat-icon>
+				</span>
+				<input
+					type="text"
+					class="form-control search-form-control bg-transparent"
+					placeholder="Search"
+					aria-label="search"
+					[ngModelOptions]="{ standalone: true }"
+					[(ngModel)]="searchTerm"
+					(keyup)="applyFilters()"
+				/>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="form-group">
+				<select
+					class="form-select bg-transparent text-capitalize"
+					aria-label="select example"
+					(change)="applyFilters()"
+					[(ngModel)]="statusFilter"
+				>
+					<option [value]="item.name" *ngFor="let item of statusList">
+						<span>{{ item.label }}</span>
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-12">
+			<button class="btn btn-outline-primary" (click)="exportBulk()">Export</button>
+			<button class="btn btn-outline-primary" (click)="openBulkUpload()">Upload</button>
+		</div>
+	</div> -->
+
+<!-- <ng-container *ngIf="dataList['count'] > 0">
+	<div class="mt-3" *ngIf="dataList['count'] > 0">
+		<div class="card card-sites shadow-color mb-4" *ngFor="let item of dataList['rows']">
+			<div class="card-body">
+				<div class="d-flex justify-content-between">
+					<h3 class="text-primary fs-5 fw-bold">{{ item.name }}</h3>
+					<div ngbDropdown container="body">
+						<span type="button" ngbDropdownToggle>
+							<mat-icon>more_vert</mat-icon>
+						</span>
+						<div ngbDropdownMenu>
+							<button ngbDropdownItem class="btn" (click)="edit(item)">Edit</button>
+							<button ngbDropdownItem class="btn text-capitalize" (click)="openConfirmStatus(item)">
+								<span *ngIf="item.status === defaultStatus.ACTIVE">{{ defaultStatus.INACTIVE }}</span>
+								<span *ngIf="item.status === defaultStatus.BLOCKED">{{ defaultStatus.ACTIVE }}</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-around g-2">
+					<div class="col-lg-4 col-md-4 col-sm-12">
+						<div class="d-flex mb-2">
+							<div class="flex-shrink-0">
+								<mat-icon mat-list-icon class="text-primary" svgIcon="web"></mat-icon>
+							</div>
+							<div class="flex-grow-1 ms-3">
+								<p class="text-primary">
+									{{ item?.website || '-' | truncate }}
+								</p>
+							</div>
+						</div>
+						<div class="d-flex mb-2">
+							<div class="flex-shrink-0">
+								<mat-icon mat-list-icon class="text-primary" svgIcon="mail"></mat-icon>
+							</div>
+							<div class="flex-grow-1 ms-3">
+								<p class="text-primary">{{ item?.email || '-' | truncate }}</p>
+							</div>
+						</div>
+						<div class="d-flex mb-2">
+							<div class="flex-shrink-0">
+								<mat-icon mat-list-icon class="text-primary" svgIcon="phone"></mat-icon>
+							</div>
+							<div class="flex-grow-1 ms-3">
+								<p class="text-primary">{{ item?.mobileNumber }}</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-4 col-sm-12">
+						<div class="d-flex">
+							<div class="flex-shrink-0">
+								<mat-icon mat-list-icon class="text-primary" svgIcon="address"></mat-icon>
+							</div>
+							<div class="flex-grow-1 ms-3">
+								<p class="text-primary mb-0">
+									{{ item?.addressLine1 }},
+									<span *ngIf="item?.addressLine2">{{ item?.addressLine2 }},</span>
+									{{ item?.city }}, {{ item?.state }}, {{ item?.countryName }}
+								</p>
+								<p class="text-primary mb-0">PIN: {{ item?.pincode }}</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-4 col-sm-12">
+						<div class="d-flex">
+							<div class="flex-shrink-0">
+								<mat-icon mat-list-icon class="text-primary" svgIcon="location"></mat-icon>
+							</div>
+							<div class="flex-grow-1 ms-3">
+								<p class="text-primary">
+									<a class="text-primary" role="button" (click)="addLocation(item)"
+										>Location On map</a
+									>
+								</p>
+								<p class="text-primary fs-5 fw-bold mb-0 text-capitalize">
+									{{ item?.region?.title }}
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="d-flex justify-content-center align-items-start w-100 p-3">
+		<ng-container>
+			<div
+				class="d-flex align-items-center previous-next-items text-primary"
+				role="button"
+				(click)="onPageChange(page - 1, 'prev')"
+				[ngClass]="{ 'text-primary-100': isPrevious() }"
+			>
+				<mat-icon mat-list-icon>arrow_back</mat-icon>
+				<span class="ps-1">Previous</span>
+			</div>
+		</ng-container>
+		<ngb-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event, null)"
+			[maxSize]="5"
+			[directionLinks]="false"
+		>
+		</ngb-pagination>
+		<ng-container>
+			<div
+				class="d-flex align-items-center previous-next-items text-primary"
+				role="button"
+				(click)="onPageChange(page + 1, 'next')"
+				[ngClass]="{ 'text-primary-100': isLastPage() }"
+			>
+				<span class="pe-1">Next</span>
+				<mat-icon mat-list-icon>arrow_forward</mat-icon>
+			</div>
+		</ng-container>
+	</div>
+</ng-container>
+<div class="card card-sites shadow-color mb-4" *ngIf="dataList['count'] === 0">
+	<div class="card-body text-center">
+		<h3 class="text-primary fs-5 fw-bold mb-0">{{ OPTIONS?.noRecord }}</h3>
+	</div>
+</div> -->
+<!-- </div> -->
+
+<ng-container>
+	<div class="table-responsive mt-3">
+		<table class="table table-hover table-striped">
+			<thead>
+				<tr>
+					<ng-container *ngFor="let item of headerColumn">
+						<th scope="col" *ngIf="item.sorting" [sortable]="item.value" (sort)="onSort($event)">
+							{{ item.label }}
+						</th>
+						<th scope="col" *ngIf="!item.sorting">
+							{{ item.label }}
+						</th>
+					</ng-container>
+				</tr>
+			</thead>
+			<tbody *ngIf="dataList['count'] > 0">
+				<tr *ngFor="let item of dataList['rows']">
+					<td class="text-capitalize text-wrap">
+						{{ item?.name | truncate }}
+					</td>
+					<td class="text-wrap">{{ item?.contactName || '-' | truncate }}</td>
+					<td>
+						<p class="mb-0">
+							{{ item?.addressLine1 }},
+							<span *ngIf="item?.addressLine2">{{ item?.addressLine2 }},</span>
+							{{ item?.city }}, {{ item?.state }}, {{ item?.countryName }}
+						</p>
+						<p class="mb-0">PIN: {{ item?.pincode }}</p>
+					</td>
+					<td>
+						<span class="" role="button" ngbTooltip="View Location on map" (click)="addLocation(item)">
+							<!-- <iconify-icon class="fs-5 text-custom-primary" icon="carbon:location"></iconify-icon> -->
+							<img src="assets/icons/marker-pin-02.svg" alt="..." />
+						</span>
+					</td>
+					<td>
+						{{ item?.email || '-' | truncate }}
+					</td>
+					<td>
+						{{ item?.website || '-' | truncate }}
+					</td>
+					<td>
+						{{ item?.mobileNumber }}
+					</td>
+					<td>
+						{{ item?.region.title }}
+					</td>
+					<td>
+						<div class="d-flex flex-row">
+							<span class="me-2" role="button" ngbTooltip="Edit" (click)="edit(item)">
+								<iconify-icon
+									class="fs-5 text-custom-black-50"
+									icon="iconamoon:edit-light"
+								></iconify-icon>
+							</span>
+							<span>
+								<div class="form-check form-switch">
+									<input
+										class="form-check-input"
+										[id]="item.id"
+										(change)="toggleCheck($event, item)"
+										type="checkbox"
+										role="switch"
+										[ngbTooltip]="item.status === defaultStatus.ACTIVE ? 'Block' : 'Active'"
+										[checked]="item.status === defaultStatus.ACTIVE"
+									/>
+								</div>
+							</span>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+			<tbody *ngIf="dataList['count'] === 0">
+				<tr>
+					<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="d-flex justify-content-end mt-2">
+		<button
+			class="btn btn-white border-primary bg-white d-flex align-items-center justify-content-center"
+			(click)="exportBulk()"
+		>
+			<iconify-icon class="fs-5 text-primary pe-1" icon="bi:download"></iconify-icon>
+			<span class="text-small fw-bold text-custom-primary-dark">Export</span>
+		</button>
+	</div>
+	<app-pagination
+		[collectionSize]="collectionSize"
+		[(page)]="page"
+		*ngIf="dataList['count'] > 0"
+		[pageSize]="pageSize"
+		(pageChange)="onPageChange($event)"
+		[maxSize]="5"
+	></app-pagination>
+</ng-container>

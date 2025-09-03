@@ -1,0 +1,216 @@
+<div>
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Request New Plan</span>
+			<span *ngIf="modelData">Update Requested Plan</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="d-flex align-items-center my-2">
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						formControlName="connectionType"
+						name="connectionType"
+						id="inlineRadio1"
+						[value]="connectionType.POST_PAID"
+					/>
+					<label class="form-check-label text-capitalize" for="inlineRadio1">PostPaid Plan</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						formControlName="connectionType"
+						name="connectionType"
+						id="inlineRadio2"
+						[value]="connectionType.PRE_PAID"
+					/>
+					<label class="form-check-label text-capitalize" for="inlineRadio2">PrePaid Plan</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Title</label>
+						<input type="text" class="form-control" id="title" placeholder="" formControlName="title" />
+						<div class="text-left" *ngFor="let error of errorMessages.title">
+							<ng-container
+								*ngIf="
+									form['title'].hasError(error.type) && (form['title'].dirty || form['title'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Description (Optional)</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="description"
+							placeholder=""
+							rows="4"
+							formControlName="description"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages.description">
+							<ng-container
+								*ngIf="
+									form['description'].hasError(error.type) &&
+									(form['description'].dirty || form['description'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div
+					class="col-lg-6 col-md-6 col-sm-12"
+					*ngIf="form['connectionType'].value === connectionType.PRE_PAID"
+				>
+					<div class="form-group">
+						<label class="form-label text-primary"> No. of Verifications*</label>
+						<input
+							type="number"
+							class="form-control"
+							id="noOfVerification"
+							placeholder=""
+							formControlName="noOfVerification"
+							(keypress)="numberOnly($event)"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.noOfVerification">
+							<ng-container
+								*ngIf="
+									form['noOfVerification'].hasError(error.type) &&
+									(form['noOfVerification'].dirty || form['noOfVerification'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- <div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Select Modules </label>
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="modulesList"
+							bindLabel="label"
+							bindValue="value"
+							formControlName="module"
+							placeholder=""
+							[dropdownPosition]="'bottom'"
+							[multiple]="true"
+							[closeOnSelect]="false"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							(add)="addModules($event)"
+							(remove)="removeModules($event)"
+							(clear)="clearAll()"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item.label }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{ item.label }}</span>
+									<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.module">
+							<ng-container
+								*ngIf="
+									form['module'].hasError(error.type) &&
+									(form['module'].dirty || form['module'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div> -->
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Plan features </label>
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="form['selectedPlanFeature']?.value"
+							groupBy="module"
+							bindLabel="label"
+							[multiple]="true"
+							[closeOnSelect]="false"
+							[dropdownPosition]="'top'"
+							formControlName="userPlanRequestFeature"
+						>
+							<ng-template ng-optgroup-tmp let-item="item" let-index="index">
+								{{ item.module.replace('_', ' ') }}
+							</ng-template>
+							<ng-template class="" ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+									(change)="removeItem($event, item$)"
+									[checked]="item$.checked"
+								/>
+								{{ item.label }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{ item.label }}</span>
+									<span class="ng-value-icon ps-2 text-danger" aria-hidden="true">,</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.userPlanRequestFeature">
+							<ng-container
+								*ngIf="
+									form['userPlanRequestFeature'].hasError(error.type) &&
+									(form['userPlanRequestFeature'].dirty || form['userPlanRequestFeature'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

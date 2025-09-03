@@ -1,0 +1,53 @@
+<div class="input-group mb-0 mobile-ng-select">
+	<ng-select
+		class="form-control text-capitalize px-1"
+		[ngClass]="{ 'bg-white-200': customClass }"
+		[items]="countryList"
+		bindLabel="countryCallingCode"
+		bindValue="countryCallingCode"
+		[formControl]="formControlCountryCode"
+		placeholder=""
+		[dropdownPosition]="'bottom'"
+		[searchable]="false"
+		(change)="checkMobileAndCountryCode()"
+		style="max-width: 60px"
+		[readonly]="true"
+	>
+		<ng-template ng-label-tmp let-item="item">
+			<span class="ps-1 text-custom-black text-uppercase">Ind</span>
+		</ng-template>
+		<ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
+			<span class="ps-1 text-custom-black text-uppercase">Ind</span>
+		</ng-template>
+	</ng-select>
+	<!-- <input type="text" class="form-control" placeholder="Mobile number" [formControl]="formControlCountryCode" readonly> -->
+	<input
+		type="text"
+		class="form-control"
+		[ngClass]="{ 'bg-white-200': customClass }"
+		placeholder="Mobile Number"
+		[formControl]="formControlMobileNumber"
+		(keypress)="numberOnly($event)"
+		style="border-left: none !important"
+		maxlength="10"
+	/>
+</div>
+<div class="text-left">
+	<ng-container
+		*ngIf="
+			!checkMobileAndCountryCode() && formControlMobileNumber.value && formControlMobileNumber.value.length > 0
+		"
+	>
+		<span class="text-danger">Please enter valid phone number</span>
+	</ng-container>
+	<ng-container *ngFor="let error of errorValidator">
+		<span
+			*ngIf="
+				formControlMobileNumber.hasError(error.type) &&
+				(formControlMobileNumber.dirty || formControlMobileNumber.touched)
+			"
+			class="text-danger"
+			>{{ error.message }}
+		</span>
+	</ng-container>
+</div>

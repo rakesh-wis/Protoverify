@@ -1,0 +1,36 @@
+<div class="p-2 verification-detail-modal-main">
+	<div class="modal-body">
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+		<div class="verification-detail-modal-text">
+			<h2 class="mb-0">{{verificationCheckDetailView?.employee?.name}}</h2>
+			<h4 class="mb-0">{{verificationCheckDetailView?.client}}</h4>
+			<p>({{verificationCheckDetailView?.maxUploadNumber}} {{keyDetails.name}} requested)</p>
+		</div>
+		<ul class="list-unstyled">
+			<li *ngFor = "let item of candidateOpenverificationCheck">
+				<div class="d-flex align-items-center mt-2 gap-2 verification-detail-item">
+					<p class="item-title mb-0">{{item.name}}</p>
+					<button class="btn btn-outline-primary rounded-pill"  [ngClass]="{'completed': item.label === 'Completed'}" (click)="view()">{{item.label}}</button>
+				</div>
+			</li>
+			<li *ngFor = "let item of opsOpenverificationCheck">
+				<div class="d-flex align-items-center mt-2 gap-2 verification-detail-item">
+					<p class="item-title mb-0">{{item.name}}</p>
+					<button class="btn btn-outline-primary rounded-pill" [ngClass]="{'completed': item.label === 'Completed'}"  (click)="view()">{{item.label}}</button>
+				</div>
+			</li>
+			<li *ngFor = "let item of vendorOpenverificationCheck">
+				<div class="d-flex align-items-center mt-2 gap-2 verification-detail-item">
+					<p class="item-title mb-0">{{item.name}}</p>
+					<button class="btn btn-outline-primary rounded-pill" [ngClass]="{'completed': item.label === 'Completed'}"  (click)="view()">{{item.label}}</button>
+				</div>
+			</li>
+			<li *ngFor = "let item of completedVerificationCheck">
+				<div class="d-flex align-items-center mt-2 gap-2 verification-detail-item">
+					<p class="item-title mb-0">{{item.name}}</p>
+					<button class="btn btn-outline-primary rounded-pill" [ngClass]="{'completed': item.label === 'Completed'}"  (click)="view()">{{item.label}}</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

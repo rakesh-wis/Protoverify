@@ -1,0 +1,121 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-6 col-md-6 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold mb-0">Wallet</h2>
+		</div>
+		<div
+			class="col-lg-3 col-md-4 col-sm-12 text-end mb-3"
+			*ngIf="userWallet?.walletType === connectionType.PRE_PAID"
+		>
+			<button type="button" class="btn btn-primary w-100" (click)="openRechargeWallet()">Top-up Wallet</button>
+		</div>
+	</div>
+	<div class="row m-2">
+		<ng-container *ngFor="let item of statsCards">
+			<div
+				class="card-group gx-2 col-md-6 col-sm-6 col-lg-3"
+				*ngIf="item?.walletType.includes(userWallet?.walletType)"
+			>
+				<div class="card border-0 shadow-color">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex flex-row align-items-center">
+								<div class="">
+									<img [src]="item?.icon" width="40" height="38" />
+								</div>
+								<div class="ms-2">
+									<label class="text-custom-black fw-bold fs-4 ms-1 my-2">
+										{{ item?.prefix }} {{ item?.value }}
+										<span class="fs-6" *ngIf="item?.suffix">({{ item?.suffix }})</span>
+									</label>
+									<p *ngIf="item?.type === 'text'" class="text-custom-black-50 fs-6">
+										{{ item?.label }}
+									</p>
+									<button
+										(click)="payBalanceAmount()"
+										*ngIf="item?.type === 'button' && userBill && userBill.status === 'pending'"
+										class="btn w-100 btn-sm btn-success"
+									>
+										{{ item?.label }}
+									</button>
+									<p
+										*ngIf="item?.type === 'button' && userBill && userBill.status !== 'pending'"
+										class="text-custom-black-50 fs-6"
+									>
+										Bill is {{ userBill?.status }}
+									</p>
+									<p *ngIf="item?.type === 'button' && !userBill" class="text-custom-black-50 fs-6">
+										No bill
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</ng-container>
+		<app-razorPay-payment
+			[hideButton]="true"
+			[amount]="dataForm.get('amount').value"
+			[notes]="dataForm.get('notes').value"
+			[triggerManually]="dataForm.get('triggerManually').value"
+			(paymentMade)="refresh($event)"
+		>
+		</app-razorPay-payment>
+	</div>
+
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th scope="col">Name</th>
+						<th scope="col">Date</th>
+						<th scope="col">Verification</th>
+						<th scope="col">Cost</th>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList?.rows">
+						<td class="text-capitalize text-wrap" role="button">
+							<p class="mb-0 fw-bold fs-7 text-primary-500">{{ item.name || '-' | truncate }}</p>
+							{{ item?.mobileNumber | truncate }}
+						</td>
+						<td class="text-capitalize text-wrap" role="button">
+							{{ item?.createdAt | date: 'dd MMM YYYY' }}
+						</td>
+						<td class="text-wrap">
+							<div class="d-flex flex-row mb-3 align-items-baseline">
+								<div
+									class="d-flex flex-column pe-1 justify-content-center align-items-start"
+									*ngFor="let verification of item?.employeeSubscription?.verificationChecks"
+									[ngbTooltip]="getVerificationTitle(verification)"
+								>
+									<img
+										[src]="VERIFICATION_BASE_URL + verification?.title + '.png'"
+										width="16"
+										height="16"
+									/>
+								</div>
+							</div>
+						</td>
+						<td>₹ {{ item?.employeeSubscription?.amountPerVerification }} + GST</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="6">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<app-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			*ngIf="dataList['count'] > 0"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event)"
+			[maxSize]="5"
+		></app-pagination>
+	</ng-container>
+</div>

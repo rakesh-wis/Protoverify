@@ -1,0 +1,82 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold">Subscriptions</h2>
+		</div>
+		<!-- <div
+			class="col-lg-3 col-md-4 col-sm-12 text-end"
+			*ngIf="dataList['count'] > 0"
+			routerLink="/getting-started/explore-plans"
+		>
+			<button type="button" class="btn btn-primary w-100">Upgrade Plan</button>
+		</div> -->
+	</div>
+
+	<div class="my-4">
+		<app-subscription-current></app-subscription-current>
+	</div>
+
+	<h2 class="text-custom-black fs-3 fw-bold">Purchase History</h2>
+
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<ng-container *ngFor="let item of headerColumn">
+							<th scope="col" *ngIf="item.sorting" [sortable]="item.value" (sort)="onSort($event)">
+								{{ item.label }}
+							</th>
+							<th scope="col" *ngIf="!item.sorting">
+								{{ item.label }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList['rows']">
+						<td class="text-capitalize text-wrap">
+							{{ item.title | truncate }}
+						</td>
+						<td class="text-wrap">{{ item?.createdAt | date: 'dd MMM YYYY' }}</td>
+						<td class="text-wrap">{{ item?.noOfVerification }}</td>
+						<td class="text-wrap">₹ {{ item?.amountPerVerification }}</td>
+						<td class="text-wrap">₹ {{ item?.totalAmount }}</td>
+						<td class="text-wrap">{{ item?.expiredAt | date: 'dd MMM YYYY' }}</td>
+						<td>
+							<span class="badge badge-success badge-table-status text-capitalize" *ngIf="item.isPaid">
+								paid
+							</span>
+							<span
+								type="button"
+								class="badge badge-warning badge-table-status text-capitalize"
+								*ngIf="!item.isPaid"
+								ngbTooltip="Mark as paid"
+							>
+								pending
+							</span>
+						</td>
+						<td>
+							<button *ngIf="!item.isPaid" class="btn btn-primary" (click)="selectPlan(item)">
+								Pay Now
+							</button>
+						</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<app-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			*ngIf="dataList['count'] > 0"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event)"
+			[maxSize]="5"
+		></app-pagination>
+	</ng-container>
+</div>

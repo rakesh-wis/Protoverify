@@ -1,0 +1,12 @@
+#planFeature {
+	ul {
+		list-style: none;
+		padding: 0;
+	}
+
+	ul li:before {
+		content: '✓';
+		color: green;
+		font-size: 22px;
+	}
+}

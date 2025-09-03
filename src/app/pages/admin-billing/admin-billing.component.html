@@ -1,0 +1,119 @@
+<div class="container-fluid page-padding">
+	<form [formGroup]="filterForm">
+		<div class="row align-items-center">
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label class="form-label text-custom-black">Search</label>
+					<div class="input-group flex-nowrap">
+						<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+							<mat-icon mat-list-icon class="text-custom-black-50">search</mat-icon>
+						</span>
+						<input
+							type="text"
+							class="form-control search-form-control bg-transparent"
+							placeholder="Search"
+							aria-label="search"
+							formControlName="search"
+						/>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label for="exampleFormControlInput1" class="form-label text-primary">Filter By client</label>
+					<ng-select
+						#select
+						class="form-control text-capitalize bg-primary-200"
+						[items]="organizationList"
+						bindLabel="registeredName"
+						bindValue="id"
+						[virtualScroll]="true"
+						[dropdownPosition]="'bottom'"
+						[clearable]="true"
+						[multiple]="true"
+						[minTermLength]="2"
+						[closeOnSelect]="false"
+						[searchable]="true"
+						[editableSearchTerm]="true"
+						formControlName="associateId"
+						appendTo="body"
+						(scrollToEnd)="onScrollClient()"
+						(add)="applyFilters()"
+						(remove)="applyFilters()"
+						(clear)="applyFilters(); getClientList()"
+						(search)="searchClient($event)"
+					>
+						<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+							<input
+								id="item-{{ index }}"
+								class="form-check-input"
+								type="checkbox"
+								[ngModel]="item$.selected"
+								[ngModelOptions]="{ standalone: true }"
+							/>
+							{{ item?.businessDetails?.registeredName || item?.name }}
+						</ng-template>
+						<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+							<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+								<span class="ng-value-label">{{
+									item?.businessDetails?.registeredName || item?.name
+								}}</span>
+								<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+							</div>
+							<div class="ng-value ps-2" *ngIf="items.length > 4">
+								<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+							</div>
+						</ng-template>
+					</ng-select>
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-3 col-sm-12 mt-3">
+				<button class="btn btn-outline-primary w-100" (click)="clearFilter()">Clear Filter</button>
+			</div>
+		</div>
+	</form>
+	<div class="tabs-locations mt-2">
+		<!-- <div class="card-body"> -->
+		<ul
+			ngbNav
+			#nav="ngbNav"
+			(navChange)="clearFilter()"
+			[(activeId)]="selectedTab"
+			class="nav-pills bg-primary-100 p-3"
+		>
+			<li ngbNavItem="invoice">
+				<a ngbNavLink routerLink="/admin-billing" fragment="invoice"> Invoice </a>
+				<ng-template ngbNavContent>
+					<app-admin-billing-client-invoice-list
+						[filters]="filterForm.value"
+					></app-admin-billing-client-invoice-list>
+				</ng-template>
+			</li>
+			<li ngbNavItem="billed-candidate" class="mx-4">
+				<a ngbNavLink routerLink="/admin-billing" fragment="billed-candidate">Billed Candidate</a>
+				<ng-template ngbNavContent>
+					<app-admin-billing-candidate-list
+						[filters]="filterForm.value"
+						[verificationStatus]="[verificationStatus.PROTO_VERIFIED]"
+					></app-admin-billing-candidate-list>
+				</ng-template>
+			</li>
+			<li ngbNavItem="un-billed-candidate" class="mx-4">
+				<a ngbNavLink routerLink="/admin-billing" fragment="un-billed-candidate">Unbilled Candidate</a>
+				<ng-template ngbNavContent>
+					<app-admin-billing-candidate-list
+						[filters]="filterForm.value"
+						[verificationStatus]="[
+							verificationStatus.DID_NOT_VERIFY,
+							verificationStatus.PARTIALLY_VERIFIED
+						]"
+					></app-admin-billing-candidate-list>
+				</ng-template>
+			</li>
+		</ul>
+
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
+		<!-- </div>
+	</div> -->
+	</div>
+</div>

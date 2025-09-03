@@ -1,0 +1,260 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Create Requested plan</span>
+			<span *ngIf="modelData">Approve Plan Requested</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-5 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Request Date</label>
+						<input
+							type="date"
+							readonly
+							class="form-control"
+							id="createdAt"
+							placeholder=""
+							formControlName="createdAt"
+						/>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Title</label>
+						<input type="text" class="form-control" id="title" placeholder="" formControlName="title" />
+						<div class="text-left" *ngFor="let error of errorMessages.title">
+							<ng-container
+								*ngIf="
+									form['title'].hasError(error.type) && (form['title'].dirty || form['title'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Description (Optional)</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="description"
+							placeholder=""
+							rows="4"
+							formControlName="description"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages.description">
+							<ng-container
+								*ngIf="
+									form['description'].hasError(error.type) &&
+									(form['description'].dirty || form['description'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 mb-3" *ngIf="modelData.status.value === defaultStatus.PENDING">
+					<div class="form-group">
+						<label class="form-label text-primary"> Select Modules </label>
+						<!-- <select class="form-select text-capitalize" aria-label="select module" formControlName="module">
+							<option value="" selected disabled hidden>Select Modules</option>
+							<option [value]="item.value" *ngFor="let item of modulesList">
+								<span>{{ item.label }}</span>
+							</option>
+						</select> -->
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="modulesList"
+							bindLabel="label"
+							bindValue="value"
+							formControlName="module"
+							placeholder=""
+							[dropdownPosition]="'bottom'"
+							[multiple]="true"
+							[closeOnSelect]="false"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							(add)="addModules($event)"
+							(remove)="removeModules($event)"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item.label }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{ item.label }}</span>
+									<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.module">
+							<ng-container
+								*ngIf="
+									form['module'].hasError(error.type) &&
+									(form['module'].dirty || form['module'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Plan features*</label>
+						<div class="table-responsive table-plan-feature">
+							<table class="table table-bordered border-black">
+								<tbody>
+									<tr *ngFor="let item$ of form['selectedPlanFeature'].value; let index">
+										<td>
+											<input
+												id="item-{{ index }}"
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[(ngModel)]="item$.selected"
+												[ngModelOptions]="{ standalone: true }"
+												(change)="removeItem($event, item$)"
+												[checked]="item$.checked"
+											/>
+										</td>
+										<td>
+											{{ item$.label }}
+										</td>
+										<td class="text-center">
+											<input
+												type="number"
+												class="form-control"
+												id="item-price-{{ index }}"
+												placeholder="Enter Cost"
+												[(ngModel)]="item$.price"
+												[ngModelOptions]="{ standalone: true }"
+												(input)="onPriceChange()"
+												(keypress)="numberOnly($event)"
+												[disabled]="!item$.selected"
+											/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.userPlanRequestFeature">
+							<ng-container
+								*ngIf="
+									form['userPlanRequestFeature'].hasError(error.type) &&
+									(form['userPlanRequestFeature'].dirty || form['userPlanRequestFeature'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row gx-2">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary text-transform-none"> Cost per verification*</label>
+						<input
+							type="number"
+							class="form-control"
+							id="amountPerVerification"
+							placeholder=""
+							formControlName="amountPerVerification"
+							(input)="onPriceChange()"
+							(keypress)="numberOnly($event)"
+							readonly
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.amountPerVerification">
+							<ng-container
+								*ngIf="
+									form['amountPerVerification'].hasError(error.type) &&
+									(form['amountPerVerification'].dirty || form['amountPerVerification'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div
+					class="col-lg-6 col-md-6 col-sm-12"
+					*ngIf="form['connectionType'].value === connectionType.PRE_PAID"
+				>
+					<div class="form-group">
+						<label class="form-label text-primary"> No. of Verifications*</label>
+						<input
+							type="number"
+							class="form-control"
+							id="noOfVerification"
+							placeholder=""
+							formControlName="noOfVerification"
+							(input)="onPriceChange()"
+							(keypress)="numberOnly($event)"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.noOfVerification">
+							<ng-container
+								*ngIf="
+									form['noOfVerification'].hasError(error.type) &&
+									(form['noOfVerification'].dirty || form['noOfVerification'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row gx-2" *ngIf="form['connectionType'].value === connectionType.PRE_PAID">
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Total Amount</label>
+						<input
+							type="number"
+							class="form-control"
+							id="totalAmount"
+							placeholder=""
+							formControlName="totalAmount"
+							readonly
+						/>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-primary ms-4"
+			(click)="onSubmit()"
+			*ngIf="form['status'].value === defaultStatus.PENDING"
+		>
+			Approve
+		</button>
+	</div>
+</div>

@@ -1,0 +1,38 @@
+<div class="container-fluid page-padding">
+	<div class="d-flex justify-content-start py-3">
+		<h1 class="text-custom-black fs-3 fw-bold">Business KYC</h1>
+	</div>
+	<div class="card">
+		<div class="card-body">
+			<div class="clearfix">
+				<h2 class="text-custom-black">Business Details</h2>
+			</div>
+			<div class="row">
+				<app-business-details
+					[canGoBack]="true"
+					[userId]="userId"
+					[canEdit]="true"
+					[showCancel]="false"
+				></app-business-details>
+
+				<!-- <hr class="my-4" />
+
+				<app-business-documents
+					[userId]="userId"
+					[canEdit]="true"
+					[canVerify]="true"
+					[showCancel]="false"
+				></app-business-documents>
+
+				<hr class="my-4" />
+
+				<app-business-address
+					[userId]="userId"
+					[canEdit]="true"
+					[canVerify]="true"
+					[showCancel]="false"
+				></app-business-address> -->
+			</div>
+		</div>
+	</div>
+</div>

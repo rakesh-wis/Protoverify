@@ -1,0 +1,135 @@
+<!-- <div class="container-fluid">
+	<div class="card plan-card shadow-color">
+		<div class="card-body">
+			<div class="row">
+				<div class="card-group col-lg-4 col-md-5 col-sm-12"
+					*ngFor="let item of dataList['rows']; let i = index">
+					<div class="card plan-card-top-border mb-4 border" [ngClass]="{
+							'border-green': item.planFeature.length >= 13,
+							'border-blue': item.planFeature.length >= 6 && item.planFeature.length < 13,
+							'border-yellow': item.planFeature.length < 6
+						}">
+						<div class="plan-banner">
+							<img [src]="'assets/images/plan-banner-' + getColor(item) + '.svg'" />
+						</div>
+
+						<div class="card-body px-4">
+							<div class="ps-5">
+								<div class="d-flex justify-content-between align-items-center mb-2">
+									<h3 class="text-custom-black text-capitalize fs-5 fw-bolder mb-0">
+										{{ item.title }}
+									</h3>
+									<div class="d-flex justify-content-between align-items-center">
+										<div ngbDropdown container="body">
+											<span type="button" ngbDropdownToggle>
+												<mat-icon class="text-custom-black-50">more_vert</mat-icon>
+											</span>
+											<div ngbDropdownMenu>
+												<button ngbDropdownItem class="btn" (click)="edit(item)"
+													*appIsGranted="'EDIT'">
+													Edit
+												</button>
+												<button ngbDropdownItem class="btn text-danger"
+													(click)="openConfirmDelete(item)" *appIsGranted="'DELETE'">
+													Delete
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<p class="text-custom-black-50">{{ item?.description }}</p>
+							</div>
+
+							<div class="d-flex align-items-center mb-4 plan-features"
+								*ngFor="let feature of item.planFeature.slice(0, 3)">
+								<div class="">
+									<iconify-icon class="check-box-icon" icon="subway:tick" [ngClass]="{
+											'check-green': item.planFeature.length >= 13,
+											'check-blue': item.planFeature.length >= 6 && item.planFeature.length < 13,
+											'check-yellow': item.planFeature.length < 6
+										}"></iconify-icon>
+								</div>
+								<p class="text-custom-black-50 text-capitalize mb-1 ps-3">
+									{{ getPlanTitle(feature)?.label }}
+								</p>
+							</div>
+							<div class="d-flex justify-content-center align-items-center plan-features">
+								<a [ngClass]="{
+										'view-green': item.planFeature.length >= 13,
+										'view-blue': item.planFeature.length >= 6 && item.planFeature.length < 13,
+										'view-yellow': item.planFeature.length < 6
+									}" role="button" class="text-underline" (click)="view(item)">
+									<span> View All </span>
+								</a>
+							</div>
+						</div>
+
+						<div class="card-footer border-0 bg-transparent">
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon [class]="'btn-plan bg-' + getColor(item) + '-total-amount'"
+												icon="material-symbols:currency-rupee"></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Total Amount</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold"> ₹ {{ item?.totalAmount }} </label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon
+												[class]="'btn-plan bg-' + getColor(item) + '-cost-verification'"
+												icon="icon-park-outline:database-position"></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Cost per Verification</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold">
+												₹ {{ item?.amountPerVerification }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon
+												[class]="'btn-plan bg-' + getColor(item) + '-num-verification'"
+												icon="mdi:tick-circle-outline"></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Number of Verifications</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold">
+												{{ item?.noOfVerification }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-footer border-0 bg-transparent pb-4">
+			<div class="d-flex justify-content-center" *ngIf="collectionSize > dataList.rows.length">
+				<label class="text-primary fs-5" role="button" (click)="onPageChange()"> View all plans</label>
+			</div>
+		</div>
+	</div>
+</div> -->

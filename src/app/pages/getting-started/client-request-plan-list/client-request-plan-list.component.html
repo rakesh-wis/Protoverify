@@ -1,0 +1,148 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-4 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold">Requested Plans</h2>
+		</div>
+	</div>
+	<!-- <div class="clearfix">
+		<div class="row">
+			<div class="card-group col-lg-5 col-md-5 col-sm-12" *ngFor="let item of dataList['rows']">
+				<div class="card card-sites shadow-color mb-4">
+					<div class="card-body">
+						<div class="d-flex justify-content-between">
+							<h3 class="text-primary text-capitalize fs-5 fw-bold">
+								{{ item.title }}
+							</h3>
+							<div ngbDropdown container="body">
+								<span type="button" ngbDropdownToggle>
+									<mat-icon>more_vert</mat-icon>
+								</span>
+								<div ngbDropdownMenu>
+									<button ngbDropdownItem class="btn" (click)="edit(item)">Edit</button>
+									<button ngbDropdownItem class="btn text-danger" (click)="openConfirmDelete(item)">
+										Delete
+									</button>
+								</div>
+							</div>
+						</div>
+						<div
+							class="d-flex align-items-center mb-4"
+							*ngFor="let feature of item?.userPlanRequestFeature"
+						>
+							<mat-icon class="text-success">check</mat-icon>
+							<p class="text-primary text-capitalize mb-0 ps-1">
+								{{ getPlanTitle(feature)?.label }}
+							</p>
+						</div>
+					</div>
+					<div class="card-footer bg-transparent border-0 text-center">
+						<button
+							class="btn text-capitalize"
+							[ngClass]="{
+								'btn-outline-primary': item.status === defaultStatus.PENDING,
+								'btn-outline-danger': item.status === defaultStatus.REJECTED
+							}"
+						>
+							{{ item.status }}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex justify-content-center mt-3" *ngIf="collectionSize > dataList.rows.length">
+			<label class="text-primary fs-5"> View all plans</label>
+		</div>
+
+		<div class="card card-sites shadow-color mb-4" *ngIf="dataList['rows'].length === 0">
+			<div class="card-body text-center">
+				<h3 class="text-primary fs-5 fw-bold">No plan requested</h3>
+			</div>
+		</div>
+	</div> -->
+	<div class="card plan-card shadow-color mt-2">
+		<div class="card-body">
+			<div class="row">
+				<div class="card-group col-lg-4 col-md-5 col-sm-12" *ngFor="let item of dataList['rows']">
+					<div
+						class="card plan-card-top-border mb-4 border"
+						[ngClass]="{
+							'border-green': item.userPlanRequestFeature.length >= 13,
+							'border-blue':
+								item.userPlanRequestFeature.length >= 6 && item.userPlanRequestFeature.length < 13,
+							'border-yellow': item.userPlanRequestFeature.length < 6
+						}"
+					>
+						<div class="plan-banner">
+							<img [src]="'assets/images/plan-banner-' + getColor(item) + '.svg'" />
+						</div>
+
+						<div class="card-body px-4">
+							<div class="ps-5">
+								<div class="d-flex justify-content-between align-items-center mb-2">
+									<h3 class="text-custom-black text-capitalize fs-5 fw-bolder mb-0">
+										{{ item.title }}
+									</h3>
+								</div>
+								<p class="text-custom-black-50">{{ item?.description }}</p>
+							</div>
+
+							<div
+								class="d-flex align-items-center mb-4 plan-features"
+								*ngFor="let feature of item.userPlanRequestFeature.slice(0, 3)"
+							>
+								<div class="">
+									<iconify-icon
+										class="check-box-icon"
+										icon="subway:tick"
+										[ngClass]="{
+											'check-green': item.userPlanRequestFeature.length >= 13,
+											'check-blue':
+												item.userPlanRequestFeature.length >= 6 &&
+												item.userPlanRequestFeature.length < 13,
+											'check-yellow': item.userPlanRequestFeature.length < 6
+										}"
+									></iconify-icon>
+								</div>
+								<p class="text-custom-black-50 text-capitalize mb-1 ps-3">
+									{{ getPlanTitle(feature)?.label }}
+								</p>
+							</div>
+							<!-- <div class="d-flex justify-content-center align-items-center plan-features">
+								<a
+									[ngClass]="{
+										'view-green': item.userPlanRequestFeature.length >= 13,
+										'view-blue':
+											item.userPlanRequestFeature.length >= 6 &&
+											item.userPlanRequestFeature.length < 13,
+										'view-yellow': item.userPlanRequestFeature.length < 6
+									}"
+									role="button"
+									class="text-underline"
+									(click)="view(item)"
+								>
+									<span> View All </span>
+								</a>
+							</div> -->
+						</div>
+						<div class="px-4">
+							<hr class="text-custom-black-50" />
+						</div>
+						<div class="card-footer border-0 text-center bg-transparent">
+							<h2 class="text-primary" *ngIf="item.status === defaultStatus.PENDING">Requested</h2>
+							<h2 class="text-danger" *ngIf="item.status === defaultStatus.REJECTED">Rejected</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="text-center" *ngIf="collectionSize < 1">
+				<h3 class="text-primary fs-5 fw-bold mb-0">No plan request</h3>
+			</div>
+		</div>
+		<div class="card-footer border-0 bg-transparent pb-4">
+			<div class="d-flex justify-content-center" *ngIf="collectionSize > dataList.rows.length">
+				<label class="text-primary fs-5" role="button" (click)="onPageChange()"> View all plans</label>
+			</div>
+		</div>
+	</div>
+</div>

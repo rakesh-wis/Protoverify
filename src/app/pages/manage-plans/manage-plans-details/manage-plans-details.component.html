@@ -1,0 +1,399 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Create New Plan</span>
+			<span *ngIf="modelData">Update Plan</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Title*</label>
+						<input type="text" class="form-control" id="title" placeholder="" formControlName="title" />
+						<div class="text-left" *ngFor="let error of errorMessages.title">
+							<ng-container
+								*ngIf="
+									form['title'].hasError(error.type) && (form['title'].dirty || form['title'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Description (Optional)</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="description"
+							placeholder=""
+							rows="4"
+							formControlName="description"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages.description">
+							<ng-container
+								*ngIf="
+									form['description'].hasError(error.type) &&
+									(form['description'].dirty || form['description'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Plan Type </label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select example"
+							formControlName="planType"
+							(change)="checkPlanType()"
+						>
+							<option [value]="item" *ngFor="let item of planType" [disabled]="form['id'].value">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.planType">
+							<ng-container
+								*ngIf="
+									form['planType'].hasError(error.type) &&
+									(form['planType'].dirty || form['planType'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Select Modules* </label>
+						<!-- <select class="form-select text-capitalize" aria-label="select module" formControlName="module">
+															<option value="" selected disabled hidden>Select Modules</option>
+															<option [value]="item.value" *ngFor="let item of modulesList">
+																<span>{{ item.label }}</span>
+															</option>
+														</select> -->
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="modulesList"
+							bindLabel="label"
+							bindValue="value"
+							formControlName="module"
+							placeholder=""
+							[dropdownPosition]="'bottom'"
+							[multiple]="true"
+							[closeOnSelect]="false"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							(add)="addModules($event)"
+							(remove)="removeModules($event)"
+							(clear)="clearAll()"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item.label }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{ item.label }}</span>
+									<!-- <span class="ng-value-icon ps-2" aria-hidden="true">,</span> -->
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.module">
+							<ng-container
+								*ngIf="
+									form['module'].hasError(error.type) &&
+									(form['module'].dirty || form['module'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" *ngIf="form['planType'].value != 'standard'">
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Select Client*</label>
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="organizationList"
+							[virtualScroll]="true"
+							[multiple]="false"
+							bindLabel="registeredName"
+							bindValue="id"
+							formControlName="userPlan"
+							[dropdownPosition]="'top'"
+							[searchable]="true"
+							[closeOnSelect]="false"
+							[searchable]="true"
+							[editableSearchTerm]="false"
+							(scrollToEnd)="onScrollClient()"
+							(add)="applyFilters()"
+							(remove)="applyFilters()"
+							(clear)="applyFilters()"
+							(search)="searchClient($event)"
+							[readonly]="form['id'].value"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item?.businessDetails?.registeredName || item?.name }}
+							</ng-template>
+							<ng-template
+								ng-label-tmp
+								let-item="item"
+								let-item$="item$"
+								let-index="index"
+								let-clear="clear"
+							>
+								<!-- <div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4"> -->
+								<span class="ng-value-label">{{
+									item?.businessDetails?.registeredName || item?.name
+								}}</span>
+								<span class="ng-value-icon ps-2 text-danger" aria-hidden="true">×</span>
+								<!-- </div> -->
+								<!-- <div class="ng-value ps-2" *ngIf="items.length > 4">
+																	<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+																</div> -->
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.userPlan">
+							<ng-container
+								*ngIf="
+									form['userPlan'].hasError(error.type) &&
+									(form['userPlan'].dirty || form['userPlan'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="d-flex align-items-center my-2">
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						formControlName="connectionType"
+						name="connectionType"
+						id="inlineRadio1"
+						[value]="connectionType.POST_PAID"
+					/>
+					<label class="form-check-label text-capitalize" for="inlineRadio1">Postpaid Plan</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						formControlName="connectionType"
+						name="connectionType"
+						id="inlineRadio2"
+						[value]="connectionType.PRE_PAID"
+					/>
+					<label class="form-check-label text-capitalize" for="inlineRadio2">Prepaid Plan</label>
+				</div>
+			</div>
+
+			<!-- <div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Plan features*</label>
+						<ng-select class="form-control text-capitalize" [items]="form['selectedPlanFeature'].value"
+							groupBy="module" bindLabel="label" [multiple]="true" [searchable]="false"
+							[closeOnSelect]="false" [dropdownPosition]="'top'" formControlName="planFeature">
+							<ng-template ng-optgroup-tmp let-item="item" let-index="index">
+								{{ item.module.replace('_', ' ') }}
+							</ng-template>
+							<ng-template class="" ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input id="item-{{ index }}" class="form-check-input" type="checkbox"
+									[ngModel]="item$.selected" [ngModelOptions]="{ standalone: true }"
+									(change)="removeItem($event, item$)" [checked]="item$.checked" />
+								{{ item.label }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{ item.label }}</span>
+									<span class="ng-value-icon ps-2 text-danger" aria-hidden="true">,</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="d-flex gap-1 flex-wrap mt-1">
+							<div class="planVerificationItem" *ngFor="let item of form['planFeature'].value">
+								<span class="text-wrap text-capitalize">
+									{{ item.label.replaceAll('_', ' ') }}
+								</span>
+							</div>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.planFeature">
+							<ng-container *ngIf="
+									form['planFeature'].hasError(error.type) &&
+									(form['planFeature'].dirty || form['planFeature'].touched)
+								">
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div> -->
+
+			<div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Plan features*</label>
+						<div class="table-responsive table-plan-feature">
+							<table class="table table-bordered border-black">
+								<tbody>
+									<tr *ngFor="let item$ of form['selectedPlanFeature'].value; let index">
+										<td>
+											<input
+												id="item-{{ index }}"
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[(ngModel)]="item$.selected"
+												[ngModelOptions]="{ standalone: true }"
+												(change)="removeItem($event, item$)"
+												[checked]="item$.checked"
+											/>
+										</td>
+										<td>
+											{{ item$.label }}
+										</td>
+										<td class="text-center">
+											<input
+												type="number"
+												class="form-control"
+												id="item-price-{{ index }}"
+												placeholder="Enter Cost"
+												[(ngModel)]="item$.price"
+												[ngModelOptions]="{ standalone: true }"
+												(input)="onPriceChange()"
+												(keypress)="numberOnly($event)"
+												[disabled]="!item$.selected"
+											/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.planFeature">
+							<ng-container
+								*ngIf="
+									form['planFeature'].hasError(error.type) &&
+									(form['planFeature'].dirty || form['planFeature'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row gx-2">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary text-transform-none"> Cost per verification*</label>
+						<input
+							type="number"
+							class="form-control"
+							id="amountPerVerification"
+							placeholder=""
+							formControlName="amountPerVerification"
+							(input)="onPriceChange()"
+							(keypress)="numberOnly($event)"
+							readonly
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.amountPerVerification">
+							<ng-container
+								*ngIf="
+									form['amountPerVerification'].hasError(error.type) &&
+									(form['amountPerVerification'].dirty || form['amountPerVerification'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div
+					class="col-lg-6 col-md-6 col-sm-12"
+					*ngIf="form['connectionType'].value === connectionType.PRE_PAID"
+				>
+					<div class="form-group">
+						<label class="form-label text-primary"> No. of Verifications*</label>
+						<input
+							type="number"
+							class="form-control"
+							id="noOfVerification"
+							placeholder=""
+							formControlName="noOfVerification"
+							(input)="onPriceChange()"
+							(keypress)="numberOnly($event)"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.noOfVerification">
+							<ng-container
+								*ngIf="
+									form['noOfVerification'].hasError(error.type) &&
+									(form['noOfVerification'].dirty || form['noOfVerification'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row gx-2" *ngIf="form['connectionType'].value === connectionType.PRE_PAID">
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Total Amount</label>
+						<input
+							type="number"
+							class="form-control"
+							id="totalAmount"
+							placeholder=""
+							formControlName="totalAmount"
+							readonly
+						/>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

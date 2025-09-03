@@ -1,0 +1,18 @@
+<div class="text-start my-3 mx-2">
+	<img src="assets/images/sidebar-logo-black.svg" class="img-fluid" width="160" />
+</div>
+<div class="row justify-content-center pt-5 mt-3 align-items-center">
+	<div class="col-10 text-center auth-slider">
+		<ngb-carousel>
+			<ng-template ngbSlide *ngFor="let item of dataList">
+				<div class="picsum-img-wrapper">
+					<img [src]="item?.image" class="img-fluid" width="840" height="540" alt="Random first slide" />
+				</div>
+			</ng-template>
+		</ngb-carousel>
+	</div>
+</div>
+<div class="d-flex flex-column justify-content-center text-center mt-5">
+	<label class="text-custom-black fs-3 mb-3 fw-bold">{{ dataList[0]?.title }}</label>
+	<p class="text-custom-black-50">{{ dataList[0]?.description }}</p>
+</div>

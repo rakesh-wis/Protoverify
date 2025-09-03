@@ -1,0 +1,17 @@
+<div class="card border-0 shadow-color" style="height: 386px; max-height: 100%">
+	<div class="card-body">
+		<label class="text-custom-primary-dark fw-bold fs-6"> Applicant Status </label>
+		<p class="text-custom-primary-dark opacity-90">Last 7 days activity records</p>
+
+		<ng-container *ngIf="chartData.length > 0">
+			<app-graph
+				[chartType]="'doughnut'"
+				[chartLabels]="chartLabels"
+				[chartDataSets]="chartData"
+				[chartOptions]="chartOptions"
+			></app-graph>
+		</ng-container>
+
+		<p *ngIf="chartData.length === 0">{{ OPTIONS?.noRecord }}</p>
+	</div>
+</div>

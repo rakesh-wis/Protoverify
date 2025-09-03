@@ -1,0 +1,28 @@
+.ng-dropdown-panel .scroll-host {
+	overflow: hidden;
+	overflow-y: auto;
+	position: relative;
+	display: block;
+}
+.ng-dropdown-panel .ng-dropdown-panel-items {
+	display: block;
+	height: auto;
+	box-sizing: border-box;
+	max-height: 240px;
+	overflow-y: auto;
+}
+.disabled {
+	cursor: none;
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.faded-checks {
+	opacity: 0.6;
+}
+
+.unclickable {
+	cursor: none;
+	opacity: 0.5;
+	pointer-events: none;
+}

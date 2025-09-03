@@ -1,0 +1,29 @@
+<ng-container *ngIf="chartData.length > 0">
+	<div class="card border-0 shadow-color">
+		<div class="card-body">
+			<div class="d-flex justify-content-between">
+				<label class="text-custom-primary-dark fw-bold fs-6"> Applicant Records </label>
+				<div class="form-group">
+					<select
+						name="selectedYearChart"
+						id="selectedYearChart"
+						class="form-select text-capitalize"
+						aria-label="change year"
+						[(ngModel)]="selectedYearChart"
+						(change)="getVerificationAnalysis()"
+					>
+						<option [value]="item.value" *ngFor="let item of yearList; let i = index" [hidden]="!item">
+							{{ item?.label }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<app-graph
+				[chartType]="'bar'"
+				[chartLabels]="chartLabels"
+				[chartDataSets]="chartData"
+				[chartOptions]="chartOptions"
+			></app-graph>
+		</div>
+	</div>
+</ng-container>

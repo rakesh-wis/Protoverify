@@ -1,0 +1,45 @@
+<div>
+	<div class="row" *ngIf="!isForView">
+		<div class="col-12 mb-3">
+			<div class="input-group flex-nowrap">
+				<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+					<mat-icon mat-list-icon class="text-primary">search</mat-icon>
+				</span>
+				<input
+					class="form-control search-form-control bg-transparent"
+					(keydown.enter)="$event.preventDefault()"
+					placeholder="Search Location"
+					autocorrect="off"
+					autocapitalize="off"
+					spellcheck="off"
+					type="text"
+					#locationSearch
+				/>
+			</div>
+		</div>
+	</div>
+
+	<google-map
+		[center]="{ lat: markers?.latitude, lng: markers?.longitude }"
+		[zoom]="zoom"
+		[options]="{ fullscreenControl: true, mapTypeControl: false }"
+		(mapClick)="markerDragEnd($event)"
+		(idle)="onMapReady($event)"
+		height="400px"
+		width="100%"
+	>
+		<map-marker
+			[position]="{ lat: markers.latitude, lng: markers.longitude }"
+			[options]="{ draggable: markerDraggable }"
+			(mapDragend)="markerDragEnd($event)"
+		></map-marker>
+
+		<ng-container *ngIf="drawingOptions && drawingOptions?.circleOptions?.center">
+			<map-circle
+				[center]="{ lat: markers.latitude, lng: markers.longitude }"
+				[radius]="drawingOptions.circleOptions.radius"
+				[options]="drawingOptions.circleOptions"
+			></map-circle>
+		</ng-container>
+	</google-map>
+</div>

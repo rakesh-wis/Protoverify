@@ -1,0 +1,50 @@
+<form [formGroup]="dateForm">
+	<div *ngIf="isRangePicker">
+		<mat-form-field class="form-material-control bg-transparent px-1 w-100">
+			<mat-date-range-input [rangePicker]="picker">
+				<input
+					matStartDate
+					[placeholder]="dateForm.get('startDate').value ? '' : 'From date'"
+					formControlName="startDate"
+					disabled
+				/>
+				<input
+					matEndDate
+					[placeholder]="dateForm.get('endDate').value ? '' : 'End date'"
+					formControlName="endDate"
+					disabled
+				/>
+			</mat-date-range-input>
+			<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+			<mat-date-range-picker #picker disabled="false">
+				<mat-date-range-picker-actions>
+					<button class="btn" matDateRangePickerCancel>Cancel</button>
+					<button class="btn btn-primary w-25" matDateRangePickerApply (click)="setDate(picker)">
+						Apply
+					</button>
+				</mat-date-range-picker-actions>
+			</mat-date-range-picker>
+		</mat-form-field>
+	</div>
+	<div *ngIf="!isRangePicker">
+		<mat-form-field class="form-material-control bg-transparent px-1 w-100">
+			<input
+				matInput
+				[placeholder]="dateForm.get('selectedDate').value ? '' : 'Select date'"
+				[matDatepicker]="datepicker"
+				formControlName="selectedDate"
+				disabled
+				[max]="maxDate"
+			/>
+			<mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+			<mat-datepicker #datepicker disabled="false">
+				<mat-datepicker-actions>
+					<button mat-button matDatepickerCancel>Cancel</button>
+					<button class="btn btn-primary w-25" matDateRangePickerApply (click)="setDate(datepicker)">
+						Apply
+					</button>
+				</mat-datepicker-actions>
+			</mat-datepicker>
+		</mat-form-field>
+	</div>
+</form>

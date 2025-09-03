@@ -1,0 +1,125 @@
+<div class="my-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0 text-align-left" id="modal-basic-title">
+			<!-- <span>Add Vendor</span> -->
+
+			<span *ngIf="!modelData">Add Vendor</span>
+			<span *ngIf="modelData">Update Vendor</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Company Name*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="companyName"
+							placeholder="Enter"
+							formControlName="companyName"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.companyName">
+							<ng-container
+								*ngIf="
+									form['companyName'].hasError(error.type) &&
+									(form['companyName'].dirty || form['companyName'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Name*</label>
+						<input type="text" class="form-control" id="name" placeholder="Enter" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									form['name'].hasError(error.type) && (form['name'].dirty || form['name'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label for="exampleFormControlInput1" class="form-label text-custom-black">
+							Email address*
+						</label>
+						<input
+							type="email"
+							class="form-control bg-white-200"
+							id="email"
+							placeholder="Enter"
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									form['email'].hasError(error.type) && (form['email'].dirty || form['email'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Mobile Number*</label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages?.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+							placeholder="Enter"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Enter Designation*</label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="Select designation"
+							formControlName="designation"
+							aria-placeholder="Select designation"
+						>
+							<option [value]="item.value" *ngFor="let item of designationList">
+								<span>{{ item.label }}</span>
+							</option>
+						</select>
+
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['designation'].hasError(error.type) &&
+									(form['designation'].dirty || form['designation'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Save</button>
+	</div>
+</div>

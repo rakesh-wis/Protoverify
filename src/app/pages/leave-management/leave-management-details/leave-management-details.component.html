@@ -1,0 +1,100 @@
+<div class="container-fluid page-padding">
+	<label class="text-primary fs-4 fw-bold"> {{ leaveRequestData?.user?.name }} leave application </label>
+
+	<div class="card mt-4">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">Employee name</h3>
+						<span class="form-label text-primary">
+							{{ leaveRequestData?.user?.name || '-' }}
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">Leave type</h3>
+						<span class="form-label text-primary text-capitalize">
+							{{ leaveRequestData?.leaveType.replace('_', ' ') }}
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-4 col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">No of days</h3>
+						<span class="form-label text-primary">
+							{{ leaveRequestData?.leaveDays }}
+						</span>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">Day type</h3>
+						<span class="form-label text-primary">
+							{{ leaveRequestData?.dayType.replace('_', ' ') }}
+						</span>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">From</h3>
+						<span class="form-label text-primary">
+							{{ leaveRequestData?.fromDate | date: 'dd MMMM y' }}
+						</span>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">To</h3>
+						<span class="form-label text-primary">
+							{{ leaveRequestData?.toDate | date: 'dd MMMM y' }}
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">Reason for leave</h3>
+						<p class="form-label text-primary">
+							{{ leaveRequestData?.message || 'No reason' }}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 mb-3">
+					<div class="form-group">
+						<h3 class="form-label fw-bold text-primary mb-0">Certificate</h3>
+						<ng-container *ngIf="leaveRequestData?.leaveRequestMedia.length > 0; else noDocument">
+							<button
+								type="button"
+								class="btn btn-outline-primary w-50 px-4"
+								*ngFor="let item of leaveRequestData?.leaveRequestMedia"
+							>
+								<div class="d-flex justify-content-between align-items-center">
+									<span class="text-truncate">{{ item.fileName }}</span>
+									<mat-icon
+										mat-list-icon
+										class="text-primary"
+										*ngIf="item?.filePath.length > 0"
+										(click)="downloadDocument(item?.filePath)"
+										>get_app
+									</mat-icon>
+								</div>
+							</button>
+						</ng-container>
+						<ng-template #noDocument>
+							<span>No document added</span>
+						</ng-template>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

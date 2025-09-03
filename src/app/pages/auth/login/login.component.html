@@ -1,0 +1,73 @@
+<div class="container-fluid h-100">
+	<div class="row" style="height: 100%">
+		<div class="col-lg-5 col-md-4 col-sm-12">
+			<app-auth-side-content></app-auth-side-content>
+		</div>
+		<div class="col-lg-7 col-md-8 col-sm-12">
+			<div class="row" style="height: 90%">
+				<div class="d-flex justify-content-end p-4">
+					<mat-icon class="text-custom-black-50">mail_outline</mat-icon>
+					<span class="text-custom-black-50 ms-2">support&#64;protostaff.com</span>
+				</div>
+				<div class="row justify-content-center">
+					<div class="col-12 text-center">
+						<h3 class="text-custom-black fs-3 fw-normal">Login</h3>
+					</div>
+					<div class="col-lg-5 col-md-6 col-sm-12">
+						<form [formGroup]="dataForm" (ngSubmit)="onSubmit()">
+							<div class="form-group">
+								<label for="exampleFormControlInput1" class="form-label text-custom-black"
+									>Mobile Number</label
+								>
+								<app-mobile-number
+									[customClass]="true"
+									[formControlMobileNumber]="dataForm.get('mobileNumber')"
+									[formControlCountryCode]="dataForm.get('countryCode')"
+									[errorValidator]="errorMessages"
+									(validNumberEvent)="receiveValidNumberEvent($event)"
+								>
+								</app-mobile-number>
+							</div>
+							<div class="clearfix my-3">
+								<button type="submit" class="btn btn-custom-primary border-radius w-100 text-uppercase">
+									Send OTP
+								</button>
+							</div>
+						</form>
+						<div class="clearfix text-center">
+							<p class="text-custom-black-80 fs-5">
+								New user?
+								<span
+									class="text-primary fw-bolder text-uppercase"
+									role="button"
+									(click)="navigateToSignUp()"
+								>
+									Sign Up
+								</span>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="text-center">
+					<div>
+						<label class="text-custom-black-50">
+							By clicking submit you are agreeing to the following
+						</label>
+					</div>
+					<div>
+						<label
+							class="text-custom-black fw-bolder text-underline"
+							role="button"
+							routerLink="/terms-and-conditions"
+						>
+							<u>Terms & conditions</u>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="text-center">
+				<span class="text-custom-black-50">© Protoverify 2023</span>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,39 @@
+<div class="card">
+	<div class="card-body">
+		<div class="d-flex justify-content-between ign-items-center">
+			<div class="d-flex">
+				<h2 class="text-primary fs-3 fw-bold">Check in time</h2>
+			</div>
+			<div>
+				<div class="d-flex text-end" (click)="toggleEdit()" *ngIf="dataForm.disabled" role="button">
+					<mat-icon class="text-primary" style="height: 16px" svgIcon="pen-note-edit"></mat-icon>
+					<a class="text-primary">Edit</a>
+				</div>
+				<!-- <div class="d-flex" role="button" (click)="viewLog()"><a class="text-primary">View Log</a></div> -->
+			</div>
+		</div>
+
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-12 col-md-7 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Camera Selfie </label>
+						<select
+							class="form-select bg-transparent text-capitalize"
+							formControlName="isAllowedCameraSelfie"
+						>
+							<option [value]="true">Enable</option>
+							<option [value]="false">Disable</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="showForm">
+				<div class="d-flex justify-content-end">
+					<button type="button" class="btn btn-outline-primary" (click)="onCancel()">Cancel</button>
+					<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

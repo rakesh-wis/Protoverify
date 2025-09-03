@@ -1,0 +1,157 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span>Add Details</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="mr-4">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Pincode</label>
+							<input
+								type="text"
+								class="form-control l bg-transparent"
+								id="pincode"
+								placeholder=""
+								formControlName="pincode"
+								(keypress)="numberOnly($event)"
+								maxlength="8"
+								(keyup)="searchPincode()"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.pincode">
+								<ng-container
+									*ngIf="
+										form['pincode'].hasError(error.type) &&
+										(form['pincode'].dirty || form['pincode'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Address as per aadhaar Card?*</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="remark"
+							placeholder="Enter"
+							rows="2"
+							formControlName="inputAddress"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages?.inputAddress">
+							<ng-container
+								*ngIf="
+									form['inputAddress'].hasError(error.type) &&
+									(form['inputAddress'].dirty || form['inputAddress'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">State</label>
+						<input
+							type="text"
+							class="form-control"
+							id="state"
+							placeholder=""
+							formControlName="state"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">City</label>
+						<input
+							type="text"
+							class="form-control"
+							id="city"
+							placeholder=""
+							formControlName="city"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Father's name* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="gender"
+							placeholder="Enter"
+							formControlName="parentName"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.parentName">
+							<ng-container
+								*ngIf="
+									form['parentName'].hasError(error.type) &&
+									(form['parentName'].dirty || form['parentName'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"
+							><span canViewEnterAttach>Select</span> Date of Birth*</label
+						>
+						<app-date-picker [isRangePicker]="false" [dateForm]="dataForm" (change)="changeDate()">
+						</app-date-picker>
+						<div class="text-left" *ngFor="let error of errorMessages.dob">
+							<ng-container
+								*ngIf="form['dob'].hasError(error.type) && (form['dob'].dirty || form['dob'].touched)"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Gender* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="gender"
+							placeholder="Enter"
+							formControlName="gender"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.gender">
+							<ng-container
+								*ngIf="
+									form['gender'].hasError(error.type) &&
+									(form['gender'].dirty || form['gender'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

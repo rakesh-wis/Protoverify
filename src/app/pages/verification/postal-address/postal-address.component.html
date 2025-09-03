@@ -1,0 +1,390 @@
+<div class="container-fluid page-padding">
+	<p class="text-primary fs-4 fw-bold mb-4">{{ userData?.name }}'s Verification Details</p>
+	<p class="text-primary fs-5">Postal address verifications</p>
+
+	<div class="card mt-4" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-body">
+			<form [formGroup]="dataForm">
+				<ng-container formArrayName="addresses" *ngFor="let _ of addresses.controls; let i = index">
+					<div class="form-check m-3" *ngIf="i === 1" [formGroupName]="i">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="isSameAsRegistered"
+							(change)="patchOptionalAddress($event)"
+							formControlName="isSameAsRegistered"
+						/>
+						<label class="form-check-label" for="isSameAsRegistered">
+							Current address is same as permanent address
+						</label>
+					</div>
+
+					<div class="d-flex justify-content-between align-items-center" *ngIf="i === 0">
+						<h3 class="text-primary fw-bold">
+							Permanent address verification
+							<img
+								[src]="
+									addresses?.controls[0]['controls']['status'].value === kycStatus.APPROVED
+										? verifiedIcon
+										: unVerifiedIcon
+								"
+								class="img-fluid"
+								width="24"
+								*ngIf="
+									[kycStatus.APPROVED, kycStatus.REJECTED].includes(
+										addresses?.controls[0]['controls']['status'].value
+									)
+								"
+							/>
+						</h3>
+						<button
+							type="button"
+							class="btn btn-outline-primary"
+							*ngIf="_.get('status').value === kycStatus.ACTIVE"
+						>
+							<div class="d-flex justify-content-center align-items-center">
+								Verified <mat-icon class="text-success ps-1">check_circle</mat-icon>
+							</div>
+						</button>
+						<button
+							type="button"
+							class="btn btn-primary ms-4"
+							*ngIf="showSameAsAadharButton && !_.get('addressLine1').value"
+							(click)="patchAadharAddress(true)"
+							[disabled]="dataForm.disabled"
+						>
+							<div class="d-flex justify-content-center align-items-center">Same As Aadhar</div>
+						</button>
+					</div>
+					<div class="d-flex justify-content-between align-items-center" *ngIf="i === 1">
+						<h3 class="text-primary fw-bold">
+							Current address verification
+							<img
+								[src]="
+									addresses?.controls[1]['controls']['status'].value === kycStatus.APPROVED
+										? verifiedIcon
+										: unVerifiedIcon
+								"
+								class="img-fluid"
+								width="24"
+								*ngIf="
+									[kycStatus.APPROVED, kycStatus.REJECTED].includes(
+										addresses?.controls[1]['controls']['status'].value
+									)
+								"
+							/>
+						</h3>
+						<button
+							type="button"
+							class="btn btn-outline-primary"
+							*ngIf="_.get('status').value === kycStatus.ACTIVE"
+						>
+							<div class="d-flex justify-content-center align-items-center">
+								Verified <mat-icon class="text-success ps-1">check_circle</mat-icon>
+							</div>
+						</button>
+						<button
+							type="button"
+							class="btn btn-primary ms-4"
+							*ngIf="showSameAsAadharButton && !_.get('addressLine1').value"
+							(click)="patchAadharAddress(false)"
+							[disabled]="dataForm.disabled"
+						>
+							<div class="d-flex justify-content-center align-items-center">Same As Aadhar</div>
+						</button>
+					</div>
+
+					<div class="row">
+						<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-primary"> Address line 1 </label>
+								<input
+									type="text"
+									class="form-control"
+									id="addressLine1"
+									placeholder=""
+									formControlName="addressLine1"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.addressLine1">
+									<ng-container
+										*ngIf="
+											_.get('addressLine1').hasError(error.type) &&
+											(_.get('addressLine1').dirty || _.get('addressLine1').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-primary"> Address line 2 </label>
+								<input
+									type="text"
+									class="form-control"
+									id="addressLine2"
+									placeholder=""
+									formControlName="addressLine2"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.addressLine2">
+									<ng-container
+										*ngIf="
+											_.get('addressLine2').hasError(error.type) &&
+											(_.get('addressLine2').dirty || _.get('addressLine2').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-12 col-md-12 col-sm-12 py-2">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-primary">PIN Code</label>
+								<input
+									type="text"
+									class="form-control l bg-transparent"
+									id="pincode"
+									placeholder=""
+									formControlName="pincode"
+									(keypress)="numberOnly($event)"
+									maxlength="6"
+									(keyup)="searchPincode(i)"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages?.pincode">
+									<ng-container
+										*ngIf="
+											_.get('pincode').hasError(error.type) &&
+											(_.get('pincode').dirty || _.get('pincode').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-primary">State</label>
+								<input
+									type="text"
+									class="form-control"
+									id="state"
+									placeholder=""
+									formControlName="state"
+									readonly
+								/>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-primary">City</label>
+								<input
+									type="text"
+									class="form-control"
+									id="city"
+									placeholder=""
+									formControlName="city"
+									readonly
+								/>
+							</div>
+						</div>
+					</div>
+					<div class="d-flex justify-content-end" *ngIf="i === 1 && _.value.status === kycStatus.PENDING">
+						<button
+							type="button"
+							class="btn btn-primary ms-4"
+							(click)="onSubmit()"
+							[disabled]="dataForm.disabled"
+						>
+							Submit
+						</button>
+					</div>
+					<div class="row" *ngIf="_.value.tempOtp && i === 1">
+						<div
+							class="col-sm-12 col-md-6 col-lg-6"
+							*ngIf="
+								[
+									roles.PROTO_SUPER_ADMIN,
+									roles.PROTO_ADMIN,
+									roles.PROTO_USER,
+									roles.PROTO_OPERATION
+								].includes(currentUser?.role)
+							"
+						>
+							<label class="form-label text-custom-black">User Generated OTP</label>
+							<div class="locationCard">
+								<p class="text-primary">{{ _.value.tempOtp }}</p>
+							</div>
+						</div>
+					</div>
+
+					<ng-container *ngIf="_.value.id && _.value.status === kycStatus.PENDING && i === 1">
+						<ng-container *appIsGranted="'EDIT'">
+							<div
+								class="col-lg-12 col-md-12 col-sm-12"
+								[formGroupName]="i"
+								*ngIf="
+									!_.value.tempOtp &&
+									[
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role)
+								"
+							>
+								<div class="d-flex justify-content-between">
+									<a
+										class="text-primary"
+										role="button"
+										(click)="dataForm.disabled ? null : generateOtp(i)"
+										*ngIf="!_.value.tempOtp"
+										>Generate OTP</a
+									>
+								</div>
+								<input
+									type="text"
+									class="form-control bg-white-400"
+									id="city"
+									formControlName="tempOtp"
+									placeholder="Processing OTP verification"
+									readonly
+									*ngIf="_.value.tempOtp"
+								/>
+							</div>
+						</ng-container>
+						<div class="bg-white-100 p-2 my-2" *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+							<p class="text-custom-primary-dark">
+								You will receive a post card on the address mentioned, please capture image and attach
+								here once received
+							</p>
+						</div>
+
+						<div
+							class="row justify-content-start align-items-center my-2"
+							*ngIf="[roles.EMPLOYEE].includes(currentUser?.role) && _.value.tempOtp"
+						>
+							<div class="col-lg-5 col-md-5 col-sm-12" [formGroupName]="i">
+								<label class="form-label text-custom-black">
+									<span canViewEnterAttach>Attach</span> Post Card Image
+								</label>
+								<input
+									hidden
+									#fileInput
+									type="file"
+									class="form-control"
+									(change)="uploadFile($event, i)"
+									accept="image/png,image/jpg,image/jpeg,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+								/>
+								<div class="input-group file-input-group">
+									<input
+										type="text"
+										readonly
+										class="form-control"
+										aria-label="Post Card Image"
+										[placeholder]="
+											!_.value.verificationImage ? 'Choose file to upload' : 'Post Card Image'
+										"
+										[ngClass]="
+											!_.value.verificationImage &&
+											![
+												roles.PROTO_SUPER_ADMIN,
+												roles.PROTO_ADMIN,
+												roles.PROTO_USER,
+												roles.PROTO_OPERATION,
+												roles.EMPLOYEE
+											].includes(currentUser?.role)
+												? 'border-end-1 rounded-end'
+												: 'border-end-0'
+										"
+									/>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 border-end-0"
+										*ngIf="_.value.verificationImage"
+										(click)="dataForm.disabled ? null : showImage(_.value.verificationImage)"
+										ngbTooltip="View"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 border-end-0"
+										*ngIf="_.value.verificationImage.length > 0"
+										(click)="dataForm.disabled ? null : downloadDocument(_.value.verificationImage)"
+										ngbTooltip="Download"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+									</span>
+
+									<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="dataForm.disabled ? null : fileInput.click()"
+											*ngIf="_.value.verificationImage.length === 0"
+											ngbTooltip="Upload File"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+											</iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											*ngIf="_.value.verificationImage.length > 0"
+											(click)="dataForm.disabled ? null : clearFile()"
+											[hidden]="dataForm?.value?.status === verificationLevel.CLEAR_REPORT"
+											ngbTooltip="Remove"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+											</iconify-icon>
+										</span>
+									</ng-container>
+								</div>
+							</div>
+							<div
+								class="col-lg-5 col-md-5 col-sm-12"
+								*ngIf="[roles.EMPLOYEE].includes(currentUser?.role)"
+							>
+								<div class="form-group">
+									<label class="form-label text-custom-black">Enter OTP</label>
+									<input
+										type="text"
+										(keypress)="numberOnly($event)"
+										class="form-control bg-transparent"
+										id="pincode"
+										placeholder=""
+										[(ngModel)]="tempOtp"
+										[ngModelOptions]="{ standalone: true }"
+									/>
+								</div>
+							</div>
+						</div>
+						<div
+							class="d-flex justify-content-end"
+							*ngIf="
+								[roles.EMPLOYEE].includes(currentUser?.role) &&
+								_.value.tempOtp &&
+								_.value.status != 'clear_report'
+							"
+						>
+							<button type="button" class="btn btn-primary mt-3" (click)="verifyOtp()">Verify</button>
+						</div>
+					</ng-container>
+				</ng-container>
+			</form>
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-end mt-5">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+</div>

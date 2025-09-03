@@ -1,0 +1,35 @@
+<div class="card border-0 shadow-color" style="height: 100%; max-height: 100%">
+	<div class="card-body">
+		<label class="text-custom-primary-dark fw-bold fs-6"> Recent Activity </label>
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item py-3" *ngFor="let item of dataList?.rows">
+				<div class="d-flex justify-content-between align-items-center">
+					<div class="d-flex flex-row align-items-center">
+						<div class="flex-shrink-0">
+							<img
+								class="rounded-circle"
+								width="48"
+								height="48"
+								[src]="item?.profilePicture || 'assets/icons/avatar.svg'"
+							/>
+						</div>
+						<div class="flex-grow-1 ms-3">
+							<p class="mb-0 text-custom-primary-dark fw-bold">
+								{{ item?.businessDetails?.registeredName || item?.name || '-' | truncate }}
+							</p>
+							<small class="mb-0 text-custom-primary-dark opacity-90"
+								>{{ item?.associatedUsersCount || 0 }} Candidates</small
+							>
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<p *ngIf="dataList.count === 0">{{ OPTIONS?.noRecord }}</p>
+	</div>
+	<div class="card-footer border-0 bg-transparent py-4" *ngIf="dataList.count > 0">
+		<button class="btn btn-primary-200 w-100" (click)="navigateTo()" routerLinkActive="router-link-active">
+			View more
+		</button>
+	</div>
+</div>

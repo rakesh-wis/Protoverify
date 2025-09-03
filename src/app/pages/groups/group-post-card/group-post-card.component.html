@@ -1,0 +1,47 @@
+<div class="d-flex mt-3">
+	<div class="flex-shrink-0">
+		<img
+			[src]="postData?.user.profilePicture || 'assets/images/avatar.jpg'"
+			alt="profileLink"
+			class="rounded-circle"
+			width="35"
+			height="35"
+		/>
+	</div>
+	<div class="flex-grow-1 ms-3 border-border-primary-200 border-bottom pb-3">
+		<div class="d-flex justify-content-between">
+			<label class="text-capitalize text-primary fw-bold">
+				{{ postData?.user?.name || getUserName(postData?.user?.mobileNumber) | truncate }}</label
+			>
+			<span class="text-primary-200"> {{ postData?.createdAt | dateAgo }}</span>
+		</div>
+		<span class="text-wrap">{{ postData?.message || '-' | truncate }}</span>
+		<div class="d-flex my-3" *ngIf="postData.postMedia.length > 0">
+			<div class="col-lg-6" *ngFor="let item of postData.postMedia">
+				<img [src]="item.filePath" height="100" />
+			</div>
+		</div>
+		<div class="d-flex justify-content-between mt-2">
+			<div class="d-flex align-items-center" role="button" (click)="likeUnLike()">
+				<mat-icon role="button" [ngClass]="postData?.isLiked ? 'text-primary' : 'text-primary-100'">
+					thumb_up
+				</mat-icon>
+				<span class="text-primary ps-1">Like</span>
+			</div>
+
+			<div class="d-flex align-items-center">
+				<div class="d-flex align-items-center" *ngIf="postData?.isLiked">
+					<mat-icon class="text-primary"> thumb_up </mat-icon>
+					<span class="text-primary ps-1">You </span>
+				</div>
+				<span class="text-primary ps-1" *ngIf="postData?.likeCount - 1 > 0 && postData?.isLiked">
+					and {{ postData?.likeCount - 1 }} others</span
+				>
+				<span class="text-primary ps-1" *ngIf="postData?.likeCount > 0 && !postData?.isLiked">
+					and {{ postData?.likeCount }}
+					others
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

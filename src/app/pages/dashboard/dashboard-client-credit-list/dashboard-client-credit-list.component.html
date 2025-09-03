@@ -1,0 +1,73 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between ign-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold">Upcoming Renewal</h2>
+		</div>
+	</div>
+	<!-- <div class="row">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="input-group flex-nowrap">
+				<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+					<mat-icon mat-list-icon>search</mat-icon>
+				</span>
+				<input
+					type="text"
+					class="form-control search-form-control bg-transparent"
+					placeholder="Search"
+					aria-label="search"
+					[ngModelOptions]="{ standalone: true }"
+					[(ngModel)]="searchTerm"
+					(keyup)="applyFilters()"
+				/>
+			</div>
+		</div>
+	</div> -->
+
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<ng-container *ngFor="let item of headerColumn">
+							<th scope="col" *ngIf="item.sorting" [sortable]="item.value" (sort)="onSort($event)">
+								{{ item.label }}
+							</th>
+							<th scope="col" *ngIf="!item.sorting">
+								{{ item.label }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList['rows']">
+						<td class="text-wrap">
+							{{ item?.user?.businessDetails?.registeredName || item?.user?.name || '-' | truncate }}
+						</td>
+						<td>
+							<p>{{ item.onboardingDate | date: 'dd MMM YYYY' }}</p>
+						</td>
+						<td>
+							{{ item?.totalAmount }}
+						</td>
+						<td>
+							{{ item?.totalAmount - item?.remainingCredits }}
+						</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<app-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			*ngIf="dataList['count'] > 0"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event)"
+			[maxSize]="5"
+		></app-pagination>
+	</ng-container>
+</div>

@@ -1,0 +1,62 @@
+<div class="my-3">
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-primary fw-bold" id="modal-basic-title">
+			<span>View Log</span>
+		</h2>
+	</div>
+	<div class="modal-body">
+		<div>
+			<div class="row">
+				<div class="col-lg-6 col-md-7 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Filter By Employee </label>
+						<select
+							class="form-select bg-transparent text-capitalize"
+							[ngModelOptions]="{ standalone: true }"
+							[(ngModel)]="employeeFilter"
+							(keyup)="applyFilters()"
+						>
+							<option [value]="true">Enable</option>
+							<option [value]="false">Disable</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-7 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Filter By Month </label>
+						<select
+							class="form-select bg-transparent text-capitalize"
+							[ngModelOptions]="{ standalone: true }"
+							[(ngModel)]="monthFilter"
+							(keyup)="applyFilters()"
+						>
+							<option [value]="true">Enable</option>
+							<option [value]="false">Disable</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-7 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Check in time </label>
+						<table class="table table-borderless">
+							<tr *ngFor="let item of data">
+								<td>05 July 2022</td>
+								<td>{{ item?.checkInTime | date: 'hh:mm A' }}</td>
+							</tr>
+							<tr>
+								<td>05 July 2022</td>
+								<td>Bangaluru</td>
+								<td>06:30 PM</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+	</div>
+</div>

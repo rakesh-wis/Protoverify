@@ -1,0 +1,1005 @@
+<div class="m-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+	<div class="modal-header align-items-center">
+		<div class="d-flex w-100 justify-content-between align-items-center">
+			<div>
+				<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">Education Details</h2>
+			</div>
+			<div class="d-flex justify-content-between">
+				<span class="text-custom-black-80" *ngIf="modelData?.updatedAt">
+					Document Submitted on: {{ modelData?.updatedAt | date: 'dd/MM/yyyy' }}
+				</span>
+				<div
+					class="ps-2"
+					*ngIf="
+						[
+							roles.PROTO_SUPER_ADMIN,
+							roles.PROTO_ADMIN,
+							roles.PROTO_USER,
+							roles.PROTO_OPERATION,
+							roles.EMPLOYEE
+						].includes(currentUser?.role)
+					"
+				>
+					<button
+						type="button"
+						class="btn-close"
+						aria-label="Close"
+						*ngIf="!form['id'].value"
+						(click)="dismissModal()"
+					></button>
+					<ng-container *appIsGranted="'DELETE'">
+						<mat-icon
+							*ngIf="form['id'].value"
+							role="button"
+							mat-list-icon
+							class="text-danger"
+							(click)="dataForm.disabled ? null : triggerEvent('delete')"
+						>
+							delete_outline
+						</mat-icon>
+					</ng-container>
+					<iconify-icon
+						*ngIf="
+							form['id'].value &&
+							[roles.EMPLOYEE].includes(currentUser?.role) &&
+							![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+						"
+						role="button"
+						mat-list-icon
+						class="text-danger"
+						(click)="triggerEvent('delete')"
+						class="fs-5 text-danger"
+						icon="ant-design:delete-outlined"
+					>
+					</iconify-icon>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Board/University </label>
+						<input type="text" class="form-control" id="board" formControlName="board" autocomplete="off" />
+						<div class="text-left" *ngFor="let error of errorMessages?.board">
+							<ng-container
+								*ngIf="
+									form['board'].hasError(error.type) && (form['board'].dirty || form['board'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> School College </label>
+						<input
+							type="text"
+							class="form-control"
+							id="college"
+							formControlName="college"
+							autocomplete="off"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages?.college">
+							<ng-container
+								*ngIf="
+									form['college'].hasError(error.type) &&
+									(form['college'].dirty || form['college'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Roll No./ Registration No. </label>
+						<input
+							type="text"
+							class="form-control"
+							id="registrationNumber"
+							formControlName="registrationNumber"
+							autocomplete="off"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages?.registrationNumber">
+							<ng-container
+								*ngIf="
+									form['registrationNumber'].hasError(error.type) &&
+									(form['registrationNumber'].dirty || form['registrationNumber'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Qualification </label>
+						<input
+							type="text"
+							class="form-control"
+							id="qualification"
+							formControlName="qualification"
+							autocomplete="off"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages?.qualification">
+							<ng-container
+								*ngIf="
+									form['qualification'].hasError(error.type) &&
+									(form['qualification'].dirty || form['qualification'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Year of Passing </label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select role"
+							formControlName="yearOfPassing"
+						>
+							<option [value]="item" *ngFor="let item of yearsList">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages?.yearOfPassing">
+							<ng-container
+								*ngIf="
+									form['yearOfPassing'].hasError(error.type) &&
+									(form['yearOfPassing'].dirty || form['yearOfPassing'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Certificate </label>
+						<input
+							hidden
+							#fileInput
+							type="file"
+							onclick="this.value = null"
+							class="form-control"
+							name="certificateDocument"
+							accept="image/png,image/jpg,image/jpeg"
+							(change)="uploadFile($event, 'certificateDocument')"
+						/>
+						<div class="input-group file-input-group">
+							<input
+								type="text"
+								readonly
+								class="form-control"
+								aria-label="Certificate Document"
+								[placeholder]="'Certificate Document'"
+								[ngClass]="
+									!form['certificateDocument'].value &&
+									![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role)
+										? 'border-end-1 rounded-end'
+										: 'border-end-0'
+								"
+							/>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0 border-end-0"
+								*ngIf="form['certificateDocument'].value"
+								(click)="
+									!form['certificateDocument'].value
+										? null
+										: showImage(form['certificateDocument'].value)
+								"
+								ngbTooltip="View"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+							</span>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0"
+								*ngIf="form['certificateDocument'].value"
+								(click)="
+									!form['certificateDocument'].value
+										? null
+										: downloadDocument(form['certificateDocument'].value)
+								"
+								ngbTooltip="Download"
+								[ngClass]="{
+									'border-end-1 rounded-end': ![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role),
+									'border-end-0':
+										[
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role) &&
+										dataForm?.value?.status !== verificationLevel?.CLEAR_REPORT,
+									'border-end-1 rounded-end':
+										[roles.EMPLOYEE].includes(currentUser?.role) &&
+										dataForm?.value?.status === verificationLevel?.CLEAR_REPORT
+								}"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+							</span>
+							<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="fileInput.click()"
+									*ngIf="!form['certificateDocument'].value"
+									ngbTooltip="Upload File"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="clearFile('certificateDocument')"
+									*ngIf="
+										form['certificateDocument'].value &&
+										![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+									"
+									ngbTooltip="Remove"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+									</iconify-icon>
+								</span>
+							</ng-container>
+							<ng-container
+								*ngIf="
+									[
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION
+									].includes(currentUser?.role)
+								"
+							>
+								<ng-container *appIsGranted="'EDIT'">
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : fileInput.click()"
+										*ngIf="!form['certificateDocument'].value"
+										ngbTooltip="Upload File"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+										</iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : clearFile('certificateDocument')"
+										*ngIf="form['certificateDocument'].value"
+										ngbTooltip="Remove"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+										</iconify-icon>
+									</span>
+								</ng-container>
+							</ng-container>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages?.certificateDocument">
+							<ng-container
+								*ngIf="
+									form['certificateDocument'].hasError(error.type) &&
+									(form['certificateDocument'].dirty || form['certificateDocument'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-start">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">
+							Passing Certificate/ Provisional Certificate
+						</label>
+						<input
+							hidden
+							#fileInput2
+							type="file"
+							class="form-control"
+							onclick="this.value = null"
+							accept="image/png,image/jpg,image/jpeg"
+							(change)="uploadFile($event, 'passingDocument')"
+						/>
+						<div class="input-group file-input-group">
+							<input
+								type="text"
+								readonly
+								class="form-control"
+								aria-label="Certificate Document"
+								[placeholder]="'Passing Document'"
+								[ngClass]="
+									!form['passingDocument'].value &&
+									![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role)
+										? 'border-end-1 rounded-end'
+										: 'border-end-0'
+								"
+							/>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0 border-end-0"
+								*ngIf="form['passingDocument'].value"
+								(click)="
+									!form['passingDocument'].value ? null : showImage(form['passingDocument'].value)
+								"
+								ngbTooltip="View"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+							</span>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0"
+								*ngIf="form['passingDocument'].value"
+								(click)="
+									!form['passingDocument'].value
+										? null
+										: downloadDocument(form['passingDocument'].value)
+								"
+								ngbTooltip="Download"
+								[ngClass]="{
+									'border-end-1 rounded-end': ![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role),
+									'border-end-0':
+										[
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role) &&
+										dataForm?.value?.status !== verificationLevel?.CLEAR_REPORT,
+									'border-end-1 rounded-end':
+										[roles.EMPLOYEE].includes(currentUser?.role) &&
+										dataForm?.value?.status === verificationLevel?.CLEAR_REPORT
+								}"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+							</span>
+							<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="fileInput2.click()"
+									*ngIf="!form['passingDocument'].value"
+									ngbTooltip="Upload File"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="clearFile('passingDocument')"
+									*ngIf="
+										form['passingDocument'].value &&
+										![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+									"
+									ngbTooltip="Remove"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+									</iconify-icon>
+								</span>
+							</ng-container>
+							<ng-container
+								*ngIf="
+									[
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION
+									].includes(currentUser?.role)
+								"
+							>
+								<ng-container *appIsGranted="'EDIT'">
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : fileInput2.click()"
+										*ngIf="!form['passingDocument'].value"
+										ngbTooltip="Upload File"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+										</iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : clearFile('passingDocument')"
+										*ngIf="form['passingDocument'].value"
+										ngbTooltip="Remove"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+										</iconify-icon>
+									</span>
+								</ng-container>
+							</ng-container>
+						</div>
+
+						<div class="text-left" *ngFor="let error of errorMessages?.passingDocument">
+							<ng-container
+								*ngIf="
+									form['passingDocument'].hasError(error.type) &&
+									(form['passingDocument'].dirty || form['passingDocument'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Final Year Marksheet* </label>
+						<input
+							hidden
+							#finalYearDocument
+							type="file"
+							class="form-control"
+							onclick="this.value = null"
+							accept="image/png,image/jpg,image/jpeg"
+							(change)="uploadFile($event, 'finalYearDocument')"
+						/>
+						<div class="input-group file-input-group">
+							<input
+								type="text"
+								readonly
+								class="form-control"
+								aria-label="Final Year Marksheet"
+								[placeholder]="'Final Year Marksheet'"
+								[ngClass]="
+									!form['finalYearDocument'].value &&
+									![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role)
+										? 'border-end-1 rounded-end'
+										: 'border-end-0'
+								"
+							/>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0 border-end-0"
+								*ngIf="form['finalYearDocument'].value"
+								(click)="
+									!form['finalYearDocument'].value ? null : showImage(form['finalYearDocument'].value)
+								"
+								ngbTooltip="View"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+							</span>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0"
+								*ngIf="form['finalYearDocument'].value"
+								(click)="
+									!form['finalYearDocument'].value
+										? null
+										: downloadDocument(form['finalYearDocument'].value)
+								"
+								ngbTooltip="Download"
+								[ngClass]="{
+									'border-end-1 rounded-end': ![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role),
+									'border-end-0': [
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role),
+									'border-end-1 rounded-end':
+										[roles.EMPLOYEE].includes(currentUser?.role) &&
+										dataForm?.value?.status === verificationLevel?.CLEAR_REPORT
+								}"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+							</span>
+							<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="finalYearDocument.click()"
+									*ngIf="!form['finalYearDocument'].value"
+									ngbTooltip="Upload File"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="clearFile('finalYearDocument')"
+									*ngIf="
+										form['finalYearDocument'].value &&
+										![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+									"
+									ngbTooltip="Remove"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+									</iconify-icon>
+								</span>
+							</ng-container>
+							<ng-container
+								*ngIf="
+									[
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION
+									].includes(currentUser?.role)
+								"
+							>
+								<ng-container *appIsGranted="'EDIT'">
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : finalYearDocument.click()"
+										*ngIf="!form['finalYearDocument'].value"
+										ngbTooltip="Upload File"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+										</iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : clearFile('finalYearDocument')"
+										*ngIf="form['finalYearDocument'].value"
+										ngbTooltip="Remove"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+										</iconify-icon>
+									</span>
+								</ng-container>
+							</ng-container>
+						</div>
+
+						<div class="text-left" *ngFor="let error of errorMessages?.finalYearDocument">
+							<ng-container
+								*ngIf="
+									form['finalYearDocument'].hasError(error.type) &&
+									(form['finalYearDocument'].dirty || form['finalYearDocument'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Optional Certificate </label>
+						<input
+							hidden
+							#fileInput3
+							type="file"
+							class="form-control"
+							onclick="this.value = null"
+							accept="image/png,image/jpg,image/jpeg"
+							(change)="uploadFile($event, 'leavingDocument')"
+						/>
+						<div class="input-group file-input-group">
+							<input
+								type="text"
+								readonly
+								class="form-control"
+								aria-label="Optional Certificate"
+								[placeholder]="'Optional Certificate'"
+								[ngClass]="
+									!form['leavingDocument'].value &&
+									![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role)
+										? 'border-end-1 rounded-end'
+										: 'border-end-0'
+								"
+							/>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0 border-end-0"
+								*ngIf="form['leavingDocument'].value"
+								(click)="
+									!form['leavingDocument'].value ? null : showImage(form['leavingDocument'].value)
+								"
+								ngbTooltip="View"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+							</span>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0"
+								*ngIf="form['leavingDocument'].value"
+								(click)="
+									!form['leavingDocument'].value
+										? null
+										: downloadDocument(form['leavingDocument'].value)
+								"
+								ngbTooltip="Download"
+								[ngClass]="{
+									'border-end-1 rounded-end': ![
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION,
+										roles.EMPLOYEE
+									].includes(currentUser?.role),
+									'border-end-0':
+										[
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role) &&
+										dataForm?.value?.status !== verificationLevel?.CLEAR_REPORT,
+									'border-end-1 rounded-end':
+										[roles.EMPLOYEE].includes(currentUser?.role) &&
+										dataForm?.value?.status === verificationLevel?.CLEAR_REPORT
+								}"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+							</span>
+							<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="fileInput3.click()"
+									*ngIf="!form['leavingDocument'].value"
+									ngbTooltip="Upload File"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="clearFile('leavingDocument')"
+									*ngIf="
+										form['leavingDocument'].value &&
+										![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+									"
+									ngbTooltip="Remove"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+									</iconify-icon>
+								</span>
+							</ng-container>
+							<ng-container
+								*ngIf="
+									[
+										roles.PROTO_SUPER_ADMIN,
+										roles.PROTO_ADMIN,
+										roles.PROTO_USER,
+										roles.PROTO_OPERATION
+									].includes(currentUser?.role)
+								"
+							>
+								<ng-container *appIsGranted="'EDIT'">
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : fileInput3.click()"
+										*ngIf="!form['leavingDocument'].value"
+										ngbTooltip="Upload File"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+										</iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="dataForm.disabled ? null : clearFile('leavingDocument')"
+										*ngIf="form['leavingDocument'].value"
+										ngbTooltip="Remove"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+										</iconify-icon>
+									</span>
+								</ng-container>
+							</ng-container>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages?.leavingDocument">
+							<ng-container
+								*ngIf="
+									form['leavingDocument'].hasError(error.type) &&
+									(form['leavingDocument'].dirty || form['leavingDocument'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div formGroupName="verifier" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+				<div class="row justify-content-center">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black"> Verifier's Name </label>
+							<input
+								type="text"
+								class="form-control"
+								id="name"
+								formControlName="name"
+								autocomplete="off"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.name">
+								<ng-container
+									*ngIf="
+										formVerifier['name'].hasError(error.type) &&
+										(formVerifier['name'].dirty || formVerifier['name'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black"> Verifier's Contact Number </label>
+							<app-mobile-number
+								[formControlMobileNumber]="formVerifier.mobileNumber"
+								[formControlCountryCode]="formVerifier.countryCode"
+								[errorValidator]="errorMessages.mobileNumber"
+								(validNumberEvent)="receiveValidNumberEvent($event)"
+							>
+							</app-mobile-number>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-start">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black"> Designation </label>
+							<input
+								type="text"
+								class="form-control"
+								id="designation"
+								formControlName="designation"
+								autocomplete="off"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.designation">
+								<ng-container
+									*ngIf="
+										formVerifier['designation'].hasError(error.type) &&
+										(formVerifier['designation'].dirty || formVerifier['designation'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div
+						class="col-lg-6 col-md-6 col-sm-12"
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_USER,
+								roles.PROTO_OPERATION
+							].includes(currentUser?.role)
+						"
+					>
+						<div class="form-group">
+							<label class="form-label text-primary">Supporting Document</label>
+							<input
+								hidden
+								#supportingDocument
+								type="file"
+								class="form-control"
+								onclick="this.value = null"
+								accept="image/png,image/jpg,image/jpeg"
+								(change)="uploadFile($event, 'supportingDocument')"
+							/>
+							<div class="input-group file-input-group">
+								<input
+									type="text"
+									readonly
+									class="form-control"
+									aria-label="Supporting Document"
+									[placeholder]="'Supporting Document'"
+									[ngClass]="
+										!form['leavingDocument'].value &&
+										![
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role)
+											? 'border-end-1 rounded-end'
+											: 'border-end-0'
+									"
+								/>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 border-end-0"
+									*ngIf="form['supportingDocument'].value"
+									(click)="dataForm.disabled ? null : showImage(form['supportingDocument'].value)"
+									ngbTooltip="View"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0"
+									*ngIf="form['supportingDocument'].value"
+									(click)="
+										dataForm.disabled ? null : downloadDocument(form['supportingDocument'].value)
+									"
+									ngbTooltip="Download"
+									[ngClass]="{
+										'border-end-1 rounded-end': ![
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role),
+										'border-end-0': [
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role),
+										'border-end-1 rounded-end': [roles.EMPLOYEE].includes(currentUser?.role)
+									}"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+								</span>
+								<ng-container>
+									<ng-container *appIsGranted="'EDIT'">
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="dataForm.disabled ? null : supportingDocument.click()"
+											*ngIf="!form['supportingDocument'].value"
+											ngbTooltip="Upload File"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+											</iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="dataForm.disabled ? null : clearFile('supportingDocument')"
+											*ngIf="form['supportingDocument'].value"
+											ngbTooltip="Remove"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+											</iconify-icon>
+										</span>
+									</ng-container>
+								</ng-container>
+							</div>
+							<div class="text-left" *ngFor="let error of errorMessages?.supportingDocument">
+								<ng-container
+									*ngIf="
+										form['supportingDocument'].hasError(error.type) &&
+										(form['supportingDocument'].dirty || form['supportingDocument'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black"> Result of verification </label>
+							<textarea
+								type="text"
+								class="form-control"
+								id="resultOfVerification"
+								formControlName="resultOfVerification"
+								autocomplete="off"
+							></textarea>
+							<div class="text-left" *ngFor="let error of errorMessages?.resultOfVerification">
+								<ng-container
+									*ngIf="
+										formVerifier['resultOfVerification'].hasError(error.type) &&
+										(formVerifier['resultOfVerification'].dirty ||
+											formVerifier['resultOfVerification'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button
+			type="button"
+			class="btn btn-outline-primary"
+			*ngIf="!form['id'].value"
+			(click)="dismissModal()"
+			[disabled]="dataForm.disabled"
+		>
+			Cancel
+		</button>
+		<button
+			type="button"
+			class="btn btn-primary ms-4"
+			*ngIf="
+				[roles.EMPLOYEE].includes(currentUser?.role) &&
+				![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+			"
+			(click)="onSubmit()"
+		>
+			Submit
+		</button>
+		<button
+			type="button"
+			class="btn btn-primary ms-4"
+			*ngIf="
+				[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER, roles.PROTO_OPERATION].includes(
+					currentUser?.role
+				)
+			"
+			(click)="onSubmit()"
+			[disabled]="dataForm.disabled"
+		>
+			Submit
+		</button>
+	</div>
+</div>

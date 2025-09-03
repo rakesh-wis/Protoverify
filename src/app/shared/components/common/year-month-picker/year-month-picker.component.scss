@@ -1,0 +1,6 @@
+@use '@angular/material' as mat;
+
+input:focus {
+	border: none !important;
+	outline: none !important;
+}

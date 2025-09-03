@@ -1,0 +1,33 @@
+<div class="d-flex justify-content-end align-items-start p-3">
+	<ng-container>
+		<div
+			class="d-flex align-items-center text-primary fw-bold"
+			role="button"
+			(click)="onPageChange(page - 1, 'prev')"
+			[ngClass]="{ 'text-custom-black-20': isPrevious() }"
+		>
+			<mat-icon mat-list-icon>arrow_back</mat-icon>
+			<span class="ps-1">Previous</span>
+		</div>
+	</ng-container>
+	<ngb-pagination
+		[collectionSize]="collectionSize"
+		[(page)]="page"
+		[pageSize]="pageSize"
+		(pageChange)="onPageChange($event, null)"
+		[maxSize]="maxSize"
+		[directionLinks]="false"
+	>
+	</ngb-pagination>
+	<ng-container>
+		<div
+			class="d-flex align-items-center text-custom-primary fw-bold ms-3"
+			role="button"
+			(click)="onPageChange(page + 1, 'next')"
+			[ngClass]="{ 'text-custom-black-20': isLastPage() }"
+		>
+			<span class="pe-1">Next</span>
+			<mat-icon mat-list-icon>arrow_forward</mat-icon>
+		</div>
+	</ng-container>
+</div>

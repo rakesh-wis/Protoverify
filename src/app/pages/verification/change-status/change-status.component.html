@@ -1,0 +1,45 @@
+<div>
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			Status of Documents': Submitted/ Not Submitted
+		</h2>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Status</label>
+						<select
+							name="status"
+							id="status"
+							[style.color]="getLevelColor"
+							class="form-select text-capitalize"
+							aria-label="change status"
+							formControlName="status"
+						>
+							<option value="" selected disabled [hidden]="form['status'].value">Choose here</option>
+							<option [value]="item.name" [style.color]="item.color" *ngFor="let item of statusList">
+								{{ item?.label }}
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages?.status">
+							<ng-container
+								*ngIf="
+									form['status'].hasError(error.type) &&
+									(form['status'].dirty || form['status'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="openConfirmStatus()">Submit</button>
+	</div>
+</div>

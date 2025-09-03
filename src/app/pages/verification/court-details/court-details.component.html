@@ -1,0 +1,137 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span>Add Details</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Number of cases found </label>
+						<input
+							type="number"
+							class="form-control"
+							id="noOfCases"
+							placeholder="Enter"
+							formControlName="noOfCases"
+							(keypress)="numberOnly($event)"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.noOfCases">
+							<ng-container
+								*ngIf="
+									form['noOfCases'].hasError(error.type) &&
+									(form['noOfCases'].dirty || form['noOfCases'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12" *ngIf="media && media.length < 4">
+					<label class="form-label text-custom-black"> Files </label>
+					<div class="input-group input-group-sm mb-3">
+						<input
+							hidden
+							#fileInput
+							type="file"
+							class="form-control"
+							(change)="uploadFile($event)"
+							accept="image/png,image/jpg,image/jpeg"
+						/>
+						<div class="input-group file-input-group">
+							<input
+								type="text"
+								readonly
+								class="form-control"
+								[aria-label]="'Upload File'"
+								[placeholder]="'Upload File'"
+							/>
+							<span
+								*ngIf="canEdit"
+								role="button"
+								class="input-group-text bg-transparent border-start-0 rounded-end"
+								(click)="fileInput.click()"
+								ngbTooltip="Upload File"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12"></div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group" *ngFor="let _ of media; let i = index">
+						<div class="row justify-content-between align-items-end py-2" *ngIf="_.status != 'deleted'">
+							<div class="col-sm-12">
+								<div class="input-group file-input-group">
+									<input
+										type="text"
+										readonly
+										class="form-control"
+										[aria-label]="'Attachment' + i"
+										[placeholder]="'Attachment ' + i"
+									/>
+									<!-- <span role="button"
+										class="input-group-text bg-transparent border-start-0 border-end-0"
+										*ngIf="_.filePath" (click)="showImage(_.filePath)"
+										ngbTooltip="View">
+										<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+									</span> -->
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0"
+										[ngClass]="{
+											'rounded-end': [roles.EMPLOYEE, roles.PROTO_LAWYER].includes(
+												currentUser?.role
+											),
+											'border-end-0': ![roles.EMPLOYEE, roles.PROTO_LAWYER].includes(
+												currentUser?.role
+											)
+										}"
+										*ngIf="_.filePath.length > 0"
+										(click)="downloadDocument(_.filePath)"
+										ngbTooltip="Download"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+									</span>
+									<ng-container
+										*ngIf="![roles.EMPLOYEE, roles.PROTO_LAWYER].includes(currentUser?.role)"
+									>
+										<ng-container *appIsGranted="'EDIT'">
+											<span
+												role="button"
+												class="input-group-text bg-transparent border-start-0 rounded-end"
+												*ngIf="_.filePath"
+												(click)="setControl(_, true, i)"
+												ngbTooltip="Remove"
+											>
+												<iconify-icon
+													class="fs-5 text-primary"
+													icon="ant-design:delete-outlined"
+												>
+												</iconify-icon>
+											</span>
+										</ng-container>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" [hidden]="!canEdit" (click)="onSubmit()">
+			Submit
+		</button>
+	</div>
+</div>

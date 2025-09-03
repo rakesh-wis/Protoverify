@@ -1,0 +1,135 @@
+<div class="container-fluid page-padding">
+	<div class="row" style="height: 80vh">
+		<div class="col-lg-4 col-md-4 col-sm-12" style="border-right: 1px solid #525f7f">
+			<h2 class="text-primary fs-3 fw-bold">Groups Chat</h2>
+			<div class="clearfix">
+				<div class="input-group flex-nowrap">
+					<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+						<mat-icon mat-list-icon>search</mat-icon>
+					</span>
+					<input
+						type="text"
+						class="form-control search-form-control bg-transparent"
+						placeholder="Search"
+						aria-label="search"
+						[ngModelOptions]="{ standalone: true }"
+						[(ngModel)]="searchTerm"
+						(keyup)="applyFilters()"
+					/>
+				</div>
+			</div>
+			<div
+				class="d-flex py-3 border-border-primary-200 border-bottom"
+				*ngFor="let item of dataList['rows']"
+				(click)="selectGroup(item)"
+				[ngClass]="{ 'bg-primary-100': selectedGroup.id === item.id }"
+			>
+				<div class="flex-shrink-0">
+					<img
+						[src]="item?.profileLink || 'assets/images/avatar.jpg'"
+						alt="profileLink"
+						class="rounded-circle"
+						width="35"
+						height="35"
+					/>
+				</div>
+				<div class="flex-grow-1 ms-3">
+					<div class="d-flex justify-content-between">
+						<label class="text-capitalize text-primary fw-bold">{{ item.name | truncate: 12 }}</label>
+						<span class="text-primary-200"> {{ item?.post[0]?.createdAt | dateAgo }}</span>
+					</div>
+					<span class="text-wrap">{{ item?.post[0]?.message || '-' | truncate }}</span>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-8 col-md-8 col-sm-12">
+			<div *ngIf="selectedGroup?.id; else noContent">
+				<div class="border-border-primary-200 border-bottom">
+					<h2 class="text-primary fs-4 fw-bold mb-1 text-capitalize">
+						{{ selectedGroup?.name }}
+					</h2>
+					<p class="text-primary">{{ selectedGroup?.description }}</p>
+				</div>
+				<div class="post-content" #scrollMe [scrollTop]="scrollMe?.scrollHeight" (scroll)="onScroll($event)">
+					<app-group-post-list [groupId]="selectedGroup?.id"> </app-group-post-list>
+				</div>
+				<div class="card-footer post-message border-0 bg-transparent">
+					<form [formGroup]="dataForm">
+						<ng-container *ngIf="postMedia.controls.length > 0">
+							<h3 class="text-primary">Media</h3>
+							<div class="d-flex my-3" formArrayName="postMedia">
+								<div
+									class="col-lg-5 col-md-6 col-sm-12"
+									*ngFor="let _ of postMedia.controls; let index"
+								>
+									<div class="d-flex justify-content-start">
+										<img [src]="_.value.filePath" height="100" />
+										<mat-icon
+											(click)="removeUploadedMedia(index)"
+											role="button"
+											class="text-danger remove-media"
+										>
+											restore_from_trash
+										</mat-icon>
+									</div>
+								</div>
+							</div>
+						</ng-container>
+
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex">
+								<img
+									class="rounded-circle"
+									width="35"
+									height="35"
+									[src]="'assets/images/avatar.jpg'"
+									alt="avatar"
+								/>
+							</div>
+							<div class="d-flex w-100 mx-2">
+								<div class="input-group flex-nowrap mb-0">
+									<span class="input-group-text" id="emoji-icon">
+										<mat-icon svgIcon="smile-emoji"></mat-icon>
+									</span>
+									<textarea
+										type="text"
+										class="form-control"
+										placeholder="Write something"
+										aria-label="Username"
+										aria-describedby="attachment"
+										formControlName="message"
+										rows="1"
+									></textarea>
+									<span class="input-group-text" id="attachment-icon" (click)="fileInput1.click()">
+										<mat-icon> attach_file</mat-icon>
+									</span>
+								</div>
+							</div>
+							<input
+								hidden
+								#fileInput1
+								type="file"
+								name="file"
+								required
+								(change)="uploadFile($event)"
+								accept="image/png,image/jpeg,image/jpg"
+							/>
+							<a class="btn bg-primary-500 btn-rounded" data-abc="true" (click)="createPost()">
+								<mat-icon class="text-white-100" style="padding-top: 4px">send </mat-icon>
+							</a>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<ng-template #noContent>
+				<div class="d-flex justify-content-center align-items-center h-75">
+					<div class="text-center">
+						<h1 class="text-capitalize text-primary fw-bold">Select group</h1>
+						<p class="text-primary">Please select group to view the posts</p>
+					</div>
+				</div>
+			</ng-template>
+		</div>
+	</div>
+</div>

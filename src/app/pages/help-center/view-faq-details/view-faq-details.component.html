@@ -1,0 +1,62 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Add FAQ</span>
+			<span *ngIf="modelData">Update FAQ</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group mb-2">
+						<label class="form-label text-primary">Question</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="question"
+							placeholder=""
+							rows="2"
+							formControlName="question"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages.question">
+							<ng-container
+								*ngIf="
+									form['question'].hasError(error.type) &&
+									(form['question'].dirty || form['question'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-label text-primary">Description</label>
+						<app-text-editor [formControl]="dataForm.get('answer')"></app-text-editor>
+
+						<div class="text-left" *ngFor="let error of errorMessages.answer">
+							<ng-container
+								*ngIf="
+									form['answer'].hasError(error.type) &&
+									(form['answer'].dirty || form['answer'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" *ngIf="modelData?.id" class="btn btn-custom-primary ms-4" (click)="onSubmit()">
+			Save
+		</button>
+		<button type="button" *ngIf="!modelData?.id" class="btn btn-custom-primary ms-4" (click)="onSubmit()">
+			Add
+		</button>
+	</div>
+</div>

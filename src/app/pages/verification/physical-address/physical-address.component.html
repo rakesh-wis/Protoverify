@@ -1,0 +1,346 @@
+<div class="container-fluid page-padding">
+	<div
+		class="d-flex justify-content-between align-items-center"
+		*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+	>
+		<label class="text-custom-black-80 fs-4 fw-bold"> {{ userData?.name }}'s Verification Details </label>
+	</div>
+	<div class="card my-4 px-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-header bg-transparent">
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex justify-content-start align-items-center">
+					<img src="assets/images/kyc_address.svg" class="img-fluid" />
+					<h2 class="text-custom-black-80 fw-bold mb-0 ms-3">Address Details</h2>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<form [formGroup]="dataForm">
+				<ng-container formArrayName="addresses" *ngFor="let _ of addresses.controls; let i = index">
+					<div class="row">
+						<div
+							class="form-check m-3"
+							*ngIf="
+								i === 1 &&
+								[
+									roles.EMPLOYEE,
+									roles.PROTO_SUPER_ADMIN,
+									roles.PROTO_ADMIN,
+									roles.PROTO_OPERATION
+								].includes(currentUser?.role)
+							"
+							[formGroupName]="i"
+						>
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="isSameAsRegistered"
+								(change)="patchOptionalAddress($event)"
+								formControlName="isSameAsRegistered"
+							/>
+							<label class="form-check-label" for="isSameAsRegistered">
+								Current address is same as permanent address
+							</label>
+						</div>
+
+						<div class="d-flex justify-content-between align-items-center" *ngIf="i === 0">
+							<img
+								[src]="_.get('status').value === kycStatus.APPROVED ? verifiedIcon : unVerifiedIcon"
+								class="img-fluid"
+								width="24"
+								*ngIf="[kycStatus.APPROVED, kycStatus.REJECTED].includes(_.get('status').value)"
+							/>
+							<h3 class="text-custom-black-80 fs-5 fw-bold ms-1">Permanent address verification</h3>
+						</div>
+						<div class="d-flex justify-content-between align-items-center" *ngIf="i === 1">
+							<img
+								[src]="_.get('status').value === kycStatus.APPROVED ? verifiedIcon : unVerifiedIcon"
+								class="img-fluid"
+								width="24"
+								*ngIf="[kycStatus.APPROVED, kycStatus.REJECTED].includes(_.get('status').value)"
+							/>
+							<h3 class="text-ustom-black-80 fs-5 fw-bold ms-1">Current address verification</h3>
+						</div>
+						<div>
+							<div class="col-lg-6 col-md-6 col-sm-12">
+								<div class="mr-4">
+									<div class="form-group" [formGroupName]="i">
+										<label class="form-label text-custom-black">Pincode</label>
+										<input
+											type="text"
+											class="form-control l bg-transparent"
+											id="pincode"
+											placeholder=""
+											formControlName="pincode"
+											(keypress)="numberOnly($event)"
+											maxlength="8"
+											(keyup)="searchPincode(i)"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages?.pincode">
+											<ng-container
+												*ngIf="
+													_.get('pincode').hasError(error.type) &&
+													(_.get('pincode').dirty || _.get('pincode').touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-custom-black"> Address line 1 </label>
+								<input
+									type="text"
+									class="form-control"
+									id="addressLine1"
+									placeholder=""
+									formControlName="addressLine1"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.addressLine1">
+									<ng-container
+										*ngIf="
+											_.get('addressLine1').hasError(error.type) &&
+											(_.get('addressLine1').dirty || _.get('addressLine1').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-custom-black"> Address line 2 </label>
+								<input
+									type="text"
+									class="form-control"
+									id="addressLine2"
+									placeholder=""
+									formControlName="addressLine2"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.addressLine2">
+									<ng-container
+										*ngIf="
+											_.get('addressLine2').hasError(error.type) &&
+											(_.get('addressLine2').dirty || _.get('addressLine2').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-custom-black">State</label>
+								<input
+									type="text"
+									class="form-control"
+									id="state"
+									placeholder=""
+									formControlName="state"
+									readonly
+								/>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group" [formGroupName]="i">
+								<label class="form-label text-custom-black">City</label>
+								<input
+									type="text"
+									class="form-control"
+									id="city"
+									placeholder=""
+									formControlName="city"
+									readonly
+								/>
+							</div>
+						</div>
+					</div>
+					<div class="row" *ngIf="i === 1" [formGroupName]="i">
+						<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="periodOfStay">
+							<div class="form-group">
+								<label class="form-label text-primary mb-0">
+									Period of stay in Number of Years & Months</label
+								>
+								<div class="input-group mb-0">
+									<input
+										type="text"
+										class="form-control"
+										formControlName="years"
+										placeholder="0-100"
+										aria-label="Year"
+										(keypress)="numberOnly($event)"
+										maxlength="3"
+									/>
+									<select
+										class="form-select text-capitalize"
+										aria-label="Number of months"
+										placeholder="Number of months"
+										formControlName="months"
+									>
+										<option value="" selected disabled [hidden]="periodOfStayForm['months'].value">
+											Number of months
+										</option>
+										<option [value]="item" *ngFor="let item of months">
+											<span>{{ item }}</span>
+										</option>
+									</select>
+								</div>
+								<p class="text-secondary mb-0">Years can be from 0-100</p>
+								<span class="text-left" *ngFor="let error of errorMessages?.years">
+									<ng-container
+										*ngIf="
+											periodOfStayForm['years'].hasError(error.type) &&
+											(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</span>
+								<span
+									class="text-danger px-1"
+									*ngIf="
+										!periodOfStayForm['years'].value &&
+										!periodOfStayForm['months'].dirty &&
+										(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched) &&
+										(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+									"
+									>&</span
+								>
+								<span class="text-left" *ngFor="let error of errorMessages?.months">
+									<ng-container
+										*ngIf="
+											periodOfStayForm['months'].hasError(error.type) &&
+											(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</span>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group">
+								<label class="form-label text-primary"> Type of Accommodation </label>
+								<select
+									class="form-select text-capitalize"
+									aria-label="select type"
+									formControlName="accommodationType"
+								>
+									<option [value]="item" *ngFor="let item of accommodationType">
+										<span>{{ item.replaceAll('_', ' ') }}</span>
+									</option>
+								</select>
+								<div class="text-left" *ngFor="let error of errorMessages.accommodationType">
+									<ng-container
+										*ngIf="
+											_.get('accommodationType').hasError(error.type) &&
+											(_.get('accommodationType').dirty || _.get('accommodationType').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group">
+								<label class="form-label text-primary"> Type of Address </label>
+								<select
+									class="form-select text-capitalize"
+									aria-label="select type"
+									formControlName="addressType"
+								>
+									<option [value]="item" *ngFor="let item of addressType">
+										<span>{{ item }}</span>
+									</option>
+								</select>
+								<div class="text-left" *ngFor="let error of errorMessages.addressType">
+									<ng-container
+										*ngIf="
+											_.get('addressType').hasError(error.type) &&
+											(_.get('addressType').dirty || _.get('addressType').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<div class="form-group">
+								<label class="form-label text-primary"> Type of Ownership </label>
+								<select
+									class="form-select text-capitalize"
+									aria-label="select type"
+									formControlName="ownershipType"
+								>
+									<option [value]="item" *ngFor="let item of ownershipType">
+										<span>{{ item }}</span>
+									</option>
+								</select>
+								<div class="text-left" *ngFor="let error of errorMessages.ownershipType">
+									<ng-container
+										*ngIf="
+											_.get('ownershipType').hasError(error.type) &&
+											(_.get('ownershipType').dirty || _.get('ownershipType').touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+						<div class="d-flex justify-content-end mt-5" *ngIf="i === 1">
+							<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+						</div>
+					</ng-container>
+					<ng-container
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_USER,
+								roles.PROTO_OPERATION
+							].includes(currentUser?.role)
+						"
+					>
+						<div class="d-flex justify-content-end mt-5" *ngIf="i === 1">
+							<button
+								type="button"
+								class="btn btn-primary ms-4"
+								*appIsGranted="'EDIT'"
+								(click)="onSubmit()"
+								[disabled] = "dataForm.disabled"
+							>
+								Submit
+							</button>
+						</div>
+					</ng-container>
+				</ng-container>
+			</form>
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-end">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+	<div class="mt-4" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-verification-status></app-verification-status>
+	</div>
+</div>

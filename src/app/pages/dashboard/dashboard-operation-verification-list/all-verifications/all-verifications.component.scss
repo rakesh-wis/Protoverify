@@ -1,0 +1,47 @@
+td {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	span.status {
+		background-color: rgba(58, 100, 200, 0.1);
+		border: 1px solid rgba(58, 100, 200, 1);
+		color: rgba(58, 100, 200, 1);
+		border-radius: 26px;
+		padding: 5px 8px;
+	}
+
+	span.tat {
+		border-radius: 26px;
+		padding: 3px 8px;
+	}
+	span.tat.medium {
+		background-color: #c3c7001a;
+		border: 1px solid #c3c700;
+		color: #c3c700;
+	}
+	span.tat.high {
+		background-color: #eaaa081a;
+		border: 1px solid #eaaa08;
+		color: #eaaa08;
+	}
+	span.tat.critical {
+		background-color: #dd20251a;
+		border: 1px solid #dd2025;
+		color: #dd2025;
+	}
+	
+}
+
+.ul-check-type li a.active {
+    border-radius: 6px;
+    background: #fff !important;
+    color: black;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ul-check-type {
+	gap: 10px;
+}
+
+.ul-check-type li {
+    border-radius: 6px !important;
+}

@@ -1,0 +1,409 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span>Start New Verification</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row" *ngIf="canVIewCLientSelection">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label for="exampleFormControlInput1" class="form-label text-primary">Select client</label>
+						<ng-select
+							#select
+							class="form-control text-capitalize"
+							[items]="organizationList"
+							bindLabel="registeredName"
+							bindValue="id"
+							[virtualScroll]="true"
+							[dropdownPosition]="'bottom'"
+							[clearable]="true"
+							[multiple]="false"
+							[minTermLength]="2"
+							[closeOnSelect]="true"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							formControlName="associateId"
+							(scrollToEnd)="onScrollClient()"
+							(search)="searchClient($event)"
+							(change)="changeClient($event)"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item?.businessDetails?.registeredName || item?.name }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{
+										item?.businessDetails?.registeredName || item?.name
+									}}</span>
+									<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Name*</label>
+						<input type="text" class="form-control" id="name" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									form['name'].hasError(error.type) && (form['name'].dirty || form['name'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Mobile Number*</label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages?.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label for="exampleFormControlInput1" class="form-label text-custom-black">
+							Email address*
+						</label>
+						<input
+							type="email"
+							class="form-control bg-white-200"
+							id="email"
+							placeholder=""
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									form['email'].hasError(error.type) && (form['email'].dirty || form['email'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Designation*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="designation"
+							placeholder=""
+							formControlName="designation"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['designation'].hasError(error.type) &&
+									(form['designation'].dirty || form['designation'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Employee Id</label>
+						<input
+							type="text"
+							class="form-control"
+							id="customEmployeeId"
+							placeholder=""
+							formControlName="customEmployeeId"
+						/>
+					</div>
+				</div>
+			</div>
+			<div class="row" formArrayName="userAssociations">
+				<ng-container *ngFor="let _ of userAssociations.controls; let i = index">
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Select Region* </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select example"
+								formControlName="regionId"
+								(change)="onRegionChangeHandler($event)"
+								required
+							>
+								<option value="" disabled>Select an option</option>
+								<option [value]="item.id" *ngFor="let item of regionList">
+									<span>{{ item.title }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.regionId">
+								<ng-container
+									*ngIf="
+										_.controls['regionId'].hasError(error.type) &&
+										(_.controls['regionId'].dirty || _.controls['regionId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Select Site* </label>
+							<!-- <ng-select class="form-control text-capitalize" [items]="siteList" [virtualScroll]="true"
+								placeholder="" bindValue="id" bindLabel="name" [dropdownPosition]="'bottom'"
+								[searchable]="true" [editableSearchTerm]="true" formControlName="sitesId"
+								(scrollToEnd)="onScrollToEnd()">
+							</ng-select> -->
+							<select
+								class="form-select text-capitalize"
+								aria-label="select example"
+								formControlName="sitesId"
+								required
+							>
+								<option value="" disabled>Select an option</option>
+								<option [value]="item.id" *ngFor="let item of siteList">
+									<span>{{ item.name }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.sitesId">
+								<ng-container
+									*ngIf="
+										_.controls['sitesId'].hasError(error.type) &&
+										(_.controls['sitesId'].dirty || _.controls['sitesId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</ng-container>
+			</div>
+			<label class="form-label text-primary"> Plan Type </label>
+			<div class="d-flex align-items-center my-2">
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						formControlName="planType"
+						name="planType"
+						id="inlineRadio1"
+						[value]="'favourite'"
+						[disabled]="form['id'].value"
+						(change)="onChangePlanType()"
+					/>
+					<label class="form-check-label text-capitalize" for="inlineRadio1">Favourite Plans</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						formControlName="planType"
+						name="planType"
+						id="inlineRadio2"
+						[value]="'customized'"
+						[disabled]="form['id'].value"
+						(change)="onChangePlanType()"
+					/>
+					<label class="form-check-label text-capitalize" for="inlineRadio2">Customized Plans</label>
+				</div>
+			</div>
+			<ng-container *ngIf="form['planType'].value === 'favourite'">
+				<div class="table-responsive table-plan-feature">
+					<table class="table table-bordered border-black">
+						<tbody>
+							<tr *ngFor="let item$ of favouritePlanList; let index">
+								<td style="width: 30px">
+									<div class="form-check me-3">
+										<input
+											id="item-{{ index }}"
+											class="form-check-input"
+											type="radio"
+											[(ngModel)]="selectedPlan"
+											[ngModelOptions]="{ standalone: true }"
+											name="favouritePlan"
+											[value]="item$"
+											(change)="onCheckFavouritePlan(item$)"
+										/>
+									</div>
+								</td>
+								<td class="text-wrap">
+									<div class="d-flex flex-row align-items-center">
+										<span class="me-1">{{ item$.title }}</span>
+										<div
+											class="d-flex flex-column pe-1 justify-content-center align-items-start"
+											*ngFor="let verification of item$?.favouritePlanFeatures"
+											[ngbTooltip]="verification?.label"
+										>
+											<img
+												[src]="VERIFICATION_BASE_URL + verification?.value + '.png'"
+												width="16"
+												height="16"
+											/>
+										</div>
+									</div>
+								</td>
+								<td class="text-center">
+									<span>₹ {{ item$?.amountPerVerification }} Per Verification</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</ng-container>
+			<ng-container *ngIf="form['planType'].value !== 'favourite'">
+				<div class="table-responsive table-plan-feature">
+					<table class="table table-bordered border-black">
+						<tbody>
+							<tr *ngFor="let item$ of verificationList; let index">
+								<td style="width: 30px">
+									<div class="form-check form-check-inline" style="vertical-align: middle">
+										<input
+											id="item-{{ index }}"
+											class="form-check-input"
+											type="checkbox"
+											[(ngModel)]="item$.checked"
+											[ngModelOptions]="{ standalone: true }"
+											[checked]="item$.checked"
+											[disabled]="item$.value === 'aadhar_card' || item$.disabled"
+										/>
+									</div>
+								</td>
+								<td class="text-custom-black">
+									<div
+										class="d-flex justify-content-start align-items-center"
+										[ngClass]="{
+											'my-2 py-1': ![
+												planFeatures.PAST_EMPLOYMENT,
+												planFeatures.EDUCATIONAL,
+												planFeatures.REFERENCE_CHECK
+											].includes(item$.value)
+										}"
+									>
+										<div class="w-30">
+											<span class="text-custom-black">{{ item$.title }}</span>
+										</div>
+										<div
+											class="form-group mb-0 ms-3"
+											*ngIf="
+												[
+													planFeatures.PAST_EMPLOYMENT,
+													planFeatures.EDUCATIONAL,
+													planFeatures.REFERENCE_CHECK
+												].includes(item$.value)
+											"
+										>
+											<!-- <select
+												class="form-select-sm form-select text-capitalize"
+												aria-label="select example"
+												[(ngModel)]="item$.maxUploadNumber"
+												[ngModelOptions]="{ standalone: true }"
+											>
+												<option [value]="item" *ngFor="let item of getListRange(item$.value)">
+													<span>{{ item }}</span>
+												</option>
+											</select> -->
+											<div class="d-flex align-items-center border rounded-2">
+												<div class="" *ngFor="let item of getListRange(item$.value)">
+													<input
+														class="btn-check"
+														type="radio"
+														[(ngModel)]="item$.maxUploadNumber"
+														[ngModelOptions]="{ standalone: true }"
+														[name]="item$.value + item"
+														[id]="item$.value + item"
+														[value]="item"
+														[disabled]="item$.disabled"
+														[checked]="item$.maxUploadNumber > 0 ? true : false"
+													/>
+													<label
+														class="btn"
+														[for]="item$.value + item"
+														[ngClass]="{
+															'btn-check-checked w-100 rounded-3':
+																item$.maxUploadNumber > 0
+														}"
+														>{{ item }}
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<small
+										class="text-custom-black-80"
+										*ngIf="[planFeatures.EDUCATIONAL].includes(item$.value)"
+									>
+										You can request up to {{ getListRange(item$.value).length }} education details*
+									</small>
+									<small
+										class="text-custom-black-80"
+										*ngIf="[planFeatures.PAST_EMPLOYMENT].includes(item$.value)"
+									>
+										You can request up to {{ getListRange(item$.value).length }} past employment
+										details*
+									</small>
+									<small
+										class="text-custom-black-80"
+										*ngIf="[planFeatures.REFERENCE_CHECK].includes(item$.value)"
+									>
+										You can request up to {{ getListRange(item$.value).length }} reference details*
+									</small>
+								</td>
+								<td class="text-center">
+									<span>₹ {{ item$?.price }} + GST</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</ng-container>
+			<div class="text-left" *ngFor="let error of errorMessages.verificationChecks">
+				<ng-container
+					*ngIf="
+						form['verificationChecks'].hasError(error.type) &&
+						(form['verificationChecks'].dirty || form['verificationChecks'].touched)
+					"
+				>
+					<span class="text-danger">{{ error.message }}</span>
+				</ng-container>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button
+			appDebounceClick
+			type="button"
+			class="btn btn-custom-primary ms-4"
+			(debounceClick)="onSubmit()"
+			[debounceTime]="700"
+		>
+			Submit
+		</button>
+	</div>
+</div>

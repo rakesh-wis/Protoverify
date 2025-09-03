@@ -1,0 +1,45 @@
+<div class="card border-0 shadow-color" style="max-height: 100%">
+	<div class="card-body pb-0">
+		<label class="text-custom-primary-dark fw-bold fs-6"> Tracker Analytics </label>
+		<ul class="list-group mt-2">
+			<li class="list-group-item py-2 border-0" *ngFor="let item of dataList?.rows">
+				<div class="d-flex justify-content-between">
+					<div class="d-flex align-items-center">
+						<div class="flex-shrink-0">
+							<img
+								class="rounded-circle"
+								width="44"
+								height="44"
+								[src]="item?.profilePicture || 'assets/icons/avatar.svg'"
+							/>
+						</div>
+						<div class="flex-grow-1 ms-3">
+							<p class="mb-0 text-custom-primary-dark fw-bold">{{ item.name || '-' | truncate }}</p>
+						</div>
+					</div>
+					<div class="d-flex align-items-center">
+						<span class="mr-1 text-custom-primary-dark opacity-90">
+							{{ item?.verificationCount?.percentage | number }} %
+						</span>
+					</div>
+				</div>
+				<div class="w-50 ms-auto mt-1">
+					<div>
+						<app-custom-progress
+							[customClass]="getClass(item)"
+							[percentage]="item?.verificationCount?.percentage"
+						>
+						</app-custom-progress>
+					</div>
+				</div>
+			</li>
+		</ul>
+
+		<p *ngIf="dataList.count === 0">{{ OPTIONS?.noRecord }}</p>
+	</div>
+	<div class="card-footer border-0 bg-transparent py-4" *ngIf="dataList.count > 0">
+		<button class="btn btn-primary-200 w-100" (click)="navigateTo()" routerLinkActive="router-link-active">
+			View Analytics
+		</button>
+	</div>
+</div>

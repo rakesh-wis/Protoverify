@@ -1,0 +1,265 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!siteId">Add</span>
+			<span *ngIf="siteId">Update</span>
+			Location
+		</h2>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row mt-4">
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Locations Name*</label>
+						<input type="text" class="form-control" id="name" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									form['name'].hasError(error.type) && (form['name'].dirty || form['name'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Contact Name*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="contactName"
+							placeholder=""
+							formControlName="contactName"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.contactName">
+							<ng-container
+								*ngIf="
+									form['contactName'].hasError(error.type) &&
+									(form['contactName'].dirty || form['contactName'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Address Line 1* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="addressLine1"
+							placeholder=""
+							formControlName="addressLine1"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.addressLine1">
+							<ng-container
+								*ngIf="
+									form['addressLine1'].hasError(error.type) &&
+									(form['addressLine1'].dirty || form['addressLine1'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Address Line2 (optional) </label>
+						<input
+							type="text"
+							class="form-control"
+							id="addressLine2"
+							placeholder=""
+							formControlName="addressLine2"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.addressLine2">
+							<ng-container
+								*ngIf="
+									form['addressLine2'].hasError(error.type) &&
+									(form['addressLine2'].dirty || form['addressLine2'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> PIN Code number* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="pincode"
+							placeholder=""
+							formControlName="pincode"
+							(keyup)="searchPincode()"
+							(keypress)="numberOnly($event)"
+							maxlength="8"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.pincode">
+							<ng-container
+								*ngIf="
+									form['pincode'].hasError(error.type) &&
+									(form['pincode'].dirty || form['pincode'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> State* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="state"
+							placeholder=""
+							formControlName="state"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> City* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="city"
+							placeholder=""
+							formControlName="city"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Select Location*</label>
+						<button type="button" class="btn btn-outline-primary w-100" (click)="addLocation()">
+							<div class="d-flex justify-content-center align-items-center">
+								<mat-icon mat-list-icon class="text-primary">place</mat-icon>
+								Location on google map
+							</div>
+						</button>
+						<div class="text-left" *ngFor="let error of errorMessages.latitude">
+							<ng-container
+								*ngIf="
+									form['latitude'].hasError(error.type) &&
+									(form['latitude'].dirty || form['latitude'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+						<div class="text-left ps-2" *ngFor="let error of errorMessages.geoFence">
+							<ng-container
+								*ngIf="
+									form['geoFence'].hasError(error.type) &&
+									(form['geoFence'].dirty || form['geoFence'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Email*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="name"
+							placeholder=""
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									form['email'].hasError(error.type) && (form['email'].dirty || form['email'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Mobile Number*</label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages?.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Website* </label>
+						<div class="input-group mb-3">
+							<span class="input-group-text bg-transparent text-primary" id="basic-addon1">https://</span>
+							<input
+								type="url"
+								class="form-control"
+								id="website"
+								placeholder=""
+								formControlName="website"
+							/>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.website">
+							<ng-container
+								*ngIf="
+									form['website'].hasError(error.type) &&
+									(form['website'].dirty || form['website'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary"> Select Region* </label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select example"
+							formControlName="regionId"
+						>
+							<option [value]="item.id" *ngFor="let item of regionList">
+								<span>{{ item.title }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.regionId">
+							<ng-container
+								*ngIf="
+									form['regionId'].hasError(error.type) &&
+									(form['regionId'].dirty || form['regionId'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

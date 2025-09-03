@@ -1,0 +1,73 @@
+<div class="card shadow-color">
+	<div class="card-body">
+		<div class="d-flex justify-content-between mx-5 my-2">
+			<h1 class="text-custom-black fw-bold">Frequently Asked Questions</h1>
+			<button type="button" class="btn btn-primary" *ngIf="isRoleAccess" (click)="add()">+ Add New</button>
+		</div>
+
+		<div class="d-flex justify-content-start mb-5">
+			<div ngbAccordion class="faq-accordion w-100">
+				<div ngbAccordionItem *ngFor="let item of dataList; let i = index" [collapsed]="false">
+					<div ngbAccordionHeader>
+						<div class="d-flex align-items-start justify-content-between">
+							<h2 class="text-custom-primary-dark fw-bold">{{ item.question }}</h2>
+							<div class="d-flex">
+								<button class="btn p-0" ngbAccordionToggle>
+									<mat-icon class="text-custom-black-50" *ngIf="!item.opened"
+										>keyboard_arrow_down</mat-icon
+									>
+									<mat-icon class="text-custom-black-50" *ngIf="item.opened"
+										>keyboard_arrow_up</mat-icon
+									>
+								</button>
+								<div class="ms-3 d-flex" *ngIf="isRoleAccess">
+									<span class="me-2" role="button" ngbTooltip="Edit" (click)="edit(i)">
+										<iconify-icon
+											class="fs-5 text-custom-black-50"
+											icon="iconamoon:edit-light"
+										></iconify-icon>
+									</span>
+									<span>
+										<div class="form-check form-switch">
+											<input
+												class="form-check-input"
+												[id]="item.id"
+												(change)="toggleCheck($event, item)"
+												type="checkbox"
+												role="switch"
+												[ngbTooltip]="item.status === defaultStatus.ACTIVE ? 'Block' : 'Active'"
+												[checked]="item.status === defaultStatus.ACTIVE"
+											/>
+										</div>
+									</span>
+									<span
+										class="me-2"
+										role="button"
+										(click)="openConfirmDelete(item)"
+										ngbTooltip="Delete"
+									>
+										<iconify-icon
+											class="fs-5 text-custom-black-50"
+											icon="ant-design:delete-outlined"
+										></iconify-icon>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div ngbAccordionCollapse>
+						<div ngbAccordionBody>
+							<ng-template>
+								<p
+									class="text-custom-primary-dark"
+									[innerHTML]="item.answer | safe: 'html'"
+									*ngIf="item"
+								></p>
+							</ng-template>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

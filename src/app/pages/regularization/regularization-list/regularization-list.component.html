@@ -1,0 +1,200 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between ign-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-primary fs-3 fw-bold">Regularization</h2>
+		</div>
+	</div>
+
+	<div class="card border-primary bg-transparent">
+		<div class="card-body bg-transparent">
+			<div class="d-flex justify-content-start align-items-center">
+				<div class="card col-lg-4 col-md-7 col-sm-12">
+					<div class="card-body p-1">
+						<app-year-month-picker (change)="selectMonthYear($event)"></app-year-month-picker>
+					</div>
+				</div>
+				<div class="text-center col-lg-8 col-md-5 col-sm-12">
+					<h2 class="text-primary fw-bold mb-0">{{ selectedMonthYear }}</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row justify-content-between align-items-center my-1">
+		<div class="col-lg-3 col-md-6 col-sm-12 my-2" *ngFor="let item of markList">
+			<div class="d-flex align-items-center">
+				<mat-icon mat-list-icon class="text-primary" [svgIcon]="item.icon"></mat-icon>
+				<label class="text-primary ms-1">{{ item?.label }}</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="row justify-content-start align-items-center">
+		<div class="col-lg-4 col-md-4 col-sm-12">
+			<div class="form-group">
+				<label for="exampleFormControlInput1" class="form-label text-primary">Filter by sites</label>
+				<ng-select
+					class="form-control text-capitalize bg-white-200"
+					[items]="sitesList['rows']"
+					[virtualScroll]="true"
+					[multiple]="true"
+					bindLabel="name"
+					bindValue="id"
+					[dropdownPosition]="'bottom'"
+					[searchable]="true"
+					[editableSearchTerm]="true"
+					[(ngModel)]="selectedSites"
+					[ngModelOptions]="{ standalone: true }"
+					appendTo="body"
+					placeholder=""
+					(scrollToEnd)="onScrollSites()"
+					(add)="applyFilters()"
+					(remove)="clearFilter()"
+					(clear)="clearFilter()"
+					(search)="searchSites($event)"
+				>
+					<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+						<input
+							id="item-{{ index }}"
+							class="form-check-input"
+							type="checkbox"
+							[ngModel]="item$.selected"
+							[ngModelOptions]="{ standalone: true }"
+						/>
+						{{ item.name }}
+					</ng-template>
+					<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+						<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:1">
+							<span class="ng-value-label">{{ item.name }}</span>
+							<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+						</div>
+						<div class="ng-value ps-2" *ngIf="items.length > 1">
+							<span class="ng-value-label ps-2">{{ items.length - 1 }} more...</span>
+						</div>
+					</ng-template>
+				</ng-select>
+			</div>
+		</div>
+		<div class="col-lg-4 col-md-4 col-sm-12">
+			<div class="form-group">
+				<label for="exampleFormControlInput1" class="form-label text-primary">Filter by Shift</label>
+				<ng-select
+					class="form-control text-capitalize bg-white-200"
+					[items]="timeShiftList['rows']"
+					[multiple]="true"
+					bindLabel="name"
+					bindValue="id"
+					[dropdownPosition]="'bottom'"
+					[editableSearchTerm]="true"
+					[(ngModel)]="selectedTimeShift"
+					[ngModelOptions]="{ standalone: true }"
+					appendTo="body"
+					placeholder=""
+					(add)="setFilters()"
+					(remove)="setFilters()"
+					(clear)="setFilters()"
+				>
+					<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+						<input
+							id="item-{{ index }}"
+							class="form-check-input"
+							type="checkbox"
+							[ngModel]="item$.selected"
+							[ngModelOptions]="{ standalone: true }"
+						/>
+						{{ item.name }}
+					</ng-template>
+					<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+						<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:1">
+							<span class="ng-value-label">{{ item.name }}</span>
+							<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+						</div>
+						<div class="ng-value ps-2" *ngIf="items.length > 1">
+							<span class="ng-value-label ps-2">{{ items.length - 1 }} more...</span>
+						</div>
+					</ng-template>
+				</ng-select>
+			</div>
+		</div>
+		<div class="col-lg-4 col-md-4 col-sm-12 text-end mt-3">
+			<button class="btn btn-outline-primary" (click)="exportBulk()">Export</button>
+			<button class="btn btn-outline-primary" (click)="openBulkUpload()">Upload</button>
+		</div>
+	</div>
+
+	<ng-container>
+		<div class="table-responsive mt-3" #TABLE>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<ng-container *ngFor="let item of headerColumn">
+							<th
+								scope="col"
+								class="text-nowrap"
+								*ngIf="item.sorting"
+								[sortable]="item.value"
+								(sort)="onSort($event)"
+							>
+								{{ item.label }}
+							</th>
+							<th scope="col" *ngIf="!item.sorting" class="text-nowrap">
+								{{ item.label }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList['rows']">
+						<td class="text-capitalize text-wrap">
+							{{ item?.profileIdentifier | truncate }}
+						</td>
+						<td class="text-capitalize text-wrap">
+							{{ item?.name | truncate }}
+						</td>
+						<td class="text-capitalize text-center" *ngFor="let col of headerColumn.slice(2)">
+							{{ getAttendanceData(item, col.value)?.mark || '-' }}
+						</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="d-flex justify-content-center align-items-start w-100 p-3" *ngIf="dataList['count'] > 0">
+			<ng-container>
+				<div
+					class="d-flex align-items-center previous-next-items text-primary"
+					role="button"
+					(click)="onPageChange(page - 1, 'prev')"
+					[ngClass]="{ 'text-primary-100': isPrevious() }"
+				>
+					<mat-icon mat-list-icon>arrow_back</mat-icon>
+					<span class="ps-1">Previous</span>
+				</div>
+			</ng-container>
+			<ngb-pagination
+				[collectionSize]="collectionSize"
+				[(page)]="page"
+				[pageSize]="pageSize"
+				(pageChange)="onPageChange($event, null)"
+				[maxSize]="5"
+				[directionLinks]="false"
+			>
+			</ngb-pagination>
+			<ng-container>
+				<div
+					class="d-flex align-items-center previous-next-items text-primary"
+					role="button"
+					(click)="onPageChange(page + 1, 'next')"
+					[ngClass]="{ 'text-primary-100': isLastPage() }"
+				>
+					<span class="pe-1">Next</span>
+					<mat-icon mat-list-icon>arrow_forward</mat-icon>
+				</div>
+			</ng-container>
+		</div>
+	</ng-container>
+</div>

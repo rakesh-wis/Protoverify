@@ -1,0 +1,44 @@
+<div class="my-3">
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-primary fw-bold" id="modal-basic-title">
+			<span>Bulk upload from template</span>
+		</h2>
+	</div>
+	<div class="modal-body">
+		<div
+			class="upload-box d-flex justify-content-center align-items-center py-3"
+			(click)="fileInput.click()"
+			role="button"
+			*ngIf="!form['file'].value"
+		>
+			<input
+				hidden
+				#fileInput
+				type="file"
+				class="form-control"
+				id="upload-file"
+				(change)="selectFile($event)"
+				accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+			/>
+			<h3 class="text-primary mb-0">Drop files to attach, or <a class="text-primary fw-bold">browse</a></h3>
+		</div>
+		<div class="d-flex justify-content-start pt-2" *ngIf="form['file'].value">
+			<h3 class="text-success">File added</h3>
+			<mat-icon class="text-success ps-1">check_circle</mat-icon>
+		</div>
+		<div class="text-left" *ngFor="let error of errorMessages.file">
+			<ng-container *ngIf="form['file'].hasError(error.type) && (form['file'].dirty || form['file'].touched)">
+				<span class="text-danger">{{ error.message }}</span>
+			</ng-container>
+		</div>
+
+		<div class="d-flex justify-content-start pt-2" role="button" (click)="downloadTemplate()">
+			<label class="text-primary">Download template to bulk upload</label>
+			<mat-icon class="text-primary" style="height: 16px" svgIcon="download"></mat-icon>
+		</div>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

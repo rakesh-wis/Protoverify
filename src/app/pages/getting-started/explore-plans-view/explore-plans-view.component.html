@@ -1,0 +1,51 @@
+<div class="">
+	<div class="modal-body plan-card p-0">
+		<div
+			class="card p-0 plan-card-top-border border"
+			[ngClass]="{
+				'border-green': modelData.planFeature.length >= 13,
+				'border-blue': modelData.planFeature.length >= 6 && modelData.planFeature.length < 13,
+				'border-yellow': modelData.planFeature.length < 6
+			}"
+		>
+			<div class="plan-banner">
+				<img [src]="'assets/images/plan-banner-' + getColor(modelData) + '.svg'" />
+			</div>
+			<div class="card-body px-4">
+				<div class="ps-5">
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<h3 class="text-custom-black text-capitalize fs-5 fw-bolder mb-0">
+							{{ modelData.title }}
+						</h3>
+						<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+					</div>
+					<p class="text-custom-black-50">{{ modelData?.description }}</p>
+				</div>
+
+				<div class="d-flex align-items-center mb-4 plan-features" *ngFor="let feature of modelData.planFeature">
+					<div class="">
+						<iconify-icon
+							class="check-box-icon"
+							icon="subway:tick"
+							[ngClass]="{
+								'check-green': modelData.planFeature.length >= 13,
+								'check-blue': modelData.planFeature.length >= 6 && modelData.planFeature.length < 13,
+								'check-yellow': modelData.planFeature.length < 6
+							}"
+						></iconify-icon>
+					</div>
+					<p class="text-custom-black-50 text-capitalize mb-1 ps-3">
+						{{ getPlanTitle(feature)?.label }}
+					</p>
+				</div>
+			</div>
+			<div class="px-4">
+				<hr class="text-custom-black-50" />
+			</div>
+			<div class="card-footer border-0 text-center bg-transparent">
+				<h2 class="text-primary mb-0 fw-bold">₹ {{ modelData?.totalAmount }}</h2>
+				<p class="text-custom-black-50">Per verification</p>
+			</div>
+		</div>
+	</div>
+</div>

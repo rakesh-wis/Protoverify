@@ -1,0 +1,49 @@
+<div>
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title"></h2>
+	</div>
+	<div class="modal-body">
+		<div class="d-flex flex-column text-center" *ngIf="!modelData?.isCompleted; else completed">
+			<label class="text-danger fw-bold"> <span class="fs-1">!</span><span class="fs-3">ncomplete</span> </label>
+			<div class="py-2">
+				<p class="text-primary-dark mb-0">
+					You have not completed
+					<strong class="text-danger">
+						{{ pendingList }}
+					</strong>
+					Verification Process. Please go back & complete the process for the pending checks in order to
+					successfully submit your verification.
+				</p>
+			</div>
+		</div>
+		<ng-template #completed>
+			<div class="d-flex flex-column text-center">
+				<div class="text-center">
+					<img [src]="'./assets/icons/verified.svg'" class="img-fluid" width="48" />
+				</div>
+				<div class="py-2">
+					<h2 class="text-primary-dark fw-bold">Verification Completed</h2>
+					<p class="text-primary-dark mb-0">
+						Your Verification is completed. You can now proceed to Submit. Once you click on submit you will
+						be logged out of this application and your verification status will be communicated with you
+						shortly.
+					</p>
+				</div>
+			</div>
+		</ng-template>
+	</div>
+	<div class="d-flex flex-column modal-footer border-0 justify-content-center">
+		<button type="button" class="btn btn-custom-primary ms-4" *ngIf="modelData?.isCompleted" (click)="closeModal()">
+			Submit
+		</button>
+		<a
+			role="button"
+			class="text-primary-dark text-decoration-none"
+			*ngIf="!modelData?.isCompleted"
+			(click)="dismissModal()"
+		>
+			<iconify-icon icon="cil:arrow-left"></iconify-icon>
+			Go back to verification
+		</a>
+	</div>
+</div>

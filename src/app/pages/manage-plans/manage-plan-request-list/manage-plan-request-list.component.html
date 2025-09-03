@@ -1,0 +1,45 @@
+<ng-container>
+	<div class="table-responsive mt-3">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<ng-container *ngFor="let item of headerColumn">
+						<th scope="col" *ngIf="item.sorting" [sortable]="item.value" (sort)="onSort($event)">
+							{{ item.label }}
+						</th>
+						<th scope="col" *ngIf="!item.sorting">
+							{{ item.label }}
+						</th>
+					</ng-container>
+				</tr>
+			</thead>
+			<tbody *ngIf="dataList['count'] > 0">
+				<tr *ngFor="let item of dataList['rows']">
+					<td class="text-capitalize text-wrap">
+						{{ item.user?.businessDetails?.registeredName | truncate }}
+					</td>
+					<td class="text-wrap">{{ item?.title | truncate }}</td>
+					<td class="text-wrap">{{ item?.createdAt | date: 'dd MMM YYYY' }}</td>
+					<td class="text-wrap">{{ item?.noOfVerification }}</td>
+					<td>
+						<button class="btn btn-outline-primary mx-2" (click)="view(item, true)">Approve</button>
+						<button class="btn btn-outline-danger mx-2" (click)="openConfirmReject(item)">Reject</button>
+					</td>
+				</tr>
+			</tbody>
+			<tbody *ngIf="dataList['count'] === 0">
+				<tr>
+					<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<app-pagination
+		[collectionSize]="collectionSize"
+		[(page)]="page"
+		*ngIf="dataList['count'] > 0"
+		[pageSize]="pageSize"
+		(pageChange)="onPageChange($event)"
+		[maxSize]="5"
+	></app-pagination>
+</ng-container>

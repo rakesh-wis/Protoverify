@@ -1,0 +1,42 @@
+<div>
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-primary fw-bold" id="modal-basic-title">Change Status</h2>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Employee Name</label>
+						<input
+							type="text"
+							class="form-control"
+							id="name"
+							placeholder=""
+							formControlName="name"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Status</label>
+						<select
+							name="status"
+							id="status"
+							class="form-select text-capitalize"
+							aria-label="change status"
+							formControlName="status"
+						>
+							<option [value]="item.name" *ngFor="let item of statusList">{{ item?.label }}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="openConfirmStatus()">Submit</button>
+	</div>
+</div>

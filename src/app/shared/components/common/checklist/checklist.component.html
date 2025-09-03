@@ -1,0 +1,80 @@
+<div class="my-4">
+	<div
+		[ngClass]="{ 'my-3': [roles.EMPLOYEE].includes(currentUser.role) }"
+		*ngFor="let item of checkList; let i = index"
+		role="button"
+		(click)="navigateTo(item)"
+		[ngClass]="{
+			unclickable:
+				[roles.PROTO_OPERATION].includes(currentUser?.role) &&
+				!assignedVerificationChecks?.includes(item?.value) &&
+				item?.value != 'user_based_onboarder'
+		}"
+	>
+		<p
+			*ngIf="[roles.EMPLOYEE].includes(currentUser.role)"
+			class="ps-4 ms-3 text-custom-primary-dark mb-0 text-smaller"
+		>
+			Step {{ i + 1 }}
+		</p>
+		<div
+			class="d-flex aling-items-center my-1 py-2"
+			[ngClass]="[linkActive(item.path)]"
+			role="button"
+			[ngbPopover]="popContent"
+			[popoverContext]="{ verification: item }"
+			triggers="mouseenter:mouseleave"
+			popoverClass="verification-popover"
+			placement="right"
+		>
+			<img
+				[src]="getVerificationIcon(item)"
+				class="img-fluid"
+				width="24"
+				*ngIf="![roles.EMPLOYEE].includes(currentUser.role)"
+			/>
+			<iconify-icon
+				class="fs-5"
+				style="color: #c4d9f2"
+				icon="mdi:radiobox-marked"
+				*ngIf="[roles.EMPLOYEE].includes(currentUser.role)"
+			></iconify-icon>
+			<label
+				class="text-custom-primary-dark fw-bold"
+				[ngClass]="{
+					'text-muted !disabled-active-verification': grayOutLinks(item.path),
+					'ms-1': true
+				}"
+				>{{ item.title }}</label
+			>
+		</div>
+		<div class="ps-4 ms-3" *ngIf="[roles.EMPLOYEE].includes(currentUser.role)">
+			<span
+				class="badge badge-danger badge-table-status py-0 px-2"
+				*ngIf="!item.status && item?.status != ''"
+				style="font-size: smaller"
+			>
+				Pending
+			</span>
+
+			<span
+				class="badge badge-danger badge-table-status py-0 px-2"
+				style="font-size: smaller"
+				*ngIf="item?.status && !item.checked"
+			>
+				Pending
+				<span *ngIf="item?.maxUploadNumber > 1">{{ item?.currentUpload }}/{{ item?.maxUploadNumber }}</span>
+			</span>
+
+			<span
+				class="badge badge-success badge-table-status text-capitalize py-0 px-2"
+				style="font-size: smaller"
+				*ngIf="item?.status && item.checked"
+				>Completed
+			</span>
+		</div>
+		<ng-template #popContent let-verificationCheck="verification">
+			<app-verification-status-popover [verificationCheck]="verificationCheck"></app-verification-status-popover>
+		</ng-template>
+	</div>
+</div>

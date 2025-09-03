@@ -1,0 +1,38 @@
+.nav-breadcrumb {
+	--bs-breadcrumb-divider: '>';
+	padding: 1rem 0rem 0rem 2rem;
+}
+
+.breadcrumbs {
+	border: 1px solid #cbd3dc;
+	border-radius: 0.3rem;
+	display: inline-flex;
+	overflow: hidden;
+}
+
+.breadcrumb-item {
+	outline: none;
+	padding: 8px;
+	position: relative;
+	text-decoration: none;
+	transition: background 0.2s linear;
+	font-size: large;
+	display: flex;
+	align-items: center;
+}
+// .breadcrumb-item:first-child {
+// 	padding: 0.5em 0.5em 0.5em 1rem;
+// }
+// .breadcrumb-item:after,
+// .breadcrumb-item:before {
+// 	background: white;
+// 	bottom: 0;
+// 	clip-path: polygon(70% 50%, -50% -50%, 0 100%);
+// 	content: '';
+// 	left: 100%;
+// 	position: absolute;
+// 	top: 0;
+// 	transition: background 0.2s linear;
+// 	width: 1em;
+// 	z-index: 1;
+// }

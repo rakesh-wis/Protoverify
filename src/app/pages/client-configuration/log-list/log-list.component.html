@@ -1,0 +1,154 @@
+<div class="container-fluid page-padding">
+	<div class="row">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="form-group">
+				<label for="exampleFormControlInput1" class="form-label text-primary">Filter By employee</label>
+				<ng-select
+					class="form-control text-capitalize"
+					[items]="employeeDataList['rows']"
+					[virtualScroll]="true"
+					[multiple]="true"
+					bindLabel="name"
+					bindValue="id"
+					[dropdownPosition]="'bottom'"
+					[searchable]="true"
+					[editableSearchTerm]="true"
+					[(ngModel)]="selectedEmployee"
+					[ngModelOptions]="{ standalone: true }"
+					appendTo="body"
+					placeholder=""
+					(scrollToEnd)="onScrollEmployee()"
+					(add)="applyFilters()"
+					(remove)="applyFilters()"
+					(search)="searchClient($event)"
+					(clear)="clearFilter()"
+				>
+					<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+						<input
+							id="item-{{ index }}"
+							class="form-check-input"
+							type="checkbox"
+							[ngModel]="item$.selected"
+							[ngModelOptions]="{ standalone: true }"
+						/>
+						{{ item?.name }}
+					</ng-template>
+					<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+						<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+							<span class="ng-value-label">{{ item?.name }}</span>
+							<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+						</div>
+						<div class="ng-value ps-2" *ngIf="items.length > 4">
+							<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+						</div>
+					</ng-template>
+				</ng-select>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="form-group">
+				<label for="exampleFormControlInput1" class="form-label text-primary">Filter By month</label>
+				<ng-select
+					class="form-control text-capitalize"
+					[items]="monthNameList"
+					bindLabel="name"
+					bindValue="id"
+					[dropdownPosition]="'bottom'"
+					[editableSearchTerm]="true"
+					[(ngModel)]="selectedMonth"
+					[ngModelOptions]="{ standalone: true }"
+					appendTo="body"
+					placeholder=""
+					(change)="applyFilters()"
+				>
+					<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+						<input
+							id="item-{{ index }}"
+							class="form-check-input"
+							type="checkbox"
+							[ngModel]="item$.selected"
+							[ngModelOptions]="{ standalone: true }"
+						/>
+						{{ item?.name }}
+					</ng-template>
+					<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+						<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+							<span class="ng-value-label">{{ item?.name }}</span>
+							<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+						</div>
+						<div class="ng-value ps-2" *ngIf="items.length > 4">
+							<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+						</div>
+					</ng-template>
+				</ng-select>
+			</div>
+		</div>
+	</div>
+
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<ng-container *ngFor="let item of headerColumn">
+							<th scope="col" *ngIf="item.sorting" [sortable]="item.value" (sort)="onSort($event)">
+								{{ item.label }}
+							</th>
+							<th scope="col" *ngIf="!item.sorting">
+								{{ item.label }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList['rows']">
+						<td class="text-wrap">{{ item?.createdAt | date: 'dd MMM YYYY' }}</td>
+						<td class="text-capitalize text-wrap">
+							{{ item?.user?.name | truncate }}
+						</td>
+						<td class="text-wrap text-capitalize">{{ item?.location }}</td>
+						<td class="text-wrap">{{ item?.checkInTime }}</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="d-flex justify-content-center align-items-start w-100 p-3" *ngIf="dataList['count'] > 0">
+			<ng-container>
+				<div
+					class="d-flex align-items-center previous-next-items text-primary"
+					role="button"
+					(click)="onPageChange(page - 1, 'prev')"
+					[ngClass]="{ 'text-primary-100': isPrevious() }"
+				>
+					<mat-icon mat-list-icon>arrow_back</mat-icon>
+					<span class="ps-1">Previous</span>
+				</div>
+			</ng-container>
+			<ngb-pagination
+				[collectionSize]="collectionSize"
+				[(page)]="page"
+				[pageSize]="pageSize"
+				(pageChange)="onPageChange($event, null)"
+				[maxSize]="5"
+				[directionLinks]="false"
+			>
+			</ngb-pagination>
+			<ng-container>
+				<div
+					class="d-flex align-items-center previous-next-items text-primary"
+					role="button"
+					(click)="onPageChange(page + 1, 'next')"
+					[ngClass]="{ 'text-primary-100': isLastPage() }"
+				>
+					<span class="pe-1">Next</span>
+					<mat-icon mat-list-icon>arrow_forward</mat-icon>
+				</div>
+			</ng-container>
+		</div>
+	</ng-container>
+</div>

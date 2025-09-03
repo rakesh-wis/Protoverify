@@ -1,0 +1,227 @@
+<div class="container-fluid">
+	<div class="card plan-card shadow-color" *ngIf="plan?.length > 0">
+		<div class="card-body">
+			<div class="row">
+				<div class="card-group col-lg-4 col-md-5 col-sm-12" *ngFor="let item of plan; let i = index">
+					<div
+						class="card plan-card-top-border mb-4 border"
+						[ngClass]="{
+							'border-green': item.features.length >= 13,
+							'border-blue': item.features.length >= 6 && item.features.length < 13,
+							'border-yellow': item.features.length < 6
+						}"
+					>
+						<div class="plan-banner">
+							<img [src]="'assets/images/plan-banner-' + getColor(item) + '.svg'" />
+						</div>
+
+						<div class="card-body px-4">
+							<div class="ps-5">
+								<div class="d-flex justify-content-between align-items-center mb-2">
+									<h3 class="text-custom-black text-capitalize fs-5 fw-bolder mb-0">
+										{{ item.title }}
+									</h3>
+								</div>
+								<p class="text-custom-black-50">{{ item?.description }}</p>
+							</div>
+
+							<div
+								class="d-flex align-items-center mb-4 plan-features"
+								*ngFor="let feature of item.features.slice(0, 3)"
+							>
+								<div class="">
+									<iconify-icon
+										class="check-box-icon"
+										icon="subway:tick"
+										[ngClass]="{
+											'check-green': item.features.length >= 13,
+											'check-blue': item.features.length >= 6 && item.features.length < 13,
+											'check-yellow': item.features.length < 6
+										}"
+									></iconify-icon>
+								</div>
+								<p class="text-custom-black-50 text-capitalize mb-1 ps-3">
+									{{ getPlanTitle(feature)?.label }}
+								</p>
+							</div>
+							<div class="d-flex justify-content-center align-items-center plan-features">
+								<a
+									[ngClass]="{
+										'view-green': item.features.length >= 13,
+										'view-blue': item.features.length >= 6 && item.features.length < 13,
+										'view-yellow': item.features.length < 6
+									}"
+									role="button"
+									class="text-underline"
+									(click)="view(item)"
+								>
+									<span> View All </span>
+								</a>
+							</div>
+							<!-- <div [ngbCollapse]="!isCollapsed[i]">
+									<div
+										class="d-flex align-items-center mb-4 plan-features"
+										*ngFor="let feature of item.features.slice(6, item.features.length)"
+									>
+										<div class="">
+											<iconify-icon
+												class="check-box-icon"
+												icon="subway:tick"
+												[ngClass]="{
+													'check-green': item.features.length >= 13,
+													'check-blue':
+														item.features.length >= 6 && item.features.length < 13,
+													'check-yellow': item.features.length < 6
+												}"
+											></iconify-icon>
+										</div>
+										<p class="text-custom-black-50 text-capitalize mb-1 ps-3">
+											{{ getPlanTitle(feature)?.label }}
+										</p>
+									</div>
+								</div> -->
+
+							<!-- <div *ngIf="item.features.length > 5" class="text-center mb-3">
+									<a
+										[ngClass]="{
+											'view-green': item.features.length >= 13,
+											'view-blue': item.features.length >= 6 && item.features.length < 13,
+											'view-yellow': item.features.length < 6
+										}"
+										role="button"
+										class="text-underline"
+										(click)="isCollapsed[i] = !isCollapsed[i]"
+									>
+										<span *ngIf="!isCollapsed[i]">
+											View All
+											<iconify-icon
+												class="text-bs-custom-black-50"
+												icon="ep:arrow-down"
+											></iconify-icon>
+										</span>
+	
+										<span *ngIf="isCollapsed[i]">
+											Collapse
+											<iconify-icon class="text-bs-custom-black-50" icon="ep:arrow-up"></iconify-icon>
+										</span>
+									</a>
+								</div> -->
+						</div>
+
+						<div class="card-footer border-0 bg-transparent">
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon
+												[class]="'btn-plan bg-' + getColor(item) + '-total-amount'"
+												icon="material-symbols:currency-rupee"
+											></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Total Amount</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold"> ₹ {{ item?.totalAmount }} </label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon
+												[class]="'btn-plan bg-' + getColor(item) + '-cost-verification'"
+												icon="icon-park-outline:database-position"
+											></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Pending Verification</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold">
+												{{ item?.remainingVerification }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon
+												[class]="'btn-plan bg-' + getColor(item) + '-num-verification'"
+												icon="mdi:tick-circle-outline"
+											></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Completed Verifications</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold">
+												{{ item?.noOfVerification - item?.remainingVerification }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card mb-2 shadow-color">
+								<div class="card-body p-2">
+									<div class="d-flex align-items-center">
+										<div class="flex-shrink-0">
+											<iconify-icon
+												[class]="'btn-plan bg-' + getColor(item) + '-total-credits'"
+												icon="mdi:tick-circle-outline"
+											></iconify-icon>
+										</div>
+										<div class="flex-grow-1 ms-3">
+											<h3 class="text-custom-black-50 mb-0">Total Credits Available</h3>
+										</div>
+										<div class="flex-grow-1 ms-3 text-end">
+											<label class="text-custom-black fw-bold">
+												{{ item?.noOfVerification }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div
+								class="d-flex justify-content-center my-4"
+								*ngIf="
+									item?.plan?.autoRenewal && item?.plan?.connectionType === connectionType.POST_PAID
+								"
+							>
+								<button
+									class="btn"
+									[ngClass]="{
+										'btn-green': item.features.length >= 13,
+										'btn-blue': item.features.length >= 6 && item.features.length < 13,
+										'btn-yellow': item.features.length < 6
+									}"
+									(click)="openConfirmStopRenewal(item)"
+								>
+									Stop Renewal
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card" *ngIf="plan?.length === 0">
+	<div class="card-body">
+		<ng-container>
+			<div class="text-center">
+				<h3 class="text-primary fs-5 fw-bold">No plans subscribed</h3>
+			</div>
+		</ng-container>
+	</div>
+</div>

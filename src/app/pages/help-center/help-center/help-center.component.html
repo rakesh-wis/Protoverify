@@ -1,0 +1,28 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold mb-0">Help Center</h2>
+		</div>
+	</div>
+
+	<div class="row my-4">
+		<div class="col-10">
+			<p class="text-custom-primary-dark">
+				{{ dataList.length > 0 ? dataList[0].description : 'No data added' }}
+			</p>
+		</div>
+		<div class="col-2 text-end" *ngIf="isRoleAccess">
+			<span class="me-2" role="button" ngbTooltip="Edit" (click)="edit()">
+				<iconify-icon class="fs-5 text-custom-black-50" icon="iconamoon:edit-light"></iconify-icon>
+			</span>
+		</div>
+	</div>
+
+	<div class="clearfix my-2">
+		<app-view-faq></app-view-faq>
+	</div>
+
+	<div class="clearfix my-3">
+		<app-view-contact-us></app-view-contact-us>
+	</div>
+</div>

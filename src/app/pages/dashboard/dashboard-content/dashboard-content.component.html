@@ -1,0 +1,42 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center mt-2">
+		<div class="col-lg-6 col-md-8 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold mb-1">Welcome back, {{ currentUser?.name }}</h2>
+			<p class="text-custom-black">Your current summary and activity</p>
+		</div>
+	</div>
+
+	<app-dashboard-operation-verification-list
+		*ngIf="currentUser.role === ROLES.PROTO_OPERATION"
+	></app-dashboard-operation-verification-list>
+
+	<app-dashboard-stats></app-dashboard-stats>
+
+	<div class="row my-5 gx-5 gy-2">
+		<div class="col-lg-8 col-md-12 col-sm-12">
+			<app-dashboard-applicant-record></app-dashboard-applicant-record>
+		</div>
+		<div class="col-lg-4 col-md-12 col-sm-12" *ngIf="hasAdminRoleAccess">
+			<app-dashboard-recent-activity></app-dashboard-recent-activity>
+		</div>
+		<div class="col-lg-4 col-md-4 col-sm-12" *ngIf="!hasAdminRoleAccess">
+			<app-dashboard-verification-status></app-dashboard-verification-status>
+		</div>
+	</div>
+
+	<div class="row justify-content-between gx-5 gy-2 card-group">
+		<div class="col-lg-4 col-md-12 col-sm-12">
+			<app-dashboard-applicant-status></app-dashboard-applicant-status>
+		</div>
+		<div class="col-lg-4 col-md-12 col-sm-12">
+			<app-dashboard-recent-application></app-dashboard-recent-application>
+		</div>
+		<div class="col-lg-4 col-md-12 col-sm-12">
+			<app-dashboard-track-analytics></app-dashboard-track-analytics>
+		</div>
+	</div>
+
+	<div class="row justify-content-center my-5" *ngIf="hasAdminRoleAccess">
+		<app-dashboard-negative-list></app-dashboard-negative-list>
+	</div>
+</div>

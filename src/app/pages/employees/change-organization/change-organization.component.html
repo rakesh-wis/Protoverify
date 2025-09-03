@@ -1,0 +1,129 @@
+<div>
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-primary fw-bold" id="modal-basic-title">Change organization</h2>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Employee Name</label>
+						<input
+							type="text"
+							class="form-control"
+							id="name"
+							placeholder=""
+							formControlName="name"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Current organization</label>
+						<input
+							type="text"
+							class="form-control"
+							id="name"
+							placeholder=""
+							formControlName="currentOrganization"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Select from Date</label>
+						<div class="input-group">
+							<input
+								class="form-control"
+								placeholder="dd-mm-yyyy"
+								name="dp"
+								formControlName="fromDate"
+								ngbDatepicker
+								#d="ngbDatepicker"
+							/>
+							<button class="btn btn-primary w-25 p-0" (click)="d.toggle()" type="button">
+								<mat-icon>calendar_today</mat-icon>
+							</button>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.fromDate">
+							<ng-container
+								*ngIf="
+									form['fromDate'].hasError(error.type) &&
+									(form['fromDate'].dirty || form['fromDate'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Select to Date</label>
+						<div class="input-group">
+							<input
+								class="form-control"
+								placeholder="dd-mm-yyyy"
+								name="d2"
+								formControlName="toDate"
+								ngbDatepicker
+								#d2="ngbDatepicker"
+							/>
+							<button class="btn btn-primary w-25 p-0" (click)="d2.toggle()" type="button">
+								<mat-icon>calendar_today</mat-icon>
+							</button>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.toDate">
+							<ng-container
+								*ngIf="
+									form['toDate'].hasError(error.type) &&
+									(form['toDate'].dirty || form['toDate'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="input-label text-primary">Select Organization</label>
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="clientList['rows']"
+							[virtualScroll]="true"
+							bindLabel="name"
+							bindValue="id"
+							formControlName="associateId"
+							placeholder="Select organization"
+							[dropdownPosition]="'bottom'"
+							[multiple]="false"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							(search)="onSearch($event)"
+							(clear)="getClients({})"
+							(scrollToEnd)="onScrollClient()"
+						>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.associateId">
+							<ng-container
+								*ngIf="
+									form['associateId'].hasError(error.type) &&
+									(form['associateId'].dirty || form['associateId'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

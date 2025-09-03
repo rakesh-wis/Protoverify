@@ -1,0 +1,21 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span>Add Signature</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<canvas
+			#canvas
+			(touchstart)="startDrawing($event)"
+			(touchmove)="moved($event)"
+			width="700"
+			height="200"
+		></canvas>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="clearPad()">Clear</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Save</button>
+	</div>
+</div>

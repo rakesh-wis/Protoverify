@@ -1,0 +1,88 @@
+<div class="clearfix">
+	<form [formGroup]="dataForm">
+		<div formArrayName="verificationMedia">
+			<div class="form-group" *ngFor="let _ of verificationMedia.controls; let i = index">
+				<div class="row justify-content-between align-items-end py-2" [formGroupName]="i">
+					<div class="col-lg-8 col-md-7 col-sm-12">
+						<label class="form-label text-primary">
+							{{ _.value.label }}
+						</label>
+						<input
+							hidden
+							#fileInput
+							type="file"
+							class="form-control"
+							[id]="i"
+							(change)="uploadFile($event, i)"
+							accept=".doc,.pdf,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+						/>
+						<button type="button" class="btn btn-outline-primary w-100 px-4">
+							<div class="d-flex justify-content-between align-items-center">
+								{{ _.value.fileName }}
+								<mat-icon
+									mat-list-icon
+									class="text-primary"
+									*ngIf="_.value.filePath.length > 0"
+									(click)="downloadDocument(_.value.filePath)"
+								>
+									get_app</mat-icon
+								>
+							</div>
+						</button>
+					</div>
+					<div class="col-lg-4 col-md-5 col-sm-12">
+						<button
+							type="button"
+							class="btn btn-primary"
+							*ngIf="canEdit && _.value.filePath.length === 0"
+							(click)="fileInput.click()"
+						>
+							Attach file
+						</button>
+						<button
+							type="button"
+							class="btn btn-outline-danger"
+							*ngIf="_.value.filePath.length > 0 && _.value.status === 'pending' && canEdit"
+							(click)="setControl(_.value, true, i)"
+						>
+							Remove
+						</button>
+
+						<button
+							type="button"
+							class="btn btn-primary"
+							(click)="openConfirmStatus(_.value, i)"
+							*ngIf="
+								_.value.status === 'pending' && _.value.id && canVerify && _.value.filePath.length > 0
+							"
+						>
+							Verify
+						</button>
+						<button type="button" class="btn btn-outline-primary" *ngIf="_.value.status === 'active'">
+							<div class="d-flex justify-content-center align-items-center">
+								Verified
+								<mat-icon class="text-success ps-1">check_circle</mat-icon>
+							</div>
+						</button>
+					</div>
+				</div>
+				<div class="text-left" [formGroupName]="i" *ngFor="let error of errorMessages.filePath">
+					<ng-container
+						*ngIf="
+							_.controls['filePath'].hasError(error.type) &&
+							(_.controls['filePath'].dirty || _.controls['filePath'].touched)
+						"
+					>
+						<span class="text-danger">{{ error.message }}</span>
+					</ng-container>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class="d-flex justify-content-end my-5" *ngIf="canEdit && !isAllVerified">
+		<button type="button" class="btn btn-outline-primary" *ngIf="showCancel" (click)="goBack()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">
+			{{ showCancel ? 'Submit' : 'Save' }}
+		</button>
+	</div>
+</div>

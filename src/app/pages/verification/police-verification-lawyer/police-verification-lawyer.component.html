@@ -1,0 +1,574 @@
+<div class="container-fluid page-padding">
+	<div
+		class="d-flex justify-content-between align-items-center"
+		*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+	>
+		<label class="text-custom-black-80 fs-4 fw-bold"> {{ userData?.name }}'s Verification Details </label>
+	</div>
+	<div *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-status-bar
+			[checkName]="form['type'].value"
+			[inputData]="form['status'].value ? dataForm.getRawValue() : null"
+			[currentUser]="currentUser"
+		>
+		</app-status-bar>
+	</div>
+	<div class="card my-4 px-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-header bg-transparent">
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex justify-content-start align-items-center py-2">
+					<img src="assets/images/kyc_police_lawyer.svg" class="img-fluid" />
+					<h2 class="text-custom-black-80 fw-bold mb-0 ms-3">Police Verification through Lawyer</h2>
+				</div>
+				<span class="text-custom-black-80" *ngIf="verificationData?.updatedAt">
+					Document Submitted on: {{ verificationData?.updatedAt | date: 'dd/MM/yyyy' }}
+				</span>
+			</div>
+		</div>
+		<div
+			class="card-body"
+			*ngIf="
+				[roles.CLIENT_SUPER_ADMIN, roles.CLIENT_ADMIN, roles.CLIENT_USER, roles.CLIENT_USER_VIEW].includes(
+					currentUser?.role
+				)
+			"
+		>
+			<div class="my-4 d-flex justify-content-center">Process controlled by Protoverify Team</div>
+		</div>
+		<div
+			class="card-body"
+			*ngIf="
+				![roles.CLIENT_SUPER_ADMIN, roles.CLIENT_ADMIN, roles.CLIENT_USER, roles.CLIENT_USER_VIEW].includes(
+					currentUser?.role
+				)
+			"
+		>
+			<div class="row mb-2">
+				<div class="col-lg-6 col-md-10 col-sm-12">
+					<div class="card border-0 bg-primary-200 rounded mt-3" *ngIf="aadharCard?.additionalDetails">
+						<div class="card-body">
+							<div class="row align-items-center">
+								<div class="col-5 text-start" *ngIf="aadharCard?.additionalDetails?.profilePicture">
+									<img
+										class="rounded-circle"
+										src="{{
+											'data:image/jpg;base64,' + aadharCard?.additionalDetails?.profilePicture
+										}}"
+										height="75"
+										width="75"
+									/>
+								</div>
+								<div class="col-7">
+									<p class="text-primary fs-5" *ngIf="aadharCard?.additionalDetails?.fullName">
+										<strong>{{ aadharCard?.additionalDetails?.fullName }}</strong>
+									</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-5">
+									<strong class="text-primary-300">Aadhar Card Number:</strong>
+								</div>
+								<div class="col-7">
+									<span class="text-primary-300">{{ aadharCard?.cardNumber }}</span>
+								</div>
+							</div>
+							<div class="row justify-content-between">
+								<div class="col-5">
+									<strong class="text-primary-300">Address:</strong>
+								</div>
+								<div
+									class="col-7 text-primary-300"
+									*ngIf="aadharCard?.additionalDetails?.address?.house"
+								>
+									<span *ngIf="aadharCard?.additionalDetails?.address?.house"
+										>{{ aadharCard?.additionalDetails?.address?.house }},</span
+									>
+									<span *ngIf="aadharCard?.additionalDetails?.address?.loc"
+										>{{ aadharCard?.additionalDetails?.address?.loc }},</span
+									>
+									<span *ngIf="aadharCard?.additionalDetails?.address?.landmark"
+										>{{ aadharCard?.additionalDetails?.address?.landmark }},</span
+									>
+									<span *ngIf="aadharCard?.additionalDetails?.address?.street"
+										>{{ aadharCard?.additionalDetails?.address?.street }},</span
+									>
+									<span *ngIf="aadharCard?.additionalDetails?.address?.dist"
+										>{{ aadharCard?.additionalDetails?.address?.dist }},</span
+									>
+									{{ aadharCard?.additionalDetails?.address?.state }}, PIN:
+									{{ aadharCard?.additionalDetails?.address?.pincode }}
+								</div>
+								<div
+									class="col-7 text-primary-300"
+									*ngIf="
+										aadharCard?.additionalDetails?.inputAddress &&
+										!aadharCard?.additionalDetails?.address?.house
+									"
+								>
+									<span>{{ aadharCard?.additionalDetails?.inputAddress }}</span>
+									{{ aadharCard?.additionalDetails?.city }}
+									{{ aadharCard?.additionalDetails?.state }}, PIN:
+									{{ aadharCard?.additionalDetails?.pincode }}
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-5">
+									<strong class="text-primary-300">DOB:</strong>
+								</div>
+								<div class="col-7">
+									<span class="text-primary-300">{{ aadharCard?.additionalDetails?.dob }}</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-5">
+									<strong class="text-primary-300">Father's Name:</strong>
+								</div>
+								<div class="col-7">
+									<span class="text-primary-300">{{
+										aadharCard?.additionalDetails?.parentName || '-'
+									}}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<form [formGroup]="dataForm">
+				<div class="row justify-content-start">
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Name of Police Station*</label>
+							<input
+								type="text"
+								class="form-control l bg-transparent"
+								id="policeStationName"
+								placeholder=""
+								formControlName="policeStationName"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.policeStationName">
+								<ng-container
+									*ngIf="
+										dataForm.get('policeStationName').hasError(error.type) &&
+										(dataForm.get('policeStationName').dirty ||
+											dataForm.get('policeStationName').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Mobile No. of Police Station*</label>
+							<app-mobile-number
+								[formControlMobileNumber]="dataForm.get('policeStationNumber')"
+								[formControlCountryCode]="dataForm.get('policeStationCountryCode')"
+								[errorValidator]="errorMessages?.mobileNumber"
+								(validNumberEvent)="receiveValidNumberEvent($event)"
+							>
+							</app-mobile-number>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Date of Visit to Police Station*</label>
+							<app-date-picker [isRangePicker]="false" [dateForm]="dataForm" (change)="changeDate()">
+							</app-date-picker>
+							<div class="text-left" *ngFor="let error of errorMessages?.policeStationName">
+								<ng-container
+									*ngIf="
+										dataForm.get('policeStationDateOfVisit').hasError(error.type) &&
+										(dataForm.get('policeStationDateOfVisit').dirty ||
+											dataForm.get('policeStationDateOfVisit').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Name of Verifying Authority*</label>
+							<input
+								type="text"
+								class="form-control l bg-transparent"
+								id="policeStationAuthorityName"
+								placeholder=""
+								formControlName="policeStationAuthorityName"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.policeStationAuthorityName">
+								<ng-container
+									*ngIf="
+										dataForm.get('policeStationAuthorityName').hasError(error.type) &&
+										(dataForm.get('policeStationAuthorityName').dirty ||
+											dataForm.get('policeStationAuthorityName').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Designation of Verifying Authority*</label>
+							<input
+								type="text"
+								class="form-control l bg-transparent"
+								id="policeStationAuthorityDesignation"
+								placeholder=""
+								formControlName="policeStationAuthorityDesignation"
+							/>
+							<div
+								class="text-left"
+								*ngFor="let error of errorMessages?.policeStationAuthorityDesignation"
+							>
+								<ng-container
+									*ngIf="
+										dataForm.get('policeStationAuthorityDesignation').hasError(error.type) &&
+										(dataForm.get('policeStationAuthorityDesignation').dirty ||
+											dataForm.get('policeStationAuthorityDesignation').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<!-- <div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black"
+								>No. of Years covered in Police Verification*</label
+							>
+							<select
+								name="policeStationYearCovered"
+								id="policeStationYearCovered"
+								class="form-select text-capitalize"
+								aria-label="change status"
+								formControlName="policeStationYearCovered"
+							>
+								<option [value]="item" *ngFor="let item of policeStationYearCovered">{{ item }}</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages?.policeStationYearCovered">
+								<ng-container
+									*ngIf="
+										dataForm.get('policeStationYearCovered').hasError(error.type) &&
+										(dataForm.get('policeStationYearCovered').dirty ||
+											dataForm.get('policeStationYearCovered').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div> -->
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Result of Police Verification*</label>
+							<select
+								name="policeStationVerificationResult"
+								id="policeStationVerificationResult"
+								class="form-select text-capitalize"
+								aria-label="change status"
+								formControlName="policeStationVerificationResult"
+								(change)="changeValidityComment()"
+							>
+								<option [value]="item.name" *ngFor="let item of policeStationVerificationResult">
+									{{ item.label }}
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages?.policeStationVerificationResult">
+								<ng-container
+									*ngIf="
+										dataForm.get('policeStationVerificationResult').hasError(error.type) &&
+										(dataForm.get('policeStationVerificationResult').dirty ||
+											dataForm.get('policeStationVerificationResult').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Additional Comments</label>
+							<input
+								type="text"
+								class="form-control l bg-transparent"
+								id="comment"
+								placeholder=""
+								formControlName="comment"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.comment">
+								<ng-container
+									*ngIf="
+										dataForm.get('comment').hasError(error.type) &&
+										(dataForm.get('comment').dirty || dataForm.get('comment').touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<div class="form-group">
+							<label class="form-label text-custom-black">
+								<span> Select Vendor* </span>
+							</label>
+							<div class="input-group">
+								<ng-select
+									#select
+									class="form-control text-capitalize bg-white-200 mb-0"
+									[items]="vendorList"
+									[virtualScroll]="true"
+									bindLabel="name"
+									bindValue="id"
+									[dropdownPosition]="'bottom'"
+									[searchable]="false"
+									[clearable]="false"
+									appendTo="body"
+									placeholder=""
+									formControlName="vendorId"
+									(scrollToEnd)="onScrollVendor()"
+									(search)="searchVendor($event)"
+								>
+									<ng-template ng-label-tmp let-item="item">
+										{{ item?.name }}
+									</ng-template>
+								</ng-select>
+								<button
+									class="btn btn-outline-send py-1"
+									[disabled]="!form['id'].value || dataForm.disabled"
+									type="button"
+									(click)="sendEmailToVendor()"
+								>
+									<iconify-icon class="fs-5 pt-1 text-primary" icon="bi:send"></iconify-icon>
+								</button>
+							</div>
+							<div class="text-left" *ngFor="let error of errorMessages.vendorId">
+								<ng-container
+									*ngIf="
+										form['vendorId'].hasError(error.type) &&
+										(form['vendorId'].dirty || form['vendorId'].touched)
+									"
+								>
+									<span class="text-danger"> {{ error.message }} Vendor </span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 py-2">
+						<label class="form-label text-custom-black"> Files </label>
+						<div class="input-group input-group-sm">
+							<input
+								hidden
+								#fileInput
+								type="file"
+								class="form-control"
+								(change)="uploadFile($event)"
+								accept="image/png,image/jpg,image/jpeg"
+							/>
+							<div class="input-group file-input-group">
+								<input
+									type="text"
+									readonly
+									class="form-control"
+									[aria-label]="'Upload File'"
+									[placeholder]="'Upload File'"
+								/>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="dataForm.disabled ? null : fileInput.click()"
+									ngbTooltip="Upload File"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ng-container *ngIf="verificationMedia.controls.length > 0">
+					<label class="form-label text-custom-black"> Attach report by Police* </label>
+					<div class="form-group" *ngFor="let _ of verificationMedia.controls; let i = index">
+						<div
+							class="row justify-content-between align-items-end py-2"
+							[formGroupName]="i"
+							*ngIf="_.value.status != 'deleted'"
+						>
+							<div class="col-sm-12">
+								<div class="input-group file-input-group">
+									<input
+										type="text"
+										readonly
+										class="form-control"
+										[aria-label]="'Attachment' + (i + 1)"
+										[placeholder]="'Attachment ' + (i + 1)"
+									/>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 border-end-0"
+										*ngIf="_.value.filePath"
+										(click)="dataForm.disabled ? null : showImage(_.value.filePath)"
+										ngbTooltip="View"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 border-end-0"
+										*ngIf="_.value.filePath.length > 0"
+										(click)="dataForm.disabled ? null : downloadDocument(_.value.filePath)"
+										ngbTooltip="Download"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+									</span>
+									<ng-container
+										*ngIf="![roles.EMPLOYEE, roles.PROTO_LAWYER].includes(currentUser?.role)"
+									>
+										<ng-container *appIsGranted="'EDIT'">
+											<span
+												role="button"
+												class="input-group-text bg-transparent border-start-0 rounded-end"
+												*ngIf="_.value.filePath"
+												(click)="dataForm.disabled ? null : setControl(_.value, true, i)"
+												ngbTooltip="Remove"
+											>
+												<iconify-icon
+													class="fs-5 text-primary"
+													icon="ant-design:delete-outlined"
+												>
+												</iconify-icon>
+											</span>
+										</ng-container>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="text-left" [formGroupName]="i" *ngFor="let error of errorMessages.filePath">
+							<ng-container
+								*ngIf="
+									_.controls['filePath'].hasError(error.type) &&
+									(_.controls['filePath'].dirty || _.controls['filePath'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</ng-container>
+				<div class="d-flex justify-content-end mt-5" *appIsGranted="'ADD'">
+					<button
+						type="button"
+						class="btn btn-primary ms-4"
+						(click)="onSubmit()"
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_LAWYER,
+								roles.PROTO_OPERATION
+							].includes(currentUser?.role)
+						"
+						[disabled]="dataForm.disabled"
+					>
+						Submit
+					</button>
+				</div>
+				<div class="row" *ngIf="dataForm?.value?.status">
+					<div class="col-12 mb-3">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Remarks</label>
+							<textarea
+								type="text"
+								class="form-control"
+								id="remark"
+								placeholder="Write your remarks here"
+								rows="4"
+								formControlName="remark"
+								[readOnly]="
+									dataForm?.value?.status === kycStatus?.APPROVED ||
+									![roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_OPERATION].includes(
+										currentUser?.role
+									)
+								"
+							></textarea>
+							<div class="text-left" *ngFor="let error of errorMessages?.remark">
+								<ng-container
+									*ngIf="
+										form['remark'].hasError(error.type) &&
+										(form['remark'].dirty || form['remark'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="gap-1 mt-2" *appIsGranted="'EDIT'">
+				<div
+					class="d-flex justify-content-end gap-1"
+					*ngIf="[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN].includes(currentUser?.role) && form['id'].value"
+				>
+					<button type="button" class="btn btn-outline-danger text-capitalize" (click)="openConfirmStatus()">
+						Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+					>
+						Clear Report
+					</button>
+				</div>
+				<div
+					class="d-flex justify-content-between gap-1"
+					*ngIf="[roles.PROTO_OPERATION].includes(currentUser?.role) && form['id'].value"
+				>
+					<button
+						type="button"
+						class="btn btn-outline-danger text-capitalize"
+						(click)="openConfirmStatus(verificationLevel.MAJOR_DISCREPANCY)"
+						[disabled]="dataForm.disabled"
+					>
+						Major Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-primary text-capitalize"
+						(click)="openConfirmStatus('others')"
+						[disabled]="dataForm.disabled"
+					>
+						others
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+						[disabled]="dataForm.disabled"
+					>
+						Clear Report
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-end">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+	<div class="mt-4" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-verification-status></app-verification-status>
+	</div>
+</div>

@@ -1,0 +1,441 @@
+<div class="my-3">
+	<div class="modal-header border-0 justify-content-center">
+		<h2 class="modal-title text-primary fw-bold" id="modal-basic-title">
+			<span *ngIf="!modelData">Create new Employee</span>
+			<span *ngIf="modelData">Update Employee</span>
+		</h2>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="verificationForm">
+			<label class="form-label text-primary">Enter Aadhar card number</label>
+			<div class="row justify-content-between align-items-start py-2">
+				<div
+					[ngClass]="
+						!otpSend && aadharVerified ? 'col-lg-12 col-md-12 col-sm-12' : 'col-lg-9 col-md-8 col-sm-12'
+					"
+				>
+					<div class="input-group mb-0">
+						<input
+							type="text"
+							class="form-control"
+							id="cardNumber"
+							placeholder=""
+							(keypress)="numberOnly($event)"
+							formControlName="cardNumber"
+							aadhar-card
+							[maxLength]="14"
+							[ngClass]="{ 'border-right-0': !otpSend && aadharVerified }"
+						/>
+						<span
+							class="input-group-text bg-transparent text-primary"
+							id="basic-addon1"
+							[ngClass]="{ 'border-left-0': !otpSend && aadharVerified }"
+							*ngIf="!otpSend && aadharVerified && verificationForm.controls['id'].value"
+						>
+							<div class="d-flex justify-content-center align-items-center">
+								Verified
+								<mat-icon class="text-success ps-1">check_circle</mat-icon>
+							</div>
+						</span>
+					</div>
+					<div class="text-left" *ngFor="let error of kycFieldForm?.cardNumber">
+						<ng-container
+							*ngIf="
+								verificationForm.controls.cardNumber.hasError(error.type) &&
+								(verificationForm.controls.cardNumber.dirty ||
+									verificationForm.controls.cardNumber.touched)
+							"
+						>
+							<span class="text-danger">{{ error.message }}</span>
+						</ng-container>
+					</div>
+				</div>
+				<div
+					class="col-lg-3 col-md-4 col-sm-12"
+					*ngIf="!aadharVerified && !verificationForm.controls['id'].value"
+				>
+					<button
+						type="button"
+						class="btn btn-outline-primary w-100 px-4"
+						[disabled]="otpSend && aadharVerified"
+						(click)="onSubmitAadhar()"
+					>
+						Verify
+					</button>
+				</div>
+				<p class="text-primary" *ngIf="aadharCard?.additionalDetails">
+					<strong class="pr-2">Address: </strong>
+					<span *ngIf="aadharCard?.additionalDetails?.address?.house"
+						>{{ aadharCard?.additionalDetails?.address?.house }},</span
+					>
+					<span *ngIf="aadharCard?.additionalDetails?.address?.loc"
+						>{{ aadharCard?.additionalDetails?.address?.loc }},</span
+					>
+					<span *ngIf="aadharCard?.additionalDetails?.address?.landmark"
+						>{{ aadharCard?.additionalDetails?.address?.landmark }},</span
+					>
+					<span *ngIf="aadharCard?.additionalDetails?.address?.street"
+						>{{ aadharCard?.additionalDetails?.address?.street }},</span
+					>
+					<span *ngIf="aadharCard?.additionalDetails?.address?.dist"
+						>{{ aadharCard?.additionalDetails?.address?.dist }},</span
+					>
+					{{ aadharCard?.additionalDetails?.address?.state }}, PIN:
+					{{ aadharCard?.additionalDetails?.address?.pincode }}
+				</p>
+			</div>
+			<div class="row justify-content-between align-items-end py-2" *ngIf="otpSend">
+				<div class="col-lg-9 col-md-8 col-sm-12">
+					<label for="exampleFormControlInput1" class="form-label text-primary">Enter OTP</label>
+					<input
+						type="number"
+						class="form-control"
+						id="otp"
+						placeholder=""
+						(keypress)="numberOnly($event)"
+						formControlName="otp"
+					/>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-12">
+					<button
+						type="button"
+						[disabled]="verificationForm.invalid"
+						class="btn btn-primary w-100 px-4"
+						(click)="verifyAadhar()"
+					>
+						Submit
+					</button>
+				</div>
+			</div>
+			<div class="d-flex justify-content-between" *ngIf="otpSend">
+				<p class="text-primary">An OTP has been sent to your registered mobile number</p>
+				<p class="text-primary" *ngIf="canResendAadharOTP">
+					Did not receive the OTP?
+					<a class="text-primary fw-bolder" role="button" (click)="requestOtp()">Resend</a>
+				</p>
+				<p class="text-primary mb-0" *ngIf="!canResendAadharOTP">
+					Resend OTP in <strong>{{ minutes }}:{{ seconds }}</strong>
+				</p>
+			</div>
+		</form>
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Name</label>
+						<input type="text" class="form-control" id="name" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									form['name'].hasError(error.type) && (form['name'].dirty || form['name'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Mobile Number</label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages?.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Email (Optional)</label>
+						<input
+							type="text"
+							class="form-control"
+							id="email"
+							placeholder=""
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									form['email'].hasError(error.type) && (form['email'].dirty || form['email'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Designation (Optional)</label>
+						<input
+							type="text"
+							class="form-control"
+							id="email"
+							placeholder=""
+							formControlName="designation"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['designation'].hasError(error.type) &&
+									(form['designation'].dirty || form['designation'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Onboarding Organization</label>
+						<select
+							class="form-select bg-transparent text-capitalize"
+							aria-label="select example"
+							formControlName="onboardingBase"
+						>
+							<option [value]="item" *ngFor="let item of onboardingBaseList">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['onboardingBase'].hasError(error.type) &&
+									(form['onboardingBase'].dirty || form['onboardingBase'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row" formArrayName="userAssociations">
+				<ng-container *ngFor="let _ of userAssociations.controls; let i = index">
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Reporting Manager </label>
+							<ng-select
+								class="form-control text-capitalize"
+								[items]="managerList['rows']"
+								[virtualScroll]="true"
+								placeholder=""
+								bindValue="id"
+								bindLabel="name"
+								[dropdownPosition]="'bottom'"
+								[searchable]="true"
+								[editableSearchTerm]="true"
+								formControlName="reportingManagerId"
+								(scrollToEnd)="onScrollToEnd()"
+								(search)="onSearchManager($event)"
+							>
+							</ng-select>
+							<div class="text-left" *ngFor="let error of errorMessages.reportingManagerId">
+								<ng-container
+									*ngIf="
+										_.controls['reportingManagerId'].hasError(error.type) &&
+										(_.controls['reportingManagerId'].dirty ||
+											_.controls['reportingManagerId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Onboarding Manager </label>
+							<ng-select
+								class="form-control text-capitalize"
+								[items]="managerList['rows']"
+								[virtualScroll]="true"
+								placeholder=""
+								bindValue="id"
+								bindLabel="name"
+								[dropdownPosition]="'bottom'"
+								[searchable]="true"
+								[editableSearchTerm]="true"
+								formControlName="onBoardingManagerId"
+								(scrollToEnd)="onScrollToEndManager()"
+								(search)="onSearchManager($event)"
+							>
+							</ng-select>
+							<div class="text-left" *ngFor="let error of errorMessages.onBoardingManagerId">
+								<ng-container
+									*ngIf="
+										_.controls['onBoardingManagerId'].hasError(error.type) &&
+										(_.controls['onBoardingManagerId'].dirty ||
+											_.controls['onBoardingManagerId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Select Region </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select example"
+								formControlName="regionId"
+								(change)="onRegionChangeHandler($event)"
+							>
+								<option [value]="item.id" *ngFor="let item of regionList">
+									<span>{{ item.title }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.regionId">
+								<ng-container
+									*ngIf="
+										_.controls['regionId'].hasError(error.type) &&
+										(_.controls['regionId'].dirty || _.controls['regionId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i" *ngIf="siteList">
+							<label class="form-label text-primary"> Select Site </label>
+							<ng-select
+								class="form-control text-capitalize"
+								[items]="siteList"
+								[virtualScroll]="true"
+								placeholder=""
+								bindValue="id"
+								bindLabel="name"
+								[dropdownPosition]="'bottom'"
+								[searchable]="true"
+								[editableSearchTerm]="true"
+								formControlName="sitesId"
+								(scrollToEnd)="onScrollToEnd()"
+								(change)="getTeams({}); form['teamId'].setValue(null); getTimeShift()"
+								(clear)="getTeams({}); form['teamId'].setValue(null); getTimeShift()"
+							>
+							</ng-select>
+							<div class="text-left" *ngFor="let error of errorMessages.sitesId">
+								<ng-container
+									*ngIf="
+										_.controls['sitesId'].hasError(error.type) &&
+										(_.controls['sitesId'].dirty || _.controls['sitesId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</ng-container>
+			</div>
+
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Select Team</label>
+						<ng-select
+							class="form-control text-capitalize"
+							[items]="teamList['rows']"
+							[virtualScroll]="true"
+							[multiple]="false"
+							bindLabel="name"
+							bindValue="id"
+							[dropdownPosition]="'bottom'"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							formControlName="teamId"
+							placeholder=""
+							(scrollToEnd)="onScrollTeam()"
+							(search)="(+$event)"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item.name }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{ item.name }}</span>
+									<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<label class="form-label text-primary">Select role</label>
+					<div class="form-group">
+						<select
+							class="form-select bg-transparent text-capitalize"
+							aria-label="select example"
+							formControlName="role"
+						>
+							<option [value]="item.value" *ngFor="let item of roleList">
+								<span>{{ item.label }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.sitesId">
+							<ng-container
+								*ngIf="
+									form['role'].hasError(error.type) && (form['role'].dirty || form['role'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<label class="form-label text-primary">Select Shift</label>
+					<div class="form-group">
+						<select
+							class="form-select bg-transparent text-capitalize"
+							aria-label="select example"
+							formControlName="timeShiftId"
+						>
+							<option [value]="item.id" *ngFor="let item of shiftTimeList">
+								<span>
+									{{ item.type.replace('_', ' ') }} ({{ item.startTime }} - {{ item?.endTime }})</span
+								>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.timeShiftId">
+							<ng-container
+								*ngIf="
+									form['timeShiftId'].hasError(error.type) &&
+									(form['timeShiftId'].dirty || form['timeShiftId'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

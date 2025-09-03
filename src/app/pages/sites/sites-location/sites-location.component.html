@@ -1,0 +1,15 @@
+<div class="my-3">
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<app-google-map
+				[locationData]="modelData"
+				[isForView]="isForView"
+				(emitLocation)="updateLocation($event)"
+			></app-google-map>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()" *ngIf="!isForView">Submit</button>
+	</div>
+</div>

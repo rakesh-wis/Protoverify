@@ -1,0 +1,84 @@
+<mat-sidenav-container>
+	<mat-sidenav
+		#sidenav
+		[mode]="mobileQuery.matches ? 'push' : 'side'"
+		[opened]="!collapsedNav"
+		[ngClass]="{ 'sidenav-collapsed': collapsedNav }"
+	>
+		<div class="m-3">
+			<img src="assets/images/sidebar-logo.svg" class="img-fluid" routerLink="/dashboard" />
+		</div>
+		<mat-nav-list>
+			<ng-container *ngFor="let nav of sideBarList">
+				<mat-list-item
+					class="side-item"
+					*ngIf="nav.list.length === 0 && viewSideBarItem(nav)"
+					(click)="!disableItems(nav) && navigateTo(nav.path)"
+					routerLinkActive=" router-link-active"
+					[ngClass]="linkActive(nav.path)"
+				>
+					<!-- <mat-icon mat-list-icon [ngClass]="linkActive(nav.path)"></mat-icon> -->
+					<iconify-icon matListItemIcon icon="{{ nav.icon }}"></iconify-icon>
+					<div matListItemTitle>{{ nav.name }}</div>
+				</mat-list-item>
+				<!-- <mat-expansion-panel
+					[class.mat-elevation-z0]="true"
+					*ngIf="nav.list.length > 0 && viewSideBarItem(nav)"
+					[disabled]="disableItems(nav)"
+				>
+					<mat-expansion-panel-header class="side-item">
+						<iconify-icon icon="{{ nav.icon }}"></iconify-icon>
+						<h4 mat-line class="mb-0">{{ nav.name }}</h4>
+					</mat-expansion-panel-header>
+					<mat-nav-list *ngFor="let subNav of nav.list">
+						<mat-list-item
+							class="side-item"
+							(click)="!disableItems(nav) && navigateTo(subNav.path)"
+							routerLinkActive="router-link-active"
+							[ngClass]="linkActive(subNav.path)"
+							[class.disabled]="disableItems(nav)"
+						>
+							<h4 mat-line>{{ subNav.name }}</h4>
+						</mat-list-item>
+					</mat-nav-list>
+				</mat-expansion-panel> -->
+			</ng-container>
+		</mat-nav-list>
+		<div class="d-flex justify-content-center">
+			<div
+				class="help-center"
+				[ngClass]="linkActive('help-center')"
+				role="button"
+				(click)="navigateTo('help-center')"
+			>
+				<div
+					[ngClass]="{ 'bg-primary-200 is-active rounded-circle': linkActive('help-center') === 'is-active' }"
+				>
+					<iconify-icon icon="mdi:comment-help-outline" style="font-size: 36px"></iconify-icon>
+				</div>
+				<h4>Help Center</h4>
+			</div>
+		</div>
+	</mat-sidenav>
+	<mat-sidenav-content [ngClass]="{ 'sidenav-collapsed': collapsedNav }">
+		<app-header [collapsedNav]="collapsedNav" (collapsedEvent)="toggleSideBar($event)" [currentUser]="currentUser">
+		</app-header>
+		<div class="main-content">
+			<div class="d-flex" style="min-height: 100vh">
+				<div
+					[ngClass]="{ 'col-lg-2 col-md-3 col-sm-12': showGettingSubItem }"
+					*ngIf="showGettingSubItem"
+					class="bg-white"
+				>
+					<app-checklist [checkList]="checkList"></app-checklist>
+				</div>
+				<div [ngClass]="showGettingSubItem ? 'col-lg-10 col-md-9 col-sm-12' : 'col-lg-12 col-md-12 col-sm-12'">
+					<app-breadcrumb
+						*ngIf="!router.url.includes('dashboard') && currentUser.role !== ROLES.EMPLOYEE"
+					></app-breadcrumb>
+					<router-outlet></router-outlet>
+				</div>
+			</div>
+		</div>
+	</mat-sidenav-content>
+</mat-sidenav-container>

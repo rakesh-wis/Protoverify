@@ -1,0 +1,357 @@
+<mat-toolbar class="navbar">
+	<mat-toolbar-row class="justify-content-between">
+		<div class="">
+			<img src="assets/images/logo-black.svg" alt="" height="58" />
+		</div>
+	</mat-toolbar-row>
+</mat-toolbar>
+<div class="container-fluid my-3 page-padding">
+	<div class="d-flex justify-content-between align-items-center">
+		<label class="text-custom-black-80 fs-4 fw-bold">
+			Permanent Address Physical Verification for {{ userData?.name }}</label
+		>
+	</div>
+
+	<div class="card mt-4">
+		<div class="card-body">
+			<div class="d-flex justify-content-start align-items-center py-2">
+				<img
+					[src]="form['status'].value === kycStatus.APPROVED ? verifiedIcon : unVerifiedIcon"
+					class="img-fluid"
+					width="24"
+					*ngIf="[kycStatus.APPROVED, kycStatus.REJECTED].includes(form['status'].value)"
+				/>
+				<!-- <label class="text-primary fs-5 fw-bold ms-1"> Physical Verification Details </label> -->
+			</div>
+			<label class="text-custom-black fs-6 fw-bold"> Candidate details:</label>
+			<div class="row mb-2">
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<label class="text-custom-black fw-bold"> Name: </label>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<label class="text-custom-black-80">
+						{{ userData?.name }}
+					</label>
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<label class="text-custom-black fw-bold"> Mobile number: </label>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<label class="text-custom-black-80">
+						{{ userData?.mobileNumber }}
+					</label>
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<label class="text-custom-black fw-bold"> Address: </label>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<label class="text-custom-black-80">
+						{{ userData?.address }}
+					</label>
+				</div>
+			</div>
+			<form [formGroup]="dataForm">
+				<div class="row">
+					<div
+						class="col-lg-6 col-md-6 col-sm-12"
+						*ngFor="let _ of verificationMedia.controls; let i = index"
+					>
+						<div class="form-group">
+							<label class="form-label text-primary"> {{ _.value.label }} </label>
+							<input
+								hidden
+								#fileInput0
+								type="file"
+								class="form-control"
+								onclick="this.value = null"
+								accept="image/png,image/jpg,image/jpeg"
+								(change)="uploadFile($event, i)"
+								capture
+								*ngIf="i == 0"
+							/>
+							<input
+								hidden
+								#fileInput1
+								type="file"
+								class="form-control"
+								onclick="this.value = null"
+								accept="image/png,image/jpg,image/jpeg"
+								(change)="uploadFile($event, i)"
+								capture
+								*ngIf="i == 1"
+							/>
+							<div class="input-group file-input-group">
+								<input
+									type="text"
+									readonly
+									class="form-control border-end-0"
+									[aria-label]="_.value.label"
+									[placeholder]="_.value.label"
+								/>
+
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									(click)="openCamera(i)"
+									*ngIf="!_.value.filePath"
+									ngbTooltip="Upload File"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 border-end-0"
+									*ngIf="_.value.filePath"
+									(click)="showImage(_.value.filePath)"
+									ngbTooltip="View"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 border-end-0"
+									*ngIf="_.value.filePath"
+									(click)="downloadDocument(_.value.filePath)"
+									ngbTooltip="Download"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+								</span>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 rounded-end"
+									*ngIf="_.value.filePath"
+									(click)="setControl(_.value, true, i)"
+									ngbTooltip="Remove"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+									</iconify-icon>
+								</span>
+							</div>
+							<div class="text-left" *ngFor="let error of errorMessages.filePath">
+								<ng-container
+									*ngIf="
+										_.controls['filePath'].hasError(error.type) &&
+										(_.controls['filePath'].dirty || _.controls['filePath'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row my-2" *ngIf="form['additionalDetails'].value">
+					<div class="col-lg-6 col-md-10 col-sm-12">
+						<div class="card border-0 bg-primary-200 rounded" *ngIf="form['additionalDetails'].value">
+							<div class="card-body">
+								<div class="row align-items-center">
+									<!-- <div class="col-5 text-start">
+											
+																				</div> -->
+									<div class="col-sm-12">
+										<label class="text-primary fw-bold"> Address: </label>
+										<p class="text-primary">
+											{{ form['additionalDetails'].value['formattedAddress'] }}
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-10 col-sm-12">
+						<div class="card border-0 bg-primary-200 rounded" *ngIf="form['latitude'].value">
+							<div class="card-body">
+								<div class="row align-items-start">
+									<div class="col-1 text-start">
+										<iconify-icon class="fs-5 text-primary" icon="gis:location-poi"> </iconify-icon>
+									</div>
+									<div class="col-10">
+										<label class="text-primary fw-bold">Latitude and Longitude</label>
+										<p class="text-primary mb-0">Latitude: {{ form['latitude'].value }}</p>
+										<p class="text-primary">Longitude: {{ form['longitude'].value }}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row align-items-start">
+					<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="periodOfStay">
+						<div class="form-group">
+							<label class="form-label text-primary"> Period of stay (Year-Month)</label>
+							<div class="input-group mb-0">
+								<input
+									type="text"
+									class="form-control"
+									formControlName="years"
+									placeholder="0-100"
+									aria-label="Year"
+									(keypress)="numberOnly($event)"
+									maxlength="3"
+								/>
+								<select
+									class="form-select text-capitalize"
+									aria-label="select month"
+									placeholder="Select month"
+									formControlName="months"
+								>
+									<option value="" selected disabled [hidden]="periodOfStayForm['months'].value">
+										Select month
+									</option>
+									<option [value]="item" *ngFor="let item of months">
+										<span>{{ item }}</span>
+									</option>
+								</select>
+							</div>
+							<p class="text-secondary mb-0">Years can be from 0-100</p>
+							<span class="text-left" *ngFor="let error of errorMessages?.years">
+								<ng-container
+									*ngIf="
+										periodOfStayForm['years'].hasError(error.type) &&
+										(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</span>
+							<span
+								class="text-danger px-1"
+								*ngIf="
+									!periodOfStayForm['years'].value &&
+									(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched) &&
+									(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+								"
+								>&</span
+							>
+							<span class="text-left" *ngFor="let error of errorMessages?.months">
+								<ng-container
+									*ngIf="
+										periodOfStayForm['months'].hasError(error.type) &&
+										(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</span>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Type of Accommodation </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select type"
+								formControlName="accommodationType"
+							>
+								<option [value]="item" *ngFor="let item of accommodationType">
+									<span>{{ item.replaceAll('_', ' ') }}</span>
+								</option>
+							</select>
+							<p class="text-secondary mb-0"></p>
+							<div class="text-left" *ngFor="let error of errorMessages.accommodationType">
+								<ng-container
+									*ngIf="
+										form['accommodationType'].hasError(error.type) &&
+										(form['accommodationType'].dirty || form['accommodationType'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Type of Address </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select type"
+								formControlName="addressType"
+							>
+								<option [value]="item" *ngFor="let item of addressType">
+									<span>{{ item }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.addressType">
+								<ng-container
+									*ngIf="
+										form['addressType'].hasError(error.type) &&
+										(form['addressType'].dirty || form['addressType'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Type of Ownership </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select type"
+								formControlName="ownershipType"
+							>
+								<option [value]="item" *ngFor="let item of ownershipType">
+									<span>{{ item }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.ownershipType">
+								<ng-container
+									*ngIf="
+										form['ownershipType'].hasError(error.type) &&
+										(form['ownershipType'].dirty || form['ownershipType'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-center" formGroupName="verifier">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Verifier's Name </label>
+							<input
+								type="text"
+								class="form-control"
+								id="name"
+								formControlName="name"
+								autocomplete="off"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.name">
+								<ng-container
+									*ngIf="
+										formVerifier['name'].hasError(error.type) &&
+										(formVerifier['name'].dirty || formVerifier['name'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Verifier's Contact Number </label>
+							<app-mobile-number
+								[formControlMobileNumber]="formVerifier.mobileNumber"
+								[formControlCountryCode]="formVerifier.countryCode"
+								[errorValidator]="errorMessages.mobileNumber"
+								(validNumberEvent)="receiveValidNumberEvent($event)"
+							>
+							</app-mobile-number>
+						</div>
+					</div>
+				</div>
+			</form>
+
+			<div class="d-flex justify-content-end mt-5 gap-1">
+				<button type="button" class="btn btn-primary" (click)="onSubmit()">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>

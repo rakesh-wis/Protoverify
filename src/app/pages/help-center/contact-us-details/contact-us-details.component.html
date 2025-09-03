@@ -1,0 +1,105 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Add Contact</span>
+			<span *ngIf="modelData">Update Contact</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Address* </label>
+						<input type="text" class="form-control" id="address" placeholder="" formControlName="address" />
+						<div class="text-left" *ngFor="let error of errorMessages.address">
+							<ng-container
+								*ngIf="
+									form['address'].hasError(error.type) &&
+									(form['address'].dirty || form['address'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Pincode*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="pincode"
+							placeholder=""
+							formControlName="pincode"
+							(keyup)="searchPincode()"
+							(keypress)="numberOnly($event)"
+							maxlength="8"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.pincode">
+							<ng-container
+								*ngIf="
+									form['pincode'].hasError(error.type) &&
+									(form['pincode'].dirty || form['pincode'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> State* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="state"
+							placeholder=""
+							formControlName="state"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> City* </label>
+						<input
+							type="text"
+							class="form-control"
+							id="city"
+							placeholder=""
+							formControlName="city"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Mobile number* </label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12"></div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" *ngIf="modelData?.id" class="btn btn-custom-primary ms-4" (click)="onSubmit()">
+			Save
+		</button>
+		<button type="button" *ngIf="!modelData?.id" class="btn btn-custom-primary ms-4" (click)="onSubmit()">
+			Add
+		</button>
+	</div>
+</div>

@@ -1,0 +1,274 @@
+<div class="card">
+	<div class="card-body">
+		<div class="clearfix">
+			<h2 class="text-primary fw-bold">Basic details</h2>
+		</div>
+		<div class="row mt-4">
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<h3 class="form-label fw-bold text-primary mb-0">Email address</h3>
+					<span class="form-label text-primary">
+						{{ basicDetails?.email || '-' }}
+					</span>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<h3 class="form-label fw-bold text-primary mb-0">Mobile Number</h3>
+					<span class="form-label text-primary">
+						({{ basicDetails?.countryCode }}) {{ basicDetails?.mobileNumber || '-' }}
+					</span>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">PAN card details</h3>
+						<mat-icon class="text-success ps-1" *ngIf="panCard?.status === kycStatus.APPROVED"
+							>check_circle
+						</mat-icon>
+					</div>
+					<div *ngIf="panCard; else noPanCard">
+						<span class="form-label text-primary">PAN card number: {{ panCard?.cardNumber }}</span>
+					</div>
+					<ng-template #noPanCard>
+						<span class="form-label text-primary">No pan details </span>
+					</ng-template>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">Postal/Current Address</h3>
+						<mat-icon class="text-success ps-1" *ngIf="address?.status === kycStatus.APPROVED"
+							>check_circle
+						</mat-icon>
+					</div>
+					<div *ngIf="address.addressLine1; else noAddress">
+						<span class="form-label text-primary">
+							{{ address.addressLine1 }},
+							<span *ngIf="address?.addressLine2">{{ address?.addressLine2 }},</span>
+							{{ address?.city }}, {{ address?.state }},
+						</span>
+						<span class="form-label text-primary">PIN: {{ address?.pincode }}</span>
+					</div>
+					<ng-template #noAddress>
+						<span class="form-label text-primary">No address added</span>
+					</ng-template>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">Aadhar card details</h3>
+						<mat-icon class="text-success ps-1" *ngIf="aadharCard?.status === kycStatus.APPROVED">
+							check_circle</mat-icon
+						>
+					</div>
+					<div *ngIf="aadharCard; else noAadhar">
+						<span class="form-label text-primary">Name: {{ aadharCard?.additionalDetails?.fullName }}</span>
+						<br />
+						<span class="form-label text-primary">Aadhar card number: {{ aadharCard?.cardNumber }}</span>
+					</div>
+					<ng-template #noAadhar>
+						<span class="form-label text-primary">No aadhar details </span>
+					</ng-template>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">Physical verification</h3>
+						<mat-icon class="text-success ps-1">check_circle</mat-icon>
+					</div>
+					<span class="form-label text-primary">(verified)</span>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<h3 class="form-label fw-bold text-primary mb-0">Company/Organization name</h3>
+					<span class="form-label text-primary">
+						{{ basicDetails?.associated?.businessDetails?.registeredName || '-' }}</span
+					>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<h3 class="form-label fw-bold text-primary mb-0">Reporting Manager name:</h3>
+					<span class="form-label text-primary" *ngIf="basicDetails?.userAssociations">{{
+						basicDetails?.userAssociations[0]?.reportingManager?.name || '-'
+					}}</span>
+					<span *ngIf="!basicDetails?.userAssociations">{{ '-' }}</span>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<h3 class="form-label fw-bold text-primary mb-0">Onboarding Manager name</h3>
+					<span class="form-label text-primary" *ngIf="basicDetails?.userAssociations">
+						{{ basicDetails?.userAssociations[0]?.onBoardingManager?.name || '-' }}
+					</span>
+					<span *ngIf="!basicDetails?.userAssociations">{{ '-' }}</span>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<h3 class="form-label fw-bold text-primary mb-0">Designation</h3>
+					<span class="form-label text-primary">{{ basicDetails?.designation || '-' }}</span>
+				</div>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 mb-3">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">Driving License</h3>
+						<mat-icon class="text-success ps-1" *ngIf="drivingLicense?.status === kycStatus.APPROVED">
+							check_circle</mat-icon
+						>
+					</div>
+					<div *ngIf="drivingLicense; else noDrivingLicense">
+						<span class="form-label text-primary">{{ drivingLicense?.cardNumber }}</span>
+					</div>
+					<ng-template #noDrivingLicense>
+						<span class="form-label text-primary">No driving license </span>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card mt-3">
+	<div class="card-body">
+		<div class="clearfix">
+			<h2 class="text-primary fw-bold">Pro details</h2>
+		</div>
+		<div class="row mt-4">
+			<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">Education details</h3>
+						<mat-icon class="text-success ps-1" *ngIf="educationalDetails?.status === kycStatus.APPROVED">
+							check_circle
+						</mat-icon>
+					</div>
+					<div *ngIf="educationalDetails?.verificationMedia; else noDocument">
+						<div class="my-2" *ngFor="let media of educationalDetails.verificationMedia">
+							<label class="form-label text-primary">
+								{{ media.label }}
+							</label>
+							<button type="button" class="btn btn-outline-primary w-100 px-4">
+								<div class="d-flex justify-content-between align-items-center">
+									<span>{{ media?.fileName }}</span>
+									<mat-icon
+										mat-list-icon
+										class="text-primary"
+										*ngIf="media.filePath.length > 0"
+										(click)="downloadDocument(media.filePath)"
+									>
+										get_app
+									</mat-icon>
+								</div>
+							</button>
+						</div>
+					</div>
+					<ng-template #noDocument>
+						<button type="button" class="btn btn-outline-primary w-100 px-4">
+							<div class="d-flex justify-content-start align-items-center">
+								<span>No document added</span>
+							</div>
+						</button>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card mt-3">
+	<div class="card-body">
+		<div class="clearfix">
+			<h2 class="text-primary fw-bold">Advance Verification Details</h2>
+		</div>
+		<div class="row mt-4">
+			<div class="col-lg-12 col-md-6 col-sm-12 mb-3" *ngFor="let item of advancedVerificationList">
+				<div class="form-group">
+					<div class="d-flex align-items-start">
+						<h3 class="form-label fw-bold text-primary mb-0">
+							{{ item?.label }}
+						</h3>
+						<mat-icon class="text-success ps-1" *ngIf="item?.data?.status === kycStatus.APPROVED">
+							check_circle
+						</mat-icon>
+					</div>
+					<div *ngIf="item?.data?.verificationMedia; else noDocument">
+						<div class="my-2" *ngFor="let media of item?.data?.verificationMedia">
+							<button type="button" class="btn btn-outline-primary w-100 px-4">
+								<div class="d-flex justify-content-between align-items-center">
+									<span>{{ media?.fileName }}</span>
+									<mat-icon
+										mat-list-icon
+										class="text-primary"
+										*ngIf="media.filePath.length > 0"
+										(click)="downloadDocument(media.filePath)"
+									>
+										get_app
+									</mat-icon>
+								</div>
+							</button>
+						</div>
+					</div>
+					<ng-template #noDocument>
+						<button type="button" class="btn btn-outline-primary w-100 px-4">
+							<div class="d-flex justify-content-start align-items-center">
+								<span>No document added</span>
+							</div>
+						</button>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card mt-3">
+	<div class="card-body">
+		<div class="d-flex align-items-start">
+			<h2 class="form-label fw-bold text-primary mb-0">Self Verification Details</h2>
+			<mat-icon class="text-success ps-1" *ngIf="selfVerification?.status === kycStatus.APPROVED">
+				check_circle
+			</mat-icon>
+		</div>
+		<div class="row mt-4">
+			<div class="col-lg-12 col-md-6 col-sm-12 mb-3">
+				<div class="form-group">
+					<div *ngIf="selfVerification?.verificationMedia; else noDocument">
+						<div class="my-2" *ngFor="let media of selfVerification.verificationMedia">
+							<label class="form-label text-primary">
+								{{ media.label }}
+							</label>
+							<button type="button" class="btn btn-outline-primary w-100 px-4">
+								<div class="d-flex justify-content-between align-items-center">
+									<span>{{ media?.fileName }}</span>
+									<mat-icon
+										mat-list-icon
+										class="text-primary"
+										*ngIf="media.filePath.length > 0"
+										(click)="downloadDocument(media.filePath)"
+									>
+										get_app
+									</mat-icon>
+								</div>
+							</button>
+						</div>
+					</div>
+					<ng-template #noDocument>
+						<button type="button" class="btn btn-outline-primary w-100 px-4">
+							<div class="d-flex justify-content-start align-items-center">
+								<span>No document added</span>
+							</div>
+						</button>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

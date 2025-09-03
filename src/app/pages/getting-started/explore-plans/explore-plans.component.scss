@@ -1,0 +1,18 @@
+.tag {
+	width: 200px;
+	padding: 8px;
+	position: relative;
+	height: 40px;
+}
+.tag:after {
+	top: 6px;
+	content: '';
+	position: absolute;
+	height: 26px;
+	width: 26px;
+	right: -13px;
+	background-color: #fff;
+	transform: rotate(45deg);
+	border-left: 1px dashed #306eb3;
+	border-bottom: 1px dashed #306eb3;
+}

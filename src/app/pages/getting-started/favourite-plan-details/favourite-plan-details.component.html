@@ -1,0 +1,180 @@
+<div>
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Create Favourite Plan</span>
+			<span *ngIf="modelData">Update Favourite Plan</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Title</label>
+						<input type="text" class="form-control" id="title" placeholder="" formControlName="title" />
+						<div class="text-left" *ngFor="let error of errorMessages.title">
+							<ng-container
+								*ngIf="
+									form['title'].hasError(error.type) && (form['title'].dirty || form['title'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Description (Optional)</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="description"
+							placeholder=""
+							rows="4"
+							formControlName="description"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages.description">
+							<ng-container
+								*ngIf="
+									form['description'].hasError(error.type) &&
+									(form['description'].dirty || form['description'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Verification Checks</label>
+						<div class="table-responsive table-plan-feature">
+							<table class="table table-bordered border-black">
+								<tbody>
+									<tr *ngFor="let item$ of form['favouritePlanFeatures'].value; let index">
+										<td>
+											<input
+												id="item-{{ index }}"
+												class="form-check-input form-custom-check-input"
+												type="checkbox"
+												[(ngModel)]="item$.selected"
+												[ngModelOptions]="{ standalone: true }"
+												(change)="addRemoveItem($event, item$)"
+												[checked]="item$.checked"
+												[disabled]="item$.value === 'aadhar_card'"
+											/>
+										</td>
+										<td class="text-custom-black">
+											<div
+												class="d-flex align-items-center"
+												[ngClass]="{
+													'my-2 py-1': ![
+														planFeatures.PAST_EMPLOYMENT,
+														planFeatures.EDUCATIONAL,
+														planFeatures.REFERENCE_CHECK
+													].includes(item$.value)
+												}"
+											>
+												<div class="w-50">
+													<span class="text-custom-black">{{ item$.title }}</span>
+												</div>
+												<div
+													class="form-group mb-0 ms-3"
+													*ngIf="
+														[
+															planFeatures.PAST_EMPLOYMENT,
+															planFeatures.EDUCATIONAL,
+															planFeatures.REFERENCE_CHECK
+														].includes(item$.value)
+													"
+												>
+													<!-- <select
+																					class="form-select-sm form-select text-capitalize"
+																					aria-label="select example"
+																					[(ngModel)]="item$.maxUploadNumber"
+																					[ngModelOptions]="{ standalone: true }"
+																				>
+																					<option [value]="item" *ngFor="let item of getListRange(item$.value)">
+																						<span>{{ item }}</span>
+																					</option>
+																				</select> -->
+													<div class="d-flex align-items-center">
+														<div
+															class="form-check form-check-inline"
+															*ngFor="let item of getListRange(item$.value)"
+														>
+															<input
+																class="form-check-input"
+																type="radio"
+																[(ngModel)]="item$.maxUploadNumber"
+																[ngModelOptions]="{ standalone: true }"
+																[name]="item$.value + item"
+																[id]="item$.value + item"
+																[value]="item"
+															/>
+															<label
+																class="form-check-label text-capitalize"
+																[for]="item$.value + item"
+																>{{ item }}
+															</label>
+														</div>
+													</div>
+												</div>
+											</div>
+											<small
+												class="text-custom-black-80"
+												*ngIf="[planFeatures.EDUCATIONAL].includes(item$.value)"
+											>
+												You can request up to 3 education details*
+											</small>
+											<small
+												class="text-custom-black-80"
+												*ngIf="[planFeatures.PAST_EMPLOYMENT].includes(item$.value)"
+											>
+												You can request up to 5 past employment details*
+											</small>
+											<small
+												class="text-custom-black-80"
+												*ngIf="[planFeatures.REFERENCE_CHECK].includes(item$.value)"
+											>
+												You can request up to 3 reference details*
+											</small>
+										</td>
+										<td class="text-center">
+											<span>₹ {{ item$?.price }} Per Verification</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row gx-2">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary text-transform-none"> Cost per verification</label>
+						<input
+							type="number"
+							class="form-control"
+							id="amountPerVerification"
+							placeholder=""
+							formControlName="amountPerVerification"
+							readonly
+						/>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

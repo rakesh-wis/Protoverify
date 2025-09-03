@@ -1,0 +1,15 @@
+.active-verification {
+	border-radius: 10px;
+}
+
+.disabled-active-verification {
+	background: #e8e8e8;
+	border-radius: 10px;
+	color: #ffffff;
+}
+
+.unclickable {
+  cursor: none;	
+  pointer-events: none;
+  opacity: .5;
+}

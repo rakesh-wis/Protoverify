@@ -1,0 +1,26 @@
+<div>
+	<div>
+		<div class="tabs-locations mt-2 nav-container">
+			<!-- <div class="card-body"> -->
+			<ul ngbNav #nav="ngbNav" [(activeId)]="selectedTab" class="nav-pills bg-primary-100 p-3">
+				<li [ngbNavItem]="0">
+					<a ngbNavLink> Ticket by checks </a>
+					<ng-template ngbNavContent>
+						<app-verification-tickets-by-checks
+							#VerificationTicketsByChecksComponent
+						></app-verification-tickets-by-checks>
+					</ng-template>
+				</li>
+
+				<li [ngbNavItem]="1" class="mx-4">
+					<a ngbNavLink>All Cases</a>
+					<ng-template ngbNavContent>
+						<app-all-verifications #AllVerificationsComponent></app-all-verifications>
+					</ng-template>
+				</li>
+			</ul>
+
+			<div [ngbNavOutlet]="nav" class="mt-2"></div>
+		</div>
+	</div>
+</div>

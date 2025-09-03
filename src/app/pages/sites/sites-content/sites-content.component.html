@@ -1,0 +1,39 @@
+<div class="container-fluid page-padding">
+	<h2 class="text-primary fs-3 fw-bold">Locations</h2>
+
+	<div class="mt-3 tabs-general">
+		<nav ngbNav #nav="ngbNav" class="nav-tabs w-100 justify-content-start">
+			<ng-container ngbNavItem>
+				<a ngbNavLink class="text-capitalize">Add Locations</a>
+				<ng-template ngbNavContent>
+					<div><app-sites-details></app-sites-details></div>
+				</ng-template>
+			</ng-container>
+			<ng-container ngbNavItem [disabled]="!sitesId" *ngIf="showItems(planFeatures.LEAVE_CONFIGURATION)">
+				<a ngbNavLink class="text-capitalize">Manage Leave</a>
+				<ng-template ngbNavContent>
+					<app-client-configuration-leave-management></app-client-configuration-leave-management>
+				</ng-template>
+			</ng-container>
+			<ng-container ngbNavItem [disabled]="!sitesId">
+				<a ngbNavLink class="text-capitalize">Manage time shift</a>
+				<ng-template ngbNavContent>
+					<app-client-configuration-time-shift></app-client-configuration-time-shift>
+				</ng-template>
+			</ng-container>
+			<ng-container ngbNavItem [disabled]="!sitesId" *ngIf="showItems(planFeatures.HOLIDAY_CONFIGURATION)">
+				<a ngbNavLink class="text-capitalize">Manage holiday</a>
+				<ng-template ngbNavContent>
+					<app-client-configuration-manage-holiday></app-client-configuration-manage-holiday>
+				</ng-template>
+			</ng-container>
+			<ng-container ngbNavItem [disabled]="!sitesId" *ngIf="showItems(planFeatures.SELFIE)">
+				<a ngbNavLink class="text-capitalize">Manage checkin time</a>
+				<ng-template ngbNavContent>
+					<app-client-configuration-checkin-time-list></app-client-configuration-checkin-time-list>
+				</ng-template>
+			</ng-container>
+		</nav>
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
+	</div>
+</div>

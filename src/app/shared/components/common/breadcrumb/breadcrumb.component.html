@@ -1,0 +1,23 @@
+<nav class="nav-breadcrumb" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item bg-white text-custom-black-50">
+			<a (click)="navigateToPage({ url: '/dashboard' })" role="button">
+				<iconify-icon icon="material-symbols:dashboard-outline" width="24" height="24"></iconify-icon>
+			</a>
+		</li>
+		<li
+			class="breadcrumb-item bg-white"
+			[ngClass]="breadcrumbs.length - 1 === i ? 'text-primary' : 'text-custom-black-50'"
+			aria-current="page"
+			*ngFor="let breadcrumb of breadcrumbs; index as i"
+		>
+			<a
+				(click)="breadcrumbs.length - 1 !== i && navigateToPage(breadcrumb)"
+				routerLinkActive="router-link-active"
+				role="button"
+			>
+				{{ breadcrumb.label }}
+			</a>
+		</li>
+	</ol>
+</nav>

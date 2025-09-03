@@ -1,0 +1,57 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">Top-Up Wallet</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="input-group mb-3" *ngFor="let item of amountList; let i = index">
+				<div class="border-0 input-group-text bg-transparent">
+					<input
+						class="form-check-input mt-0"
+						type="radio"
+						[id]="i"
+						[value]="item?.value"
+						aria-label="Select amount value"
+						name="flexRadioDefault"
+						(change)="onSelectRadioButton($event, i)"
+						[checked]="item?.selected"
+					/>
+				</div>
+				<input
+					*ngIf="item?.readonly"
+					[readonly]="item?.readonly"
+					inputNumber
+					[for]="i"
+					[placeholder]="item?.placeholder"
+					type="text"
+					class="form-control"
+					aria-label="Input amount"
+				/>
+				<input
+					*ngIf="!item?.readonly"
+					[readonly]="item?.readonly"
+					inputNumber
+					[(ngModel)]="item.value"
+					[ngModelOptions]="{ standalone: true }"
+					[for]="i"
+					[placeholder]="item?.placeholder"
+					type="text"
+					class="form-control"
+					aria-label="Input amount"
+				/>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="openRazorPay()">Submit</button>
+		<app-razorPay-payment
+			[hideButton]="true"
+			[amount]="dataForm.get('amount').value"
+			(paymentMade)="onSubmit($event)"
+			[triggerManually]="dataForm.get('triggerManually').value"
+		>
+		</app-razorPay-payment>
+	</div>
+</div>

@@ -1,0 +1,431 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold">Candidate Verification</h2>
+		</div>
+		<div class="col-md-6 col-sm-6 col-lg-3 gx-3 my-4">
+			<button type="button" *appIsGranted="'ADD'" class="btn btn-primary w-100" (click)="add()">
+				+ Add Candidate Details
+			</button>
+		</div>
+	</div>
+
+	<form [formGroup]="filterForm">
+		<div class="row align-items-center">
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<label for="exampleFormControlInput1" class="form-label text-primary">Search</label>
+				<div class="input-group flex-nowrap">
+					<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+						<mat-icon mat-list-icon class="text-custom-black-50">search</mat-icon>
+					</span>
+					<input
+						type="text"
+						class="form-control search-form-control bg-transparent"
+						placeholder="Search"
+						aria-label="search"
+						formControlName="search"
+						(keyup)="applyFilters()"
+					/>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label for="exampleFormControlInput1" class="form-label text-primary">Filter By client</label>
+					<ng-select
+						#select
+						class="form-control text-capitalize bg-primary-200"
+						[items]="organizationList"
+						bindLabel="registeredName"
+						bindValue="id"
+						[virtualScroll]="true"
+						[dropdownPosition]="'bottom'"
+						[clearable]="true"
+						[multiple]="true"
+						[minTermLength]="2"
+						[closeOnSelect]="false"
+						[searchable]="true"
+						[editableSearchTerm]="true"
+						formControlName="associateId"
+						appendTo="body"
+						(scrollToEnd)="onScrollClient()"
+						(add)="applyFilters()"
+						(remove)="applyFilters()"
+						(clear)="applyFilters(); getClientList()"
+						(search)="searchClient($event)"
+					>
+						<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+							<input
+								id="item-{{ index }}"
+								class="form-check-input"
+								type="checkbox"
+								[ngModel]="item$.selected"
+								[ngModelOptions]="{ standalone: true }"
+							/>
+							{{ item?.businessDetails?.registeredName || item?.name }}
+						</ng-template>
+						<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+							<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+								<span class="ng-value-label">{{
+									item?.businessDetails?.registeredName || item?.name
+								}}</span>
+								<span class="ng-value-icon ps-2" aria-hidden="true">,</span>
+							</div>
+							<div class="ng-value ps-2" *ngIf="items.length > 4">
+								<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+							</div>
+						</ng-template>
+					</ng-select>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label class="form-label text-custom-black">Select Date</label>
+					<app-date-picker [isRangePicker]="true" [dateForm]="filterForm" (change)="applyFilters()">
+					</app-date-picker>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-12 mt-3">
+				<div class="d-flex justify-content-between">
+					<button class="btn btn-outline-primary" (click)="clearFilter()">Clear Filter</button>
+					<button class="btn btn-white border-primary bg-white px-2 pb-1" *ngIf="selectedData.length > 0">
+						<span
+							*appIsGranted="'DELETE'"
+							role="button"
+							(click)="openConfirmBulkDelete()"
+							ngbTooltip="Bulk Delete"
+						>
+							<iconify-icon
+								class="fs-5 text-primary"
+								icon="material-symbols:delete-outline"
+							></iconify-icon>
+						</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr style="vertical-align: top">
+						<th scope="col">
+							<div class="form-check">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									[id]="'all'"
+									(change)="addAndRemoveAll($event)"
+								/>
+							</div>
+						</th>
+						<th scope="col">Name</th>
+						<th scope="col">Date</th>
+						<th scope="col">Status</th>
+						<th scope="col">Verification</th>
+						<th scope="col">
+							Action
+							<div class="mt-2 d-flex flex-row align-items-center gap-2" *ngIf="selectedData.length > 0">
+								<span
+									role="button"
+									(click)="performBulkAction(bulkList.SEND_ONBOARDING_MESSAGE)"
+									ngbTooltip="Send Onboarding message"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="ic:baseline-whatsapp"></iconify-icon>
+								</span>
+								<ng-container *appIsGranted="'EDIT'">
+									<span
+										role="button"
+										(click)="performBulkAction(bulkList.GENERATE_REPORT)"
+										ngbTooltip="Generate/re-generate report"
+									>
+										<iconify-icon
+											class="fs-5 text-primary"
+											icon="humbleicons:refresh"
+										></iconify-icon>
+									</span>
+
+									<span
+										role="button"
+										(click)="performBulkAction(bulkList.SEND_REPORT)"
+										ngbTooltip="Send Report"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="bi:send"></iconify-icon>
+									</span>
+								</ng-container>
+								<span
+									role="button"
+									(click)="performBulkAction(bulkList.DOWNLOAD_REPORT)"
+									ngbTooltip="Download report"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="bi:download"></iconify-icon>
+								</span>
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList?.rows; let i; as: index">
+						<td>
+							<div class="form-check">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									[id]="i"
+									(change)="addAndRemove($event, item)"
+									[checked]="item?.selected"
+								/>
+							</div>
+						</td>
+						<td class="text-capitalize" role="button" (click)="view(item)">
+							<p class="mb-0 fw-bold fs-7 text-primary-500">{{ item.name || '-' | truncate }}</p>
+							{{ item?.mobileNumber | truncate }}
+							<p class="mb-0 text-primary-400">
+								{{ item?.associated?.businessDetails?.registeredName | truncate }}
+							</p>
+						</td>
+						<td class="text-capitalize" role="button" (click)="view(item)">
+							{{ item.createdAt | date: 'dd MMM YYYY' }}
+						</td>
+						<td role="button" (click)="view(item)">
+							<div
+								class="d-flex align-items-center mb-1"
+								*ngIf="[verificationStatus.PARTIALLY_VERIFIED].includes(item.verificationStatus)"
+							>
+								<app-custom-progress
+									style="width: 100%"
+									[customClass]="getClass(item)"
+									[percentage]="item?.verificationCount?.percentage"
+									*ngIf="item?.verificationCount?.percentage < 100"
+								>
+								</app-custom-progress>
+							</div>
+							<div class="text-capitalize mb-0 d-flex flex-row">
+								<span *ngIf="[verificationStatus.DID_NOT_VERIFY].includes(item.verificationStatus)">
+									{{ item?.verificationStatus.replaceAll('_', ' ') }}
+								</span>
+								<span
+									class="text-custom-black-80 fw-bold me-1"
+									*ngIf="[verificationStatus.PARTIALLY_VERIFIED].includes(item.verificationStatus)"
+								>
+									{{ item?.verificationStatus.replaceAll('_', ' ') }}
+								</span>
+								<span *ngIf="[verificationStatus.PROTO_VERIFIED].includes(item.verificationStatus)">
+									<img src="assets/icons/full-verified.svg" alt="" />
+								</span>
+								<span *ngIf="[verificationStatus.PROTO_VERIFIED].includes(item.verificationStatus)"
+									>Verified
+								</span>
+							</div>
+							<ng-container
+								*ngIf="
+									checkAllDocumentAreSubmitted(item?.verificationCount?.verificationList);
+									else showPendingFromCandidate
+								"
+							>
+								<p
+									*ngIf="item?.verificationCount?.percentage < 100"
+									class="mb-0"
+									[ngClass]="{
+										'text-success': getDaysDiff(item.submittedAt) <= 5,
+										'text-warning':
+											getDaysDiff(item?.verificationCount?.submittedAt) > 5 &&
+											getDaysDiff(item?.verificationCount?.submittedAt) < 10,
+										'text-danger': getDaysDiff(item?.verificationCount?.submittedAt) > 10
+									}"
+								>
+									Pending since {{ getDaysDiff(item?.verificationCount?.submittedAt) }} days
+								</p>
+							</ng-container>
+							<ng-template #showPendingFromCandidate>
+								<p>
+									{{ getPendingCount(item?.verificationCount?.verificationList) }}
+									Detail<span *ngIf="getPendingCount(item?.verificationCount?.verificationList) > 1"
+										>s</span
+									>
+									Pending from Candidate
+								</p>
+							</ng-template>
+						</td>
+						<td class="text-wrap">
+							<div class="d-flex flex-row align-items-baseline">
+								<div
+									class="d-flex flex-column pe-1 justify-content-center align-items-start"
+									*ngFor="let verification of item?.verificationCount?.verificationList"
+									[ngbPopover]="popContent"
+									[popoverContext]="{ verification }"
+									triggers="mouseenter:mouseleave"
+									popoverClass="verification-popover"
+									(click)="navigateToVerificationPage(item, verification)"
+									role="button"
+									[ngClass]="{
+										unclickable:
+											[ROLES.PROTO_OPERATION].includes(currentUser?.role) &&
+											!assignedVerificationChecks?.includes(verification?.value)
+									}"
+								>
+									<div
+										*ngIf="
+											verification?.icon != 'assets/verification/active/user_based_onboarder.png'
+										"
+									>
+										<img
+											[src]="VERIFICATION_BASE_URL + '/' + verification?.icon"
+											width="16"
+											height="16"
+											[ngClass]="{
+												'faded-checks':
+													[ROLES.PROTO_OPERATION].includes(currentUser?.role) &&
+													!assignedVerificationChecks?.includes(verification?.value)
+											}"
+										/>
+									</div>
+									<div
+										class="m-auto"
+										*ngIf="verification.status && verification.status === 'pending'"
+										[hidden]="
+											verification?.icon === 'assets/verification/active/user_based_onboarder.png'
+										"
+									>
+										<img src="assets/icons/blue-dot.svg" class="img-fluid" />
+									</div>
+								</div>
+								<ng-template #popContent let-verificationCheck="verification">
+									<app-verification-status-popover
+										[verificationCheck]="verificationCheck"
+									></app-verification-status-popover>
+								</ng-template>
+							</div>
+							<!-- <span
+								class=""
+								*ngIf="
+									[verificationStatus.DID_NOT_VERIFY].includes(item?.verificationStatus) &&
+									item?.verificationCount?.percentage < 100
+								"
+							>
+								Final doc submitted by candidate on:
+								{{ item?.verificationCount?.submittedAt | date: 'dd/MM/YYYY' }}
+							</span> -->
+						</td>
+						<td>
+							<div class="d-flex flex-row align-items-center gap-2">
+								<span
+									(click)="sendWhatsAppOnBoarding(item)"
+									role="button"
+									ngbTooltip="Send Onboarding message"
+								>
+									<iconify-icon
+										class="fs-5 text-custom-black-50"
+										icon="ic:baseline-whatsapp"
+									></iconify-icon>
+								</span>
+								<!-- <span *ngIf="
+										[
+											verificationStatus.PARTIALLY_VERIFIED,
+											verificationStatus.DID_NOT_VERIFY
+										].includes(item.verificationStatus)
+									" (click)="view(item)" role="button" ngbTooltip="Complete verification">
+									<iconify-icon class="fs-5 text-custom-black-50"
+										icon="uil:file-check-alt"></iconify-icon>
+								</span> -->
+
+								<ng-container *appIsGranted="'EDIT'">
+									<span
+										(click)="reGenerateReport(item)"
+										role="button"
+										ngbTooltip="Generate/re-generate report"
+									>
+										<iconify-icon
+											class="fs-5 text-custom-black-50"
+											icon="humbleicons:refresh"
+										></iconify-icon>
+									</span>
+
+									<span
+										*ngIf="item.reportLink"
+										(click)="sendReport(item)"
+										role="button"
+										ngbTooltip="Send Report"
+									>
+										<iconify-icon class="fs-5 text-custom-black-50" icon="bi:send"></iconify-icon>
+									</span>
+								</ng-container>
+
+								<span
+									*ngIf="item.reportLink"
+									(click)="downloadReport(item)"
+									role="button"
+									ngbTooltip="Download report"
+								>
+									<iconify-icon class="fs-5 text-custom-black-50" icon="bi:download"></iconify-icon>
+								</span>
+
+								<div class="spinner-border" role="status" *ngIf="getCheckReportGeneration(item.id)">
+									<span class="sr-only"></span>
+								</div>
+								<ng-container *appIsGranted="'DELETE'">
+									<span
+										role="button"
+										*ngIf="OPTIONS?.defaultNumber != item?.mobileNumber"
+										(click)="openConfirmDelete(item)"
+										ngbTooltip="Delete"
+									>
+										<iconify-icon
+											class="fs-5 text-custom-black-50"
+											icon="ant-design:delete-outlined"
+										></iconify-icon>
+									</span>
+								</ng-container>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="6">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="d-flex justify-content-end mt-2 gap-2">
+			<div class="form-group mb-0">
+				<select
+					class="form-select text-capitalize"
+					aria-label="select role"
+					[(ngModel)]="pageSize"
+					(change)="loadData()"
+				>
+					<option [value]="item" *ngFor="let item of pages">
+						<span>{{ item }}</span>
+					</option>
+				</select>
+			</div>
+			<button
+				class="btn btn-white border-primary bg-white d-flex align-items-center justify-content-center"
+				(click)="exportBulk()"
+				[disabled]="selectedData.length === 0"
+			>
+				<iconify-icon
+					class="fs-5 pe-2"
+					[ngClass]="{
+						'text-primary': selectedData.length > 0,
+						'text-grey': selectedData.length === 0
+					}"
+					icon="bi:download"
+				></iconify-icon>
+				<span class="text-small fw-bold" [ngClass]="selectedData.length > 0 ? 'text-primary' : 'text-grey'"
+					>Export</span
+				>
+			</button>
+		</div>
+		<app-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			*ngIf="dataList['count'] > 0"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event)"
+			[maxSize]="5"
+		></app-pagination>
+	</ng-container>
+</div>

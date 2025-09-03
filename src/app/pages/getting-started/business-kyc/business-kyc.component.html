@@ -1,0 +1,49 @@
+<div class="container-fluid page-padding">
+	<div class="d-flex justify-content-start py-3">
+		<h1 class="text-custom-black fs-3 fw-bold">Business KYC</h1>
+	</div>
+	<!-- <div class="d-flex justify-content-center">
+		<ngb-accordion #accordion="ngbAccordion" class="business-accordion w-100" [closeOthers]="false">
+			<ngb-panel [id]="'panel-' + i" *ngFor="let item of dataList; let i = index" [expand]="'panel-0'">
+				<ng-template ngbPanelHeader let-opened="opened">
+					<div
+						class="d-flex align-items-center justify-content-between"
+						(click)="accordion.toggle('panel-' + i)"
+					>
+						<h2 class="text-primary fw-bold mb-0">{{ item.label }}</h2>
+						<div>
+							<button class="btn p-0">
+								<mat-icon class="text-primary" *ngIf="!opened">keyboard_arrow_down</mat-icon>
+								<mat-icon class="text-primary" *ngIf="opened">keyboard_arrow_up</mat-icon>
+							</button>
+						</div>
+					</div>
+				</ng-template>
+				<ng-template ngbPanelContent>
+					<div *ngIf="i === 0"> -->
+	<div class="card">
+		<div class="card-body px-5">
+			<div class="clearfix">
+				<h2 class="text-custom-black">Business Details</h2>
+			</div>
+			<app-business-details (changeAccordion)="selectAccordion($event)" [userId]="userId"></app-business-details>
+		</div>
+	</div>
+	<!-- </div>
+					<div *ngIf="i === 1">
+						<app-business-documents
+							(changeAccordion)="selectAccordion($event)"
+							[userId]="currentUser.id"
+						></app-business-documents>
+					</div>
+					<div *ngIf="i === 2">
+						<app-business-address
+							(changeAccordion)="selectAccordion($event)"
+							[userId]="currentUser.id"
+						></app-business-address>
+					</div>
+				</ng-template>
+			</ngb-panel>
+		</ngb-accordion>
+	</div> -->
+</div>

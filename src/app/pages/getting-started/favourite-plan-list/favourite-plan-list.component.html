@@ -1,0 +1,110 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold">My Favourite Plans</h2>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12 text-end mb-3">
+			<button type="button" class="btn btn-primary w-100" (click)="requestPlan()">Create Favourite Plan</button>
+		</div>
+	</div>
+	<div class="card plan-card shadow-color mt-2">
+		<div class="card-body">
+			<div class="row">
+				<div class="card-group col-lg-4 col-md-5 col-sm-12" *ngFor="let item of dataList['rows']">
+					<div
+						class="card plan-card-top-border mb-4 border"
+						[ngClass]="{
+							'border-green': item.favouritePlanFeatures.length >= 13,
+							'border-blue':
+								item.favouritePlanFeatures.length >= 6 && item.favouritePlanFeatures.length < 13,
+							'border-yellow': item.favouritePlanFeatures.length < 6
+						}"
+					>
+						<div class="plan-banner">
+							<img [src]="'assets/images/plan-banner-' + getColor(item) + '.svg'" />
+						</div>
+
+						<div class="card-body px-4">
+							<div class="ps-5">
+								<div class="d-flex justify-content-between align-items-center mb-2">
+									<h3 class="text-custom-black text-capitalize fs-5 fw-bolder mb-0">
+										{{ item.title }}
+									</h3>
+									<div ngbDropdown container="body">
+										<span type="button" ngbDropdownToggle>
+											<mat-icon>more_vert</mat-icon>
+										</span>
+										<div ngbDropdownMenu>
+											<button ngbDropdownItem class="btn" (click)="edit(item)">Edit</button>
+											<button
+												ngbDropdownItem
+												class="btn text-danger"
+												(click)="openConfirmDelete(item)"
+											>
+												Delete
+											</button>
+										</div>
+									</div>
+								</div>
+								<p class="text-custom-black-50">{{ item?.description }}</p>
+							</div>
+
+							<div
+								class="d-flex align-items-center mb-4 plan-features"
+								*ngFor="let feature of item.favouritePlanFeatures.slice(0, 3)"
+							>
+								<div class="">
+									<iconify-icon
+										class="check-box-icon"
+										icon="subway:tick"
+										[ngClass]="{
+											'check-green': item.favouritePlanFeatures.length >= 13,
+											'check-blue':
+												item.favouritePlanFeatures.length >= 6 &&
+												item.favouritePlanFeatures.length < 13,
+											'check-yellow': item.favouritePlanFeatures.length < 6
+										}"
+									></iconify-icon>
+								</div>
+								<p class="text-custom-black-50 text-capitalize mb-1 ps-3">
+									{{ getPlanTitle(feature)?.label }}
+								</p>
+							</div>
+							<div class="d-flex justify-content-center align-items-center plan-features">
+								<a
+									[ngClass]="{
+										'view-green': item.favouritePlanFeatures.length >= 13,
+										'view-blue':
+											item.favouritePlanFeatures.length >= 6 &&
+											item.favouritePlanFeatures.length < 13,
+										'view-yellow': item.favouritePlanFeatures.length < 6
+									}"
+									role="button"
+									class="text-underline"
+									(click)="view(item)"
+								>
+									<span> View All </span>
+								</a>
+							</div>
+						</div>
+						<div class="px-4">
+							<hr class="text-custom-black-50" />
+						</div>
+						<div class="card-footer border-0 text-center bg-transparent">
+							<h2 class="text-primary mb-0 fw-bold">₹ {{ getAmountPerVerification(item) }}</h2>
+							<p class="text-custom-black-50">Per verification</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="text-center" *ngIf="collectionSize < 1">
+				<h3 class="text-primary fs-5 fw-bold mb-0">No plan request</h3>
+			</div>
+		</div>
+		<div class="card-footer border-0 bg-transparent pb-4">
+			<div class="d-flex justify-content-center" *ngIf="collectionSize > dataList.rows.length">
+				<label class="text-primary fs-5" role="button" (click)="onPageChange()"> View all plans</label>
+			</div>
+		</div>
+	</div>
+</div>

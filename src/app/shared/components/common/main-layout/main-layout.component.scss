@@ -1,0 +1,12 @@
+@use '@angular/material' as mat;
+
+mat-list-item.disabled {
+	cursor: not-allowed !important;
+	opacity: 0.5;
+	text-decoration: none;
+}
+.mat-expansion-panel-header[aria-disabled='true'] {
+	cursor: not-allowed !important;
+	opacity: 0.5;
+	text-decoration: none;
+}

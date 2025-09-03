@@ -1,0 +1,17 @@
+.faq-accordion .accordion-item {
+	padding: 0.6em !important;
+	width: 58vw;
+	border: none;
+	/* border-top: 1px solid #cbd3dc !important; */
+	border-width: 1px !important;
+}
+ul {
+	list-style: none;
+	padding: 0;
+}
+
+ul li:before {
+	content: '✓';
+	color: green;
+	font-size: 22px;
+}

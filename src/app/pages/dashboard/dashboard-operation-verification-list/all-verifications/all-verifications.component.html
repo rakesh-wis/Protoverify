@@ -1,0 +1,67 @@
+<ng-container>
+	<div class="table-responsive mt-3">
+		<ul ngbNav #nav="ngbNav"  class="nav-pills bg-primary-100 p-3 ul-check-type">
+				<li [ngbNavItem]=check.ngbNavItemVal   *ngFor="let check of checkTypes">
+					<a ngbNavLink> {{ check.label }} </a>
+				</li>
+		</ul>
+		<table class="table table-hover table-striped">
+			<thead>
+				<tr>
+					<ng-container *ngFor="let item of headerColumn">
+						<th scope="col" *ngIf="item.sorting">
+							{{ item.label }}
+						</th>
+						<th scope="col" *ngIf="!item.sorting">
+							{{ item.label }}
+						</th>
+					</ng-container>
+				</tr>
+			</thead>
+			<tbody *ngIf="dataList['count'] > 0">
+				<tr *ngFor="let item of dataList?.rows">
+					<td class="text-capitalize text-wrap">
+						{{ item?.name | truncate }}
+					</td>
+					<td class="text-wrap">
+						<span class="status">
+							{{ item?.status | truncate }}
+						</span>
+					</td>
+					<td class="text-wrap">
+						<span *ngIf="item?.tat?.status === 'medium'" class="tat medium">
+							{{ item?.tat?.value | truncate }}
+						</span>
+						<span *ngIf="item?.tat?.status === 'high'" class="tat high d-inline-flex align-items-center">
+							{{ item?.tat?.value | truncate }}
+							<iconify-icon icon="oui:dot" class="dot"></iconify-icon>
+						</span>
+						<span
+							*ngIf="item?.tat?.status === 'critical'"
+							class="tat critical d-inline-flex align-items-center gap-1"
+						>
+							{{ item?.tat?.value | truncate }}
+							<iconify-icon icon="oui:dot" class="dot"></iconify-icon>
+						</span>
+					</td>
+					<td class="text-wrap">{{ item?.check | truncate }}</td>
+					<td class="text-wrap">{{ item?.clients | truncate }}</td>
+				</tr>
+			</tbody>
+			<tbody *ngIf="dataList['count'] === 0">
+				<tr>
+					<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<app-pagination
+		[collectionSize]="collectionSize"
+		[(page)]="page"
+		*ngIf="dataList['count'] > 0"
+		[pageSize]="pageSize"
+		(pageChange)="onPageChange($event)"
+		[maxSize]="5"
+	></app-pagination>
+</ng-container>

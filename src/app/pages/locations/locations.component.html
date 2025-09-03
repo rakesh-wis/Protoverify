@@ -1,0 +1,81 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold mb-0">Locations</h2>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12 text-end py-2">
+			<button type="button" class="btn btn-primary w-100" (click)="addLocation()">
+				+ Add
+				<span *ngIf="selectedTab === 'regions'">Region</span>
+				<span *ngIf="selectedTab !== 'regions'">Location</span>
+			</button>
+		</div>
+	</div>
+	<form [formGroup]="filterForm">
+		<div class="row align-items-center">
+			<div class="col-lg-3 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label class="form-label text-custom-black">Search</label>
+					<div class="input-group flex-nowrap">
+						<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+							<mat-icon mat-list-icon class="text-custom-black-50">search</mat-icon>
+						</span>
+						<input
+							type="text"
+							class="form-control search-form-control bg-transparent"
+							placeholder="Search"
+							aria-label="search"
+							formControlName="search"
+							(keyup)="applyFilters()"
+						/>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-4 col-sm-12">
+				<div class="form-group">
+					<label class="form-label text-custom-black">Select Status</label>
+					<select
+						class="form-select bg-transparent text-capitalize"
+						aria-label="select example"
+						formControlName="status"
+						(change)="applyFilters()"
+					>
+						<option [value]="item.name" *ngFor="let item of statusList">
+							<span>{{ item.label }}</span>
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-3 col-sm-12 mt-3">
+				<button class="btn btn-outline-primary w-100" (click)="clearFilter()">Clear Filter</button>
+			</div>
+		</div>
+	</form>
+	<div class="tabs-locations mt-2">
+		<!-- <div class="card-body"> -->
+		<ul
+			ngbNav
+			#nav="ngbNav"
+			(navChange)="clearFormField()"
+			[(activeId)]="selectedTab"
+			class="nav-pills bg-primary-100 p-3"
+		>
+			<li ngbNavItem="regions">
+				<a ngbNavLink> Regions </a>
+				<ng-template ngbNavContent>
+					<app-regions-list #regionListComponent></app-regions-list>
+				</ng-template>
+			</li>
+			<li ngbNavItem="sites" class="mx-4">
+				<a ngbNavLink>Locations</a>
+				<ng-template ngbNavContent>
+					<app-sites-list #sitesListComponent></app-sites-list>
+				</ng-template>
+			</li>
+		</ul>
+
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
+		<!-- </div>
+	</div> -->
+	</div>
+</div>

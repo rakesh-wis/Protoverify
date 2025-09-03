@@ -1,0 +1,31 @@
+<div class="container-fluid page-padding">
+	<h2 class="text-primary fs-3 fw-bold">Employee Details</h2>
+	<div class="mt-3 tabs-general" *ngIf="!isRoleAccess; else showOnlyVerification">
+		<ul ngbNav #nav="ngbNav" class="nav-tabs w-100 justify-content-center align-items-center">
+			<li ngbNavItem>
+				<a ngbNavLink class="text-capitalize">Verification</a>
+				<ng-template ngbNavContent>
+					<app-employee-verification [employeeId]="employeeId"></app-employee-verification>
+				</ng-template>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink class="text-capitalize">Attendance</a>
+				<ng-template ngbNavContent>
+					<app-employee-attendance-list [employeeId]="employeeId"> </app-employee-attendance-list>
+				</ng-template>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink class="text-capitalize">Work history</a>
+				<ng-template ngbNavContent>
+					<app-employee-past-history-list [employeeId]="employeeId"></app-employee-past-history-list>
+				</ng-template>
+			</li>
+		</ul>
+
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
+	</div>
+
+	<ng-template #showOnlyVerification>
+		<app-employee-verification [employeeId]="employeeId"></app-employee-verification>
+	</ng-template>
+</div>

@@ -1,0 +1,259 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!memberId">Create New Member</span>
+			<span *ngIf="memberId">Update Member</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Name*</label>
+						<input type="text" class="form-control" id="name" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									form['name'].hasError(error.type) && (form['name'].dirty || form['name'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Mobile Number*</label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages?.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Email*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="email"
+							placeholder=""
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									form['email'].hasError(error.type) && (form['email'].dirty || form['email'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Role*</label>
+						<select class="form-select text-capitalize" aria-label="select role" formControlName="role">
+							<option [value]="item.value" *ngFor="let item of rolesList">
+								<span>{{ item.label }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.role">
+							<ng-container
+								*ngIf="
+									form['role'].hasError(error.type) && (form['role'].dirty || form['role'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" *ngIf="[role.PROTO_USER, role.PROTO_OPERATION].includes(form['role'].value)">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Select Client </label>
+						<ng-select
+							#select
+							class="form-control text-capitalize bg-white-200 mb-0"
+							[items]="organizationList"
+							[virtualScroll]="true"
+							bindLabel="name"
+							bindValue="id"
+							formControlName="userClient"
+							placeholder=""
+							[dropdownPosition]="'bottom'"
+							[clearable]="false"
+							[multiple]="true"
+							[minTermLength]="2"
+							[closeOnSelect]="false"
+							[searchable]="true"
+							[editableSearchTerm]="true"
+							(search)="onSearch($event)"
+							(scrollToEnd)="onScrollClient()"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item?.businessDetails?.registeredName || item?.name }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:4">
+									<span class="ng-value-label">{{
+										item?.businessDetails?.registeredName || item?.name
+									}}</span>
+									<span class="ng-value-icon ps-2 text-danger" aria-hidden="true">×</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 4">
+									<span class="ng-value-label ps-2">{{ items.length - 4 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.userClient">
+							<ng-container
+								*ngIf="
+									form['userClient'].hasError(error.type) &&
+									(form['userClient'].dirty || form['userClient'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary"> Assign Check </label>
+						<ng-select
+							#select
+							class="form-control text-capitalize bg-white-200 mb-0"
+							[items]="planModulesFeatures"
+							[virtualScroll]="true"
+							bindLabel="label"
+							bindValue="value"
+							formControlName="verificationChecks"
+							placeholder=""
+							[dropdownPosition]="'bottom'"
+							[clearable]="false"
+							[multiple]="true"
+							[minTermLength]="2"
+							[closeOnSelect]="false"
+							[searchable]="false"
+							[editableSearchTerm]="true"
+						>
+							<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+								<input
+									id="item-{{ index }}"
+									class="form-check-input"
+									type="checkbox"
+									[ngModel]="item$.selected"
+									[ngModelOptions]="{ standalone: true }"
+								/>
+								{{ item.label }}
+							</ng-template>
+							<ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+								<div class="ng-value ps-2" *ngFor="let item of items | slice: 0:1">
+									<span class="ng-value-label">{{ item.label }}</span>
+									<span class="ng-value-icon ps-2 text-danger" aria-hidden="true">×</span>
+								</div>
+								<div class="ng-value ps-2" *ngIf="items.length > 1">
+									<span class="ng-value-label ps-2">{{ items.length - 1 }} more...</span>
+								</div>
+							</ng-template>
+						</ng-select>
+						<div class="text-left" *ngFor="let error of errorMessages.userClient">
+							<ng-container
+								*ngIf="
+									form['userClient'].hasError(error.type) &&
+									(form['userClient'].dirty || form['userClient'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row px-3 mt-3" *ngIf="form['role'].value && ![role.ON_BOARDER].includes(form['role'].value)">
+				<div class="card border-0 p-0">
+					<div class="card-body p-0">
+						<div
+							class="row"
+							formArrayName="accessManagement"
+							*ngFor="let _ of accessManagement.controls; let i = index"
+						>
+							<div
+								class="d-flex justify-content-between flex-row"
+								*ngIf="_.value.forRole?.includes(form['role'].value)"
+							>
+								<div class="d-flex w-50">
+									<h3 class="text-custom-black-50 fw-bold text-capitalize">
+										{{ _.value.label }}
+									</h3>
+								</div>
+								<div class="d-flex justify-content-between flex-row w-50">
+									<div class="form-check" [formGroupName]="i">
+										<input
+											class="form-check-input form-custom-check-input"
+											type="checkbox"
+											formControlName="view"
+											id="view"
+										/>
+										<label class="form-check-label" for="view"> View </label>
+									</div>
+									<div class="form-check" [formGroupName]="i">
+										<input
+											class="form-check-input form-custom-check-input"
+											type="checkbox"
+											formControlName="add"
+											id="add"
+											(change)="checkView($event, i, 'add')"
+										/>
+										<formControl class="form-check-label" for="add"> Add </formControl>
+									</div>
+									<div class="form-check" [formGroupName]="i">
+										<input
+											class="form-check-input form-custom-check-input"
+											type="checkbox"
+											formControlName="edit"
+											id="edit"
+											(change)="checkView($event, i, 'edit')"
+										/>
+										<formControl class="form-check-label" for="edit"> Edit </formControl>
+									</div>
+									<div class="form-check" [formGroupName]="i">
+										<input
+											class="form-check-input form-custom-check-input"
+											type="checkbox"
+											formControlName="delete"
+											id="delete"
+										/>
+										<label class="form-check-label" for="delete"> Delete </label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

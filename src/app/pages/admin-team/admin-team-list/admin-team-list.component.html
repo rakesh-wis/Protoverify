@@ -1,0 +1,195 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold">Admins</h2>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12 text-end" *appIsGranted="'ADD'">
+			<button type="button" class="btn btn-primary w-100" (click)="add()">+ Add a member</button>
+		</div>
+	</div>
+	<div class="d-flex justify-content-end" *ngIf="selectedData.length > 0">
+		<button class="btn btn-white border-primary bg-white px-2 pb-1">
+			<span *appIsGranted="'DELETE'" role="button" (click)="openConfirmBulkDelete()" ngbTooltip="Bulk Delete">
+				<iconify-icon class="fs-5 text-primary" icon="material-symbols:delete-outline"></iconify-icon>
+			</span>
+		</button>
+	</div>
+	<div class="row align-items-center">
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="form-group">
+				<label class="form-label text-custom-black">Search</label>
+				<div class="input-group flex-nowrap">
+					<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+						<mat-icon mat-list-icon class="text-custom-black-50">search</mat-icon>
+					</span>
+					<input
+						type="text"
+						class="form-control search-form-control bg-transparent"
+						placeholder="Search"
+						aria-label="search"
+						[ngModelOptions]="{ standalone: true }"
+						[(ngModel)]="searchTerm"
+						(keyup)="applyFilters()"
+					/>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="form-group">
+				<label class="form-label text-custom-black">Select Status</label>
+				<select
+					class="form-select bg-transparent text-capitalize"
+					aria-label="select example"
+					(change)="applyFilters()"
+					[(ngModel)]="statusFilter"
+				>
+					<option [value]="item.name" *ngFor="let item of statusList">
+						<span>{{ item.label }}</span>
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-lg-2 col-md-3 col-sm-12 mt-3">
+			<button class="btn btn-outline-primary w-100" (click)="clearFilter()">Clear Filter</button>
+		</div>
+	</div>
+
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<ng-container *ngFor="let item of headerColumn">
+							<th scope="col" *ngIf="item.sorting" [sortable]="item.value" (sort)="onSort($event)">
+								{{ item.label }}
+							</th>
+							<th scope="col" *ngIf="!item.sorting">
+								{{ item.label }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList?.rows">
+						<td>
+							<div class="form-check">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									[id]="i"
+									(change)="addAndRemove($event, item)"
+								/>
+							</div>
+						</td>
+						<td class="text-capitalize text-wrap">
+							{{ item?.name | truncate }}
+						</td>
+						<td class="text-wrap">{{ item?.mobileNumber | truncate }}</td>
+						<td class="text-wrap">{{ item?.email | truncate }}</td>
+						<td class="text-wrap text-capitalize">
+							{{ item?.role.replace('PROTO_', '').replace('_', ' ') | truncate }}
+						</td>
+						<td class="text-wrap text-capitalize">
+							{{ getClientNames(item) }}
+						</td>
+						<td>
+							<span
+								class="badge badge-success badge-table-status text-capitalize"
+								*ngIf="item.status === defaultStatus.ACTIVE"
+								>&#9679; {{ item.status }}
+							</span>
+							<span
+								class="badge badge-danger badge-table-status text-capitalize"
+								*ngIf="[defaultStatus.BLOCKED].includes(item.status)"
+							>
+								&#9679; {{ item.status }}
+							</span>
+						</td>
+						<td>
+							<div class="d-flex flex-row">
+								<span
+									class="me-2"
+									*appIsGranted="'EDIT'"
+									role="button"
+									ngbTooltip="Edit"
+									(click)="edit(item)"
+								>
+									<iconify-icon
+										class="fs-5 text-custom-black-50"
+										icon="iconamoon:edit-light"
+									></iconify-icon>
+								</span>
+								<span *appIsGranted="'EDIT'">
+									<div class="form-check form-switch">
+										<input
+											class="form-check-input"
+											[id]="item.id"
+											(change)="toggleCheck($event, item)"
+											type="checkbox"
+											role="switch"
+											[ngbTooltip]="item.status === defaultStatus.ACTIVE ? 'Block' : 'Active'"
+											[checked]="item.status === defaultStatus.ACTIVE"
+										/>
+									</div>
+								</span>
+								<span
+									class="me-2"
+									*appIsGranted="'DELETE'"
+									role="button"
+									(click)="openConfirmDelete(item)"
+									ngbTooltip="Delete"
+								>
+									<iconify-icon
+										class="fs-5 text-custom-black-50"
+										icon="ant-design:delete-outlined"
+									></iconify-icon>
+								</span>
+							</div>
+							<!-- <div ngbDropdown container="body">
+								<span type="button" ngbDropdownToggle>
+									<mat-icon>more_vert</mat-icon>
+								</span>
+								<div ngbDropdownMenu>
+									<button ngbDropdownItem class="btn" (click)="edit(item)" *appIsGranted="'EDIT'">
+										Edit
+									</button>
+									<button
+										ngbDropdownItem
+										class="btn text-capitalize"
+										(click)="openConfirmStatus(item)"
+									>
+										<span *ngIf="item.status === defaultStatus.ACTIVE">Block</span>
+										<span *ngIf="item.status === defaultStatus.BLOCKED">{{
+											defaultStatus.ACTIVE
+										}}</span>
+									</button>
+									<button
+										ngbDropdownItem
+										class="btn text-danger"
+										(click)="openConfirmDelete(item)"
+										*appIsGranted="'DELETE'"
+									>
+										Delete
+									</button>
+								</div>
+							</div> -->
+						</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="headerColumn.length">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<app-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			*ngIf="dataList['count'] > 0"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event)"
+			[maxSize]="5"
+		></app-pagination>
+	</ng-container>
+</div>

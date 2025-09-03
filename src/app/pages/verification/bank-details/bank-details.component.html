@@ -1,0 +1,251 @@
+<div class="container-fluid page-padding">
+	<div
+		class="d-flex justify-content-between align-items-center"
+		*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+	>
+		<label class="text-custom-black-80 fs-4 fw-bold"> {{ userData?.name }}'s Verification Details </label>
+	</div>
+	<div *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-status-bar
+			[startText]="''"
+			[inputData]="form['id'].value ? dataForm.getRawValue() : null"
+			[currentUser]="currentUser"
+		></app-status-bar>
+	</div>
+	<div class="card my-4 px-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-header bg-transparent">
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex justify-content-start align-items-center py-2">
+					<img src="assets/images/kyc_bank.svg" class="img-fluid" />
+					<h2 class="text-custom-black-80 fw-bold mb-0 ms-3">Bank Account</h2>
+				</div>
+
+				<div class="d-flex justify-content-between">
+					<span class="text-custom-black-80" *ngIf="bankDetails?.updatedAt">
+						Document Submitted on: {{ bankDetails?.updatedAt | date: 'dd/MM/yyyy' }}
+					</span>
+					<ng-container
+						*ngIf="
+							[roles.EMPLOYEE].includes(currentUser?.role) &&
+							form['id'].value &&
+							![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+						"
+					>
+						<span class="mx-2" role="button" (click)="openConfirmDelete(item)" ngbTooltip="Delete">
+							<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined"></iconify-icon>
+						</span>
+					</ng-container>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<form [formGroup]="dataForm">
+				<div class="row">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<label class="form-label text-custom-black">IFSC</label>
+						<div class="input-group file-input-group mb-0">
+							<input
+								type="text"
+								class="form-control bg-transparent border-end-1 rounded-end"
+								placeholder="Enter"
+								aria-label="search"
+								formControlName="ifscCode"
+							/>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages?.ifscCode">
+							<ng-container
+								*ngIf="
+									form['ifscCode'].hasError(error.type) &&
+									(form['ifscCode'].dirty || form['ifscCode'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+						<div *ngIf="bankDetails?.BRANCH">
+							<p class="text-custom-primary-dark mb-0">
+								Branch:
+								<span class="text-custom-primary-dark fw-bold ps-1"
+									>{{ bankDetails?.BRANCH }}, {{ bankDetails?.STATE }}</span
+								>
+							</p>
+							<p class="text-custom-primary-dark mb-0">
+								Bank:<span class="text-custom-primary-dark fw-bold ps-1">{{ bankDetails?.BANK }}</span>
+							</p>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Bank Account Number</label>
+							<input
+								type="text"
+								class="form-control"
+								id="accountNumber"
+								placeholder="Enter"
+								formControlName="accountNumber"
+								(keypress)="numberOnly($event)"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.accountNumber">
+								<ng-container
+									*ngIf="
+										form['accountNumber'].hasError(error.type) &&
+										(form['accountNumber'].dirty || form['accountNumber'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row align-items-center">
+					<div class="col-lg-10 col-md-10 col-sm-12 py-2" *ngIf="form['id'].value">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Name of the Account Holder</label>
+							<input
+								type="text"
+								class="form-control"
+								id="accountName"
+								placeholder=""
+								formControlName="accountName"
+								readonly
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages?.accountName">
+								<ng-container
+									*ngIf="
+										form['accountName'].hasError(error.type) &&
+										(form['accountName'].dirty || form['accountName'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-2 col-md-2 col-sm-12 text-end" *ngIf="form['id'].value">
+						<button class="btn w-100 btn btn-white-100 mt-3">
+							<img src="assets/icons/check-circle-broken.svg" class="img-fluid" />
+							<span class="fw-bold text-custom-black ms-1">Verified</span>
+						</button>
+					</div>
+				</div>
+				<div class="row" *ngIf="dataForm?.value?.status && ![roles.EMPLOYEE].includes(currentUser?.role)">
+					<div class="col-12 mb-3">
+						<div class="form-group">
+							<label class="form-label text-custom-black">Remarks</label>
+							<textarea
+								type="text"
+								class="form-control"
+								id="remark"
+								placeholder="Write your remarks here"
+								rows="4"
+								formControlName="remark"
+								[readOnly]="
+									![roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_OPERATION].includes(
+										currentUser?.role
+									)
+								"
+							></textarea>
+							<div class="text-left" *ngFor="let error of errorMessages?.remark">
+								<ng-container
+									*ngIf="
+										form['remark'].hasError(error.type) &&
+										(form['remark'].dirty || form['remark'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex justify-content-end my-2">
+					<ng-container
+						*ngIf="
+							[roles.EMPLOYEE].includes(currentUser?.role) &&
+							![verificationLevel.CLEAR_REPORT].includes(form['status'].value) &&
+							!form['id'].value
+						"
+					>
+						<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Verify</button>
+					</ng-container>
+					<ng-container
+						*ngIf="
+							[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER].includes(currentUser?.role)
+						"
+					>
+						<div *ngIf="!form['id'].value">
+							<button
+								type="button"
+								class="btn btn-primary ms-4"
+								(click)="onSubmit()"
+								*appIsGranted="'ADD'"
+							>
+								Verify
+							</button>
+						</div>
+					</ng-container>
+				</div>
+			</form>
+
+			<div class="gap-1" *appIsGranted="'EDIT'">
+				<div
+					class="d-flex justify-content-end gap-1"
+					*ngIf="[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN].includes(currentUser?.role) && form['id'].value"
+				>
+					<button type="button" class="btn btn-outline-danger text-capitalize" (click)="openConfirmStatus()">
+						Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+					>
+						Clear Report
+					</button>
+				</div>
+				<div
+					class="d-flex justify-content-between gap-1"
+					*ngIf="[roles.PROTO_OPERATION].includes(currentUser?.role) && form['id'].value"
+				>
+					<button
+						type="button"
+						class="btn btn-outline-danger text-capitalize"
+						(click)="openConfirmStatus(verificationLevel.MAJOR_DISCREPANCY)"
+						[disabled]="dataForm.disabled"
+					>
+						Major Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-primary text-capitalize"
+						(click)="openConfirmStatus('others')"
+						[disabled]="dataForm.disabled"
+					>
+						others
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+						[disabled]="dataForm.disabled"
+					>
+						Clear Report
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="d-flex justify-content-end">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+
+	<div class="mt-4" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-verification-status></app-verification-status>
+	</div>
+</div>

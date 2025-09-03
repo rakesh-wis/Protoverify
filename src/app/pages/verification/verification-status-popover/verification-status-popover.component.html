@@ -1,0 +1,40 @@
+<ng-container *ngIf="verificationCheck">
+	<div
+		*ngIf="
+			[planFeatures.EDUCATIONAL, planFeatures.PAST_EMPLOYMENT, planFeatures.REFERENCE_CHECK].includes(
+				verificationCheck.value
+			)
+		"
+	>
+		<div class="mb-2" *ngFor="let item of getVerificationCheck(verificationCheck)">
+			<div class="d-flex align-items-center justify-content-between">
+				<span class="pe-2"
+					><small>{{ item?.title }}</small></span
+				>
+				<span [ngClass]="item?.badgeClass"
+					><small>{{ item?.status }}</small></span
+				>
+			</div>
+			@if(item?.updatedAt) {<span class="text-primary">
+				<small>Submitted on: {{ item?.updatedAt | date: 'dd/MM/YYYY' || '-' }}</small>
+			</span>
+			}@else{ Pending }
+		</div>
+	</div>
+	<div
+		*ngIf="
+			![planFeatures.EDUCATIONAL, planFeatures.PAST_EMPLOYMENT, planFeatures.REFERENCE_CHECK].includes(
+				verificationCheck.value
+			)
+		"
+	>
+		<span
+			><small
+				>{{ verificationCheck?.title }} @if(verificationCheck?.updatedAt) {<span class="">
+					Submitted on: {{ verificationCheck?.updatedAt | date: 'dd/MM/YYYY' || '-' }}
+				</span>
+				}@else{ Pending }
+			</small>
+		</span>
+	</div>
+</ng-container>

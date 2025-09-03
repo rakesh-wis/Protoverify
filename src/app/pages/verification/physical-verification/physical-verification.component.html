@@ -1,0 +1,928 @@
+<div class="container-fluid page-padding">
+	<div
+		class="d-flex justify-content-between align-items-center"
+		*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+	>
+		<label class="text-custom-black-80 fs-4 fw-bold"> {{ userData?.name }}'s Verification Details </label>
+	</div>
+	<div *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-status-bar
+			[checkName]="'physical_verification'"
+			[inputData]="form['id'].value ? dataForm.getRawValue() : null"
+			[currentUser]="currentUser"
+		></app-status-bar>
+	</div>
+	<div class="card my-4 px-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-header bg-transparent">
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex justify-content-start align-items-center py-2">
+					<img src="assets/images/kyc_physical_verification.svg" class="img-fluid" />
+					<h2 class="text-custom-black-80 fw-bold mb-0 ms-3">Current Address Physical Verification</h2>
+				</div>
+				<div class="d-flex justify-content-between">
+					<span class="text-custom-black-80" *ngIf="verificationData?.updatedAt">
+						Document Submitted on: {{ verificationData?.updatedAt | date: 'dd/MM/yyyy' }}
+					</span>
+					<ng-container
+						*ngIf="
+							[roles.EMPLOYEE].includes(currentUser?.role) &&
+							![verificationLevel.CLEAR_REPORT].includes(form['status'].value) &&
+							form['id'].value &&
+							form['addressType'].value
+						"
+					>
+						<button type="button" class="btn btn-outline-primary mx-1" (click)="onSubmit()">Save</button>
+					</ng-container>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<form [formGroup]="dataForm">
+				<div class="form-check m-3" formGroupName="physicalVerificationAddress">
+					<input
+						class="form-check-input"
+						type="checkbox"
+						id="isSameAsPermanent"
+						(change)="patchOptionalAddress($event)"
+						[attr.disabled]="form['id'].value"
+						formControlName="isSameAsPermanent"
+					/>
+					<label class="form-check-label" for="isSameAsPermanent">
+						Current Address same as Permanent Address
+					</label>
+				</div>
+				<h3 class="text-custom-black fw-bold">Current Address</h3>
+				<div class="row" formGroupName="physicalVerificationAddress">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="mr-4">
+							<div class="form-group">
+								<label class="form-label text-custom-black">Pincode</label>
+								<input
+									type="text"
+									class="form-control bg-transparent"
+									id="pincode"
+									placeholder=""
+									formControlName="pincode"
+									(keypress)="numberOnly($event)"
+									maxlength="8"
+									(keyup)="searchPincode()"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages?.pincode">
+									<ng-container
+										*ngIf="
+											physicalVerificationAddress['pincode'].hasError(error.type) &&
+											(physicalVerificationAddress['pincode'].dirty ||
+												physicalVerificationAddress['pincode'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row align-items-start" formGroupName="physicalVerificationAddress">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black"> Address line 1 </label>
+							<input
+								type="text"
+								class="form-control"
+								id="addressLine1"
+								placeholder=""
+								formControlName="addressLine1"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages.addressLine1">
+								<ng-container
+									*ngIf="
+										physicalVerificationAddress['addressLine1'].hasError(error.type) &&
+										(physicalVerificationAddress['addressLine1'].dirty ||
+											physicalVerificationAddress['addressLine1'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black"> Address line 2 </label>
+							<input
+								type="text"
+								class="form-control"
+								id="addressLine2"
+								placeholder=""
+								formControlName="addressLine2"
+							/>
+							<div class="text-left" *ngFor="let error of errorMessages.addressLine2">
+								<ng-container
+									*ngIf="
+										physicalVerificationAddress['addressLine2'].hasError(error.type) &&
+										(physicalVerificationAddress['addressLine2'].dirty ||
+											physicalVerificationAddress['addressLine2'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black">State</label>
+							<input
+								type="text"
+								class="form-control"
+								id="state"
+								placeholder=""
+								formControlName="state"
+								readonly
+							/>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black">City</label>
+							<input
+								type="text"
+								class="form-control"
+								id="city"
+								placeholder=""
+								formControlName="city"
+								readonly
+							/>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="periodOfStay">
+						<div class="form-group">
+							<label class="form-label text-primary"> Period of stay in Number of Years & Months</label>
+							<div class="input-group mb-0">
+								<input
+									type="text"
+									class="form-control"
+									formControlName="years"
+									placeholder="0-100"
+									aria-label="Year"
+									(keypress)="numberOnly($event)"
+									maxlength="3"
+								/>
+								<select
+									class="form-select text-capitalize"
+									aria-label="Number of months"
+									placeholder="Number of months"
+									formControlName="months"
+								>
+									<option value="" selected disabled [hidden]="periodOfStayForm['months'].value">
+										Number of months
+									</option>
+									<option [value]="item" *ngFor="let item of months">
+										<span>{{ item }}</span>
+									</option>
+								</select>
+							</div>
+							<p class="text-secondary mb-0">Years can be from 0-100</p>
+							<span class="text-left" *ngFor="let error of errorMessages?.years">
+								<ng-container
+									*ngIf="
+										periodOfStayForm['years'].hasError(error.type) &&
+										(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</span>
+							<span
+								class="text-danger px-1"
+								*ngIf="
+									!periodOfStayForm['years'].value &&
+									!periodOfStayForm['months'].dirty &&
+									(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched) &&
+									(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+								"
+								>&</span
+							>
+							<span class="text-left" *ngFor="let error of errorMessages?.months">
+								<ng-container
+									*ngIf="
+										periodOfStayForm['months'].hasError(error.type) &&
+										(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</span>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Type of Accommodation </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select type"
+								formControlName="accommodationType"
+							>
+								<option [value]="item" *ngFor="let item of accommodationType">
+									<span>{{ item.replaceAll('_', ' ') }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.accommodationType">
+								<ng-container
+									*ngIf="
+										physicalVerificationAddress['accommodationType'].hasError(error.type) &&
+										(physicalVerificationAddress['accommodationType'].dirty ||
+											physicalVerificationAddress['accommodationType'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Type of Address </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select type"
+								formControlName="addressType"
+							>
+								<option [value]="item" *ngFor="let item of addressType">
+									<span>{{ item }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.addressType">
+								<ng-container
+									*ngIf="
+										physicalVerificationAddress['addressType'].hasError(error.type) &&
+										(physicalVerificationAddress['addressType'].dirty ||
+											physicalVerificationAddress['addressType'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-primary"> Type of Ownership </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select type"
+								formControlName="ownershipType"
+							>
+								<option [value]="item" *ngFor="let item of ownershipType">
+									<span>{{ item }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.ownershipType">
+								<ng-container
+									*ngIf="
+										physicalVerificationAddress['ownershipType'].hasError(error.type) &&
+										(physicalVerificationAddress['ownershipType'].dirty ||
+											physicalVerificationAddress['ownershipType'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="d-flex align-items-center p-2"
+					*ngIf="
+						form['id'].value &&
+						dataForm.get('physicalVerificationAddress.addressLine1').value &&
+						[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER, roles.PROTO_OPERATION].includes(
+							currentUser?.role
+						)
+					"
+				>
+					<div class="d-flex flex-column">
+						<button
+							type="button"
+							class="btn btn-outline-primary"
+							(click)="copyLink()"
+							[disabled]="dataForm.disabled"
+						>
+							Copy Link
+						</button>
+						<label class="text-custom-black ms-4">Copy link to share </label>
+					</div>
+					<div
+						class="mb-3 ms-4"
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_USER,
+								roles.PROTO_OPERATION
+							].includes(currentUser?.role)
+						"
+					>
+						<div class="form-check form-check-inline">
+							<input
+								class="form-check-input"
+								type="radio"
+								name="verifierType"
+								id="field_officer"
+								value="field_officer"
+								formControlName="verifierType"
+								(change)="onChangeVerificationType()"
+							/>
+							<label class="form-check-label" for="field_officer">Field Officer</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input
+								class="form-check-input"
+								type="radio"
+								name="verifierType"
+								id="vendor"
+								value="vendor"
+								formControlName="verifierType"
+								(change)="onChangeVerificationType()"
+							/>
+							<label class="form-check-label" for="vendor">Vendor</label>
+						</div>
+					</div>
+				</div>
+
+				<div
+					class="row py-2"
+					*ngIf="
+						[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER, roles.PROTO_OPERATION].includes(
+							currentUser?.role
+						)
+					"
+				>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group">
+							<label class="form-label text-custom-black">
+								<span *ngIf="form['verifierType'].value !== 'vendor'"> Field Officer* </span>
+								<span *ngIf="form['verifierType'].value === 'vendor'"> Select Vendor* </span>
+							</label>
+							<div class="input-group">
+								<ng-select
+									#select
+									class="form-control text-capitalize bg-white-200 mb-0"
+									[items]="vendorList"
+									[virtualScroll]="true"
+									bindLabel="name"
+									bindValue="id"
+									[dropdownPosition]="'bottom'"
+									[searchable]="false"
+									[clearable]="false"
+									appendTo="body"
+									placeholder=""
+									formControlName="vendorId"
+									(scrollToEnd)="onScrollVendor()"
+									(search)="searchVendor($event)"
+								>
+									<ng-template ng-label-tmp let-item="item">
+										{{ item?.name }}
+									</ng-template>
+								</ng-select>
+								<button
+									class="btn btn-outline-send py-1"
+									type="button"
+									(click)="sendEmailToVendor()"
+									[disabled]="dataForm.disabled"
+								>
+									<iconify-icon class="fs-5 pt-1 text-primary" icon="bi:send"></iconify-icon>
+								</button>
+							</div>
+							<div class="text-left" *ngFor="let error of errorMessages.vendorId">
+								<ng-container
+									*ngIf="
+										form['vendorId'].hasError(error.type) &&
+										(form['vendorId'].dirty || form['vendorId'].touched)
+									"
+								>
+									<span class="text-danger">
+										{{ error.message }}
+										<span *ngIf="form['verifierType'].value !== 'vendor'"> Field Officer </span>
+										<span *ngIf="form['verifierType'].value === 'vendor'"> Vendor </span>
+									</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ng-container
+					*ngIf="
+						form['id'].value &&
+						[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER, roles.PROTO_OPERATION].includes(
+							currentUser?.role
+						)
+					"
+				>
+					<div [ngClass]="{ 'opacity-50': form['verifierType'].value !== 'vendor' }">
+						<h3 class="text-custom-black fw-bold">Details From Verifier</h3>
+						<div class="row">
+							<div
+								class="col-lg-6 col-md-6 col-sm-12"
+								*ngFor="let _ of verificationMedia.controls; let i = index"
+							>
+								<div class="form-group">
+									<label class="form-label text-custom-black"> {{ _.value.label }} </label>
+									<input
+										hidden
+										#fileInput
+										type="file"
+										class="form-control"
+										onclick="this.value = null"
+										[accept]="
+											i === 2
+												? 'image/png,image/jpg,image/jpeg'
+												: 'image/png,image/jpg,image/jpeg,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+										"
+										(change)="uploadFile($event, i)"
+									/>
+									<div class="input-group file-input-group">
+										<input
+											type="text"
+											readonly
+											class="form-control"
+											[aria-label]="_.value.label"
+											[placeholder]="_.value.label"
+											[ngClass]="
+												!_.value.filePath &&
+												![
+													roles.PROTO_SUPER_ADMIN,
+													roles.PROTO_ADMIN,
+													roles.PROTO_USER,
+													roles.PROTO_OPERATION,
+													roles.EMPLOYEE
+												].includes(currentUser?.role)
+													? 'border-end-1 rounded-end'
+													: 'border-end-0'
+											"
+										/>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 border-end-0"
+											*ngIf="_.value.filePath"
+											(click)="dataForm.disabled ? null : showImage(_.value.filePath)"
+											ngbTooltip="View"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="iconamoon:eye">
+											</iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0"
+											*ngIf="_.value.filePath"
+											[ngClass]="{
+												'rounded-end': form['verifierType'].value !== 'vendor',
+												'border-end-0': form['verifierType'].value === 'vendor'
+											}"
+											(click)="dataForm.disabled ? null : downloadDocument(_.value.filePath)"
+											ngbTooltip="Download"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											*ngIf="_.value.filePath && form['verifierType'].value === 'vendor'"
+											(click)="dataForm.disabled ? null : setControl(_.value, true, i)"
+											ngbTooltip="Remove"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+											</iconify-icon>
+										</span>
+										<ng-container
+											*ngIf="
+												[
+													roles.PROTO_SUPER_ADMIN,
+													roles.PROTO_ADMIN,
+													roles.PROTO_USER,
+													roles.PROTO_OPERATION
+												].includes(currentUser?.role)
+											"
+										>
+											<ng-container *appIsGranted="'EDIT'">
+												<span
+													role="button"
+													class="input-group-text bg-transparent border-start-0 rounded-end"
+													(click)="
+														form['verifierType'].value === 'vendor'
+															? fileInput.click()
+															: null
+													"
+													*ngIf="!_.value.filePath"
+													ngbTooltip="Upload File"
+												>
+													<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+													</iconify-icon>
+												</span>
+											</ng-container>
+										</ng-container>
+									</div>
+									<div class="text-left" *ngFor="let error of errorMessages.filePath">
+										<ng-container
+											*ngIf="
+												_.controls['filePath'].hasError(error.type) &&
+												(_.controls['filePath'].dirty || _.controls['filePath'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row my-2">
+							<div class="col-lg-6 col-md-10 col-sm-12" formGroupName="additionalDetails">
+								<div class="form-group">
+									<label class="form-label text-custom-black">Address</label>
+									<textarea
+										type="text"
+										class="form-control"
+										id="formattedAddress"
+										placeholder="Write address"
+										rows="2"
+										formControlName="formattedAddress"
+										[readonly]="form['verifierType'].value !== 'vendor'"
+									></textarea>
+									<div class="text-left" *ngFor="let error of errorMessages?.formattedAddress">
+										<ng-container
+											*ngIf="
+												additionalFormattedAddress['formattedAddress'].hasError(error.type) &&
+												(additionalFormattedAddress['formattedAddress'].dirty ||
+													additionalFormattedAddress['formattedAddress'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-6 col-md-10 col-sm-12">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Latitude & Longitude</label>
+									<div class="input-group mb-0">
+										<input
+											type="number"
+											class="form-control"
+											formControlName="latitude"
+											placeholder=""
+											aria-label="Latitude"
+											[readonly]="form['verifierType'].value !== 'vendor'"
+										/>
+										<input
+											type="number"
+											class="form-control"
+											formControlName="longitude"
+											placeholder=""
+											aria-label="Longitude"
+											[readonly]="form['verifierType'].value !== 'vendor'"
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row align-items-start">
+							<div class="col-lg-6 col-md-6 col-sm-12" formGroupName="periodOfStay">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Period of Stay (Year-Month)</label>
+									<div class="input-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											formControlName="years"
+											placeholder="0-100"
+											aria-label="Year"
+											(keypress)="numberOnly($event)"
+											maxlength="3"
+											[readonly]="form['verifierType'].value !== 'vendor'"
+										/>
+										<select
+											class="form-select text-capitalize"
+											aria-label="Number of months"
+											placeholder="Number of months"
+											formControlName="months"
+											[attr.disabled]="
+												form['verifierType'].value !== 'vendor' ? 'disabled' : null
+											"
+										>
+											<option
+												value=""
+												selected
+												disabled
+												[hidden]="periodOfStayForm['months'].value"
+											>
+												Select month
+											</option>
+											<option [value]="item" *ngFor="let item of months">
+												<span>{{ item }}</span>
+											</option>
+										</select>
+									</div>
+									<p class="text-secondary mb-0">Years can be from 0-100</p>
+									<span class="text-left" *ngFor="let error of errorMessages?.years">
+										<ng-container
+											*ngIf="
+												periodOfStayForm['years'].hasError(error.type) &&
+												(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</span>
+									<span
+										class="text-danger px-1"
+										*ngIf="
+											!periodOfStayForm['years'].value &&
+											(periodOfStayForm['years'].dirty || periodOfStayForm['years'].touched) &&
+											(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+										"
+										>&</span
+									>
+									<span class="text-left" *ngFor="let error of errorMessages?.months">
+										<ng-container
+											*ngIf="
+												periodOfStayForm['months'].hasError(error.type) &&
+												(periodOfStayForm['months'].dirty || periodOfStayForm['months'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</span>
+								</div>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Type of Accommodation </label>
+									<select
+										class="form-select text-capitalize"
+										aria-label="select type"
+										formControlName="accommodationType"
+										[attr.disabled]="form['verifierType'].value !== 'vendor' ? 'disabled' : null"
+									>
+										<option [value]="item" *ngFor="let item of accommodationType">
+											<span>{{ item.replaceAll('_', ' ') }}</span>
+										</option>
+									</select>
+									<div class="text-left" *ngFor="let error of errorMessages.accommodationType">
+										<ng-container
+											*ngIf="
+												form['accommodationType'].hasError(error.type) &&
+												(form['accommodationType'].dirty || form['accommodationType'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-6 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Type of Address </label>
+									<select
+										class="form-select text-capitalize"
+										aria-label="select type"
+										formControlName="addressType"
+										[attr.disabled]="form['verifierType'].value !== 'vendor' ? 'disabled' : null"
+									>
+										<option [value]="item" *ngFor="let item of addressType">
+											<span>{{ item }}</span>
+										</option>
+									</select>
+									<div class="text-left" *ngFor="let error of errorMessages.addressType">
+										<ng-container
+											*ngIf="
+												form['addressType'].hasError(error.type) &&
+												(form['addressType'].dirty || form['addressType'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Type of Ownership </label>
+									<select
+										class="form-select text-capitalize"
+										aria-label="select type"
+										formControlName="ownershipType"
+										[attr.disabled]="form['verifierType'].value !== 'vendor' ? 'disabled' : null"
+									>
+										<option [value]="item" *ngFor="let item of ownershipType">
+											<span>{{ item }}</span>
+										</option>
+									</select>
+									<div class="text-left" *ngFor="let error of errorMessages.ownershipType">
+										<ng-container
+											*ngIf="
+												form['ownershipType'].hasError(error.type) &&
+												(form['ownershipType'].dirty || form['ownershipType'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row justify-content-center" formGroupName="verifier">
+							<div class="col-lg-6 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Verifier's Name </label>
+									<input
+										type="text"
+										class="form-control"
+										id="name"
+										formControlName="name"
+										autocomplete="off"
+										[readonly]="form['verifierType'].value !== 'vendor'"
+									/>
+									<div class="text-left" *ngFor="let error of errorMessages?.name">
+										<ng-container
+											*ngIf="
+												formVerifier['name'].hasError(error.type) &&
+												(formVerifier['name'].dirty || formVerifier['name'].touched)
+											"
+										>
+											<span class="text-danger">{{ error.message }}</span>
+										</ng-container>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-12">
+								<div class="form-group">
+									<label class="form-label text-custom-black"> Verifier's Contact Number </label>
+									<app-mobile-number
+										[formControlMobileNumber]="formVerifier.mobileNumber"
+										[formControlCountryCode]="formVerifier.countryCode"
+										[errorValidator]="errorMessages.mobileNumber"
+										(validNumberEvent)="receiveValidNumberEvent($event)"
+										[isDisabled]="form['verifierType'].value !== 'vendor'"
+									>
+									</app-mobile-number>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						class="d-flex justify-content-end mt-2"
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_USER,
+								roles.PROTO_OPERATION
+							].includes(currentUser?.role) && form['id'].value
+						"
+					>
+						<button
+							type="button"
+							class="btn btn-outline-primary"
+							(click)="onSubmit()"
+							*appIsGranted="'EDIT'"
+							[disabled]="dataForm.disabled"
+						>
+							Save
+						</button>
+					</div>
+					<div
+						class="row"
+						*ngIf="
+							[
+								roles.PROTO_SUPER_ADMIN,
+								roles.PROTO_ADMIN,
+								roles.PROTO_LAWYER,
+								roles.PROTO_OPERATION
+							].includes(currentUser?.role) && form['id'].value
+						"
+					>
+						<div class="col-12 mb-3">
+							<div class="form-group">
+								<label class="form-label text-custom-black">Remarks</label>
+								<textarea
+									type="text"
+									class="form-control"
+									id="remark"
+									placeholder="Write your remarks here"
+									rows="4"
+									formControlName="remark"
+									[readOnly]="
+										dataForm?.value?.status === kycStatus?.APPROVED ||
+										![roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_OPERATION].includes(
+											currentUser?.role
+										)
+									"
+								></textarea>
+								<div class="text-left" *ngFor="let error of errorMessages?.remark">
+									<ng-container
+										*ngIf="
+											form['remark'].hasError(error.type) &&
+											(form['remark'].dirty || form['remark'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+				</ng-container>
+			</form>
+
+			<div
+				class="d-flex justify-content-end my-3"
+				*ngIf="!form['id'].value && [roles.EMPLOYEE].includes(currentUser?.role)"
+			>
+				<button type="button" class="btn btn-primary" (click)="onSubmit()">Submit</button>
+			</div>
+			<div *appIsGranted="'ADD'">
+				<div
+					class="px-2"
+					*ngIf="
+						!form['id'].value &&
+						[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER, roles.PROTO_OPERATION].includes(
+							currentUser?.role
+						)
+					"
+				>
+					<label class="text-primary me-4">Generate link to be shared </label>
+					<button
+						type="button"
+						class="btn btn-outline-primary"
+						(click)="onSubmit()"
+						[disabled]="dataForm.disabled"
+					>
+						Generate Link
+					</button>
+				</div>
+			</div>
+			<div class="gap-1" *appIsGranted="'EDIT'">
+				<div
+					class="d-flex justify-content-end gap-1"
+					*ngIf="[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN].includes(currentUser?.role) && form['id'].value"
+				>
+					<button type="button" class="btn btn-outline-danger text-capitalize" (click)="openConfirmStatus()">
+						Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+					>
+						Clear Report
+					</button>
+				</div>
+				<div
+					class="d-flex justify-content-between gap-1"
+					*ngIf="[roles.PROTO_OPERATION].includes(currentUser?.role) && form['id'].value"
+				>
+					<button
+						type="button"
+						class="btn btn-outline-danger text-capitalize"
+						(click)="openConfirmStatus(verificationLevel.MAJOR_DISCREPANCY)"
+						[disabled]="dataForm.disabled"
+					>
+						Major Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-primary text-capitalize"
+						(click)="openConfirmStatus('others')"
+						[disabled]="dataForm.disabled"
+					>
+						others
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+						[disabled]="dataForm.disabled"
+					>
+						Clear Report
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-end mt-5">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+
+	<div class="mt-4" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-verification-status></app-verification-status>
+	</div>
+</div>

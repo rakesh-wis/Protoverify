@@ -1,0 +1,249 @@
+<div class="container mt-4">
+	<div class="time-container" *ngIf="![roles.PROTO_OPERATION].includes(currentUser?.role)">
+		<div class="d-flex align-items-center">
+			<img
+				[src]="
+					inputData && inputData?.status
+						? './assets/icons/verification/pending-grey.svg'
+						: './assets/icons/verification/none.svg'
+				"
+				class="img-fluid"
+				width="24"
+			/>
+			<span class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }"
+				>{{ startText }} pending</span
+			>
+		</div>
+		<div class="separator text-success">-----</div>
+		<div class="d-flex align-items-center">
+			<img
+				[src]="
+					inputData && inputData?.status === 'pending'
+						? './assets/icons/verification/clear_report.svg'
+						: './assets/icons/verification/un-verified.svg'
+				"
+				class="img-fluid"
+				width="24"
+			/>
+			<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }"
+				>{{ startText }} submitted</small
+			>
+		</div>
+		<div class="separator text-success">-----</div>
+		<div class="d-flex align-items-center">
+			<img
+				[src]="
+					inputData && inputData?.status === 'pending'
+						? './assets/icons/verification/clear_report.svg'
+						: './assets/icons/verification/un-verified.svg'
+				"
+				class="img-fluid"
+				width="24"
+			/>
+			<span class="text-medium fw-bold text-primary-dark ps-1">Verification under progress</span>
+		</div>
+		<div class="separator text-success">-----</div>
+		<div
+			class="d-flex align-items-center"
+			[ngClass]="{
+				'text-success': inputData && !['pending', '', null].includes(inputData?.status),
+				'text-grey': !inputData || inputData?.status === 'pending'
+			}"
+		>
+			<iconify-icon class="fs-4" icon="subway:tick"> </iconify-icon>
+			<span class="text-medium pt-1" style="position: relative; left: -4px">erified</span>
+		</div>
+	</div>
+	<div class="time-container" *ngIf="[roles.PROTO_OPERATION].includes(currentUser?.role)">
+		<div class="d-flex align-items-center">
+			<img
+				[src]="
+					inputData && inputData?.status
+						? './assets/icons/document-pending.svg'
+						: './assets/icons/document-red.svg'
+				"
+				class="img-fluid"
+				width="24"
+			/>
+			<span class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }"
+				>{{ startText }} pending</span
+			>
+		</div>
+		<div class="separator text-grey">-----</div>
+		<div class="d-flex align-items-center">
+			<img
+				[src]="
+					inputData
+						? inputData?.status === 'pending' && !inputData?.vendorId
+							? './assets/icons/document-submitted.svg'
+							: './assets/icons/document-pending.svg'
+						: './assets/icons/document-gray.svg'
+				"
+				class="img-fluid"
+				width="24"
+			/>
+			<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }">
+				<span
+					*ngIf="
+						[
+							planFeatures.AADHAR_CARD,
+							planFeatures.PAN_CARD,
+							planFeatures.DRIVING_LICENSE,
+							planFeatures.BANK_ACCOUNT,
+							planFeatures.RC_CHECK,
+							planFeatures.BANK_STATEMENT,
+							planFeatures.PASSPORT_CHECK,
+							planFeatures.VOTER_ID
+						].includes(checkName) || !checkName
+					"
+				>
+					Check doc & assign remark
+				</span>
+				<span *ngIf="checkName === planFeatures.SELF_VERIFICATION"> Check address & Lat-long matches </span>
+				<span
+					*ngIf="
+						[
+							planFeatures.EDUCATIONAL,
+							planFeatures.GLOBAL_DATABASE_CHECK,
+							planFeatures.DUAL_EMPLOYMENT,
+							planFeatures.CIBIL,
+							planFeatures.DIRECTORSHIP_TEST,
+							planFeatures.SOCIAL_MEDIA_CHECK,
+							planFeatures.GAP_CHECK,
+							planFeatures.DRUG_TEST,
+							planFeatures.POLICE_VERIFICATION_THROUGH_POLICE,
+							planFeatures.POLICE_VERIFICATION_THROUGH_LAWYER
+						].includes(checkName)
+					"
+				>
+					Send Doc to Vendor
+				</span>
+				<span *ngIf="[planFeatures.PAST_EMPLOYMENT, planFeatures.REFERENCE_CHECK].includes(checkName)">
+					Check docs and company on MCA
+				</span>
+				<span *ngIf="[planFeatures.PHYSICAL_VERIFICATION, planFeatures.PERMANENT_ADDRESS].includes(checkName)">
+					Generate link and assign FO
+				</span>
+				<span *ngIf="[planFeatures.COURT_CHECK].includes(checkName)"> Send Doc to Vendor </span>
+			</small>
+		</div>
+		<ng-container
+			*ngIf="
+				[
+					planFeatures.COURT_CHECK,
+					planFeatures.EDUCATIONAL,
+					planFeatures.GLOBAL_DATABASE_CHECK,
+					planFeatures.DUAL_EMPLOYMENT,
+					planFeatures.CIBIL,
+					planFeatures.DIRECTORSHIP_TEST,
+					planFeatures.SOCIAL_MEDIA_CHECK,
+					planFeatures.GAP_CHECK,
+					planFeatures.DRUG_TEST,
+					planFeatures.POLICE_VERIFICATION_THROUGH_POLICE,
+					planFeatures.POLICE_VERIFICATION_THROUGH_LAWYER
+				].includes(checkName)
+			"
+		>
+			<div class="separator text-grey">-----</div>
+			<div class="d-flex align-items-center">
+				<img
+					[src]="
+						inputData && inputData?.vendorId
+							? inputData?.status === 'pending'
+								? './assets/icons/document-submitted.svg'
+								: './assets/icons/document-pending.svg'
+							: './assets/icons/document-gray.svg'
+					"
+					class="img-fluid"
+					width="24"
+				/>
+				<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }">
+					<span> Follow up with vendor </span>
+				</small>
+			</div>
+		</ng-container>
+		<ng-container *ngIf="[planFeatures.PHYSICAL_VERIFICATION, planFeatures.PERMANENT_ADDRESS].includes(checkName)">
+			<div class="separator text-grey">-----</div>
+			<div class="d-flex align-items-center">
+				<img
+					[src]="
+						inputData
+							? inputData?.status === 'pending' && inputData?.vendorId && !inputData?.verifier?.name
+								? './assets/icons/document-submitted.svg'
+								: './assets/icons/document-pending.svg'
+							: './assets/icons/document-gray.svg'
+					"
+					class="img-fluid"
+					width="24"
+				/>
+				<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }">
+					<span> Follow up with FO </span>
+				</small>
+			</div>
+		</ng-container>
+		<ng-container *ngIf="[planFeatures.PHYSICAL_VERIFICATION, planFeatures.PERMANENT_ADDRESS].includes(checkName)">
+			<div class="separator text-grey">-----</div>
+			<div class="d-flex align-items-center">
+				<img
+					[src]="
+						inputData && inputData?.vendorId
+							? inputData?.verifier?.name && inputData?.status !== 'pending'
+								? './assets/icons/document-pending.svg'
+								: './assets/icons/document-submitted.svg'
+							: './assets/icons/document-gray.svg'
+					"
+					class="img-fluid"
+					width="24"
+				/>
+				<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }">
+					<span> Check address & lat-long match- assign remark </span>
+				</small>
+			</div>
+		</ng-container>
+		<ng-container *ngIf="[planFeatures.PAST_EMPLOYMENT, planFeatures.REFERENCE_CHECK].includes(checkName)">
+			<div class="separator text-grey">-----</div>
+			<div class="d-flex align-items-center">
+				<img
+					[src]="
+						inputData
+							? inputData?.status === 'pending'
+								? './assets/icons/document-submitted.svg'
+								: './assets/icons/document-pending.svg'
+							: './assets/icons/document-gray.svg'
+					"
+					class="img-fluid"
+					width="24"
+				/>
+				<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }">
+					<span> Follow up with HR </span>
+				</small>
+			</div>
+			<div class="separator text-grey">-----</div>
+			<div class="d-flex align-items-center">
+				<img
+					[src]="
+						inputData && inputData?.status !== 'pending'
+							? './assets/icons/document-pending.svg'
+							: './assets/icons/document-gray.svg'
+					"
+					class="img-fluid"
+					width="24"
+				/>
+				<small class="text-medium fw-bold text-primary-dark ps-1" [ngClass]="{ 'text-capitalize': !startText }">
+					<span> Upload verified doc & assign remark </span>
+				</small>
+			</div>
+		</ng-container>
+		<div class="separator text-grey">-----</div>
+		<div
+			class="d-flex align-items-center"
+			[ngClass]="{
+				'text-success': inputData && (!['pending', '', null].includes(inputData?.status) || inputData?.remark),
+				'text-grey': !inputData || inputData?.status === 'pending'
+			}"
+		>
+			<iconify-icon class="fs-4" icon="subway:tick"> </iconify-icon>
+			<span class="text-medium pt-1" style="position: relative; left: -4px">erified</span>
+		</div>
+	</div>
+</div>

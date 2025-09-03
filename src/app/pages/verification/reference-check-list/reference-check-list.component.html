@@ -1,0 +1,433 @@
+<div class="container-fluid page-padding">
+	<div
+		class="d-flex justify-content-between align-items-center"
+		*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+	>
+		<label class="text-custom-black-80 fs-4 fw-bold"> {{ userData?.name }}'s Verification Details </label>
+	</div>
+	<div *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-status-bar
+			[checkName]="'reference_check'"
+			[inputData]="form['status'].value ? dataForm.getRawValue() : null"
+			[currentUser]="currentUser"
+		>
+		</app-status-bar>
+	</div>
+	<div class="d-flex justify-content-end mt-3">
+		<!-- <div class="col-lg-3 col-md-4 col-sm-12">
+			<div class="input-group flex-nowrap">
+				<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+					<mat-icon mat-list-icon>search</mat-icon>
+				</span>
+				<input type="text" class="form-control search-form-control bg-transparent" placeholder="Search"
+					aria-label="search" [ngModelOptions]="{ standalone: true }" [(ngModel)]="searchTerm"
+					(keyup)="applyFilters()" />
+			</div>
+		</div> -->
+		<ng-container
+			*ngIf="
+				[roles.EMPLOYEE].includes(currentUser?.role) &&
+				![verificationLevel.CLEAR_REPORT].includes(form['status'].value) &&
+				dataList.length < maxUploadNumber
+			"
+		>
+			<div class="text-end mb-3">
+				<button type="button" class="btn btn-primary w-100" (click)="add()">Reference Check</button>
+			</div>
+		</ng-container>
+		<ng-container
+			*ngIf="
+				[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_USER, roles.PROTO_OPERATION].includes(
+					currentUser?.role
+				) && dataList.length < maxUploadNumber
+			"
+		>
+			<div class="text-end mb-3" *appIsGranted="'ADD'">
+				<button type="button" class="btn btn-primary w-100" (click)="add()" [disabled]="dataForm.disabled">
+					+ Add Reference
+				</button>
+			</div>
+		</ng-container>
+	</div>
+	<div class="card my-4 px-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-header bg-transparent">
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex justify-content-start align-items-center py-2">
+					<img src="assets/images/kyc_reference_check.svg" class="img-fluid" />
+					<h2 class="text-custom-black-80 fw-bold mb-0 ms-3">Reference Check</h2>
+				</div>
+				<div>
+					<span class="badge badge-primary fw-normal">
+						Details of past <strong>{{ maxUploadNumber }} reference</strong> requested</span
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+	<ng-container>
+		<div class="card my-2" *ngFor="let item of dataList" [ngClass]="{ 'opacity-50': isFormDisabled }">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-4 col-md-4 border-end">
+						<label class="text-custom-primary-dark fw-bold">Organization</label>
+						<p class="text-custom-primary-dark mb-0">{{ item?.organizationName | truncate }}</p>
+						<!-- <p class="mb-0">
+							<span> Joining : {{ item?.fromDate | date: 'dd MMM YYYY' }}</span>
+						</p> -->
+						<p class="text-custom-primary-dark">
+							<span [ngClass]="item?.currentlyWorking ? 'text-danger' : 'text-custom-primary-dark'">
+								<span *ngIf="item?.currentlyWorking"> Currently working </span>
+								<span *ngIf="!item?.currentlyWorking"> Not currently working </span>
+							</span>
+						</p>
+					</div>
+					<div class="col-lg-4 col-md-4 ps-4 border-end">
+						<label class="text-custom-primary-dark fw-bold">Manager Details:</label>
+						<p class="text-custom-primary-dark mb-0">
+							<span>{{ item?.name }}</span>
+						</p>
+						<p class="mb-0">
+							<span>{{ item?.countryCode }}{{ item?.mobileNumber }}</span>
+						</p>
+						<p class="text-custom-primary-dark">
+							<span>{{ item?.email }}</span>
+						</p>
+					</div>
+					<div class="col-lg-1 col-md-2">
+						<ng-container
+							*ngIf="
+								[
+									roles.PROTO_SUPER_ADMIN,
+									roles.PROTO_ADMIN,
+									roles.PROTO_USER,
+									roles.PROTO_OPERATION
+								].includes(currentUser?.role)
+							"
+						>
+							<div class="d-flex flex-column">
+								<span
+									class="me-2"
+									*appIsGranted="'EDIT'"
+									role="button"
+									ngbTooltip="Edit"
+									(click)="dataForm.disabled ? null : update(item)"
+								>
+									<iconify-icon
+										class="fs-5 text-custom-black-50"
+										icon="iconamoon:edit-light"
+									></iconify-icon>
+								</span>
+								<span
+									class="me-2"
+									*appIsGranted="'DELETE'"
+									role="button"
+									(click)="dataForm.disabled ? null : openConfirmDelete(item)"
+									ngbTooltip="Delete"
+								>
+									<iconify-icon
+										class="fs-5 text-custom-black-50"
+										icon="ant-design:delete-outlined"
+									></iconify-icon>
+								</span>
+							</div>
+						</ng-container>
+					</div>
+				</div>
+				<span class="text-custom-black-80" *ngIf="item?.updatedAt">
+					Document Submitted on: {{ item?.updatedAt | date: 'dd/MM/yyyy' }}
+				</span>
+				<div class="d-flex justify-content-start">
+					<div
+						ngbAccordion
+						*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+						class="hr-details-accordion w-100"
+					>
+						<div ngbAccordionItem [id]="'managerDetails'">
+							<div ngbAccordionHeader>
+								<div class="d-flex align-items-start justify-content-between">
+									Reporting Manager’s Email
+									<div>
+										<button ngbAccordionToggle class="btn p-0">
+											<mat-icon class="text-custom-black-50" *ngIf="!item.opened"
+												>keyboard_arrow_down</mat-icon
+											>
+											<mat-icon class="text-custom-black-50" *ngIf="item.opened"
+												>keyboard_arrow_up</mat-icon
+											>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div ngbAccordionCollapse>
+								<div ngbAccordionBody>
+									<div class="table-responsive mt-3">
+										<table class="table table-hover">
+											<thead>
+												<tr class="bg-primary-200">
+													<th scope="col" width="100">Parameters</th>
+													<th scope="col" width="140">Details by candidate</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Employee Name</td>
+													<td>{{ userData?.name }}</td>
+												</tr>
+												<tr>
+													<td>Organization Name</td>
+													<td>{{ item?.organizationName | truncate }}</td>
+												</tr>
+												<tr>
+													<td>Location</td>
+													<td>{{ item?.location | truncate }}</td>
+												</tr>
+												<tr class="bg-primary-200">
+													<th>General Impression</th>
+													<th width="140">Details to be verified by Manager/Colleague</th>
+												</tr>
+												<tr>
+													<td>How long you have known the candidate?</td>
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.yearsOfKnown }}
+													</td>
+												</tr>
+												<tr>
+													<td>In what capacity did the candidate work with you?</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.capacityOfWorking }}
+													</td>
+												</tr>
+												<tr>
+													<td>What were the candidate’s roles and responsibilities?</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.rolesAndResponsibility }}
+													</td>
+												</tr>
+												<tr>
+													<td>
+														What according to you are the candidate’s professional
+														strengths?
+													</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.professionalStrengths }}
+													</td>
+												</tr>
+												<tr>
+													<td>Areas of improvement/concerns, if any?</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.areasOfImprovement }}
+													</td>
+												</tr>
+												<tr>
+													<td>Why did he/she leave the company?</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.reasonOfLeaving }}
+													</td>
+												</tr>
+												<tr class="bg-primary-200">
+													<th colspan="2">Achievements</th>
+												</tr>
+												<tr>
+													<td class="text-wrap">
+														If you were putting together a team, would you rehire the
+														candidate? If yes, in what capacity
+													</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.eligibilityForRehire }}
+													</td>
+												</tr>
+												<tr class="bg-primary-200">
+													<th colspan="2">Personal Attributes</th>
+												</tr>
+												<tr>
+													<td class="text-wrap">
+														What are his/her biggest accomplishments or key contributions to
+														the organization?
+													</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.keyAttributes }}
+													</td>
+												</tr>
+
+												<tr>
+													<td class="text-wrap">
+														How does this person compare with other executives in similar
+														position in your organization or comparable organizations?
+													</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.comparisonWithOthers }}
+													</td>
+												</tr>
+												<tr>
+													<td>
+														What kind of personal qualities come to mind when you think of
+														him/her?
+													</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.personalQualities }}
+													</td>
+												</tr>
+												<tr>
+													<td>What motivates the candidate?</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.motivationOfCandidate }}
+													</td>
+												</tr>
+												<tr>
+													<td class="text-wrap">
+														How would you rate the candidate’s communication skills- “verbal
+														and written” on a scale of 1 to 5, 5 being the best?
+													</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.verbalAndWriterRating }}
+													</td>
+												</tr>
+												<tr>
+													<td>a. Commitment</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.commitmentRating }}
+													</td>
+												</tr>
+												<tr>
+													<td>b. Passion</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.passionRating }}
+													</td>
+												</tr>
+												<tr>
+													<td>c. Integrity</td>
+
+													<td *ngIf="item?.verificationData">
+														{{ item?.verificationData?.integrityRating }}
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<form
+			[formGroup]="dataForm"
+			*ngIf="
+				dataList?.length > 0 &&
+				[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_LAWYER, roles.PROTO_OPERATION].includes(
+					currentUser?.role
+				)
+			"
+		>
+			<div class="row my-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+				<div class="col-12 mb-3">
+					<div class="form-group">
+						<label class="form-label text-primary">Remarks</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="remark"
+							placeholder="Write your remarks here"
+							rows="4"
+							formControlName="remark"
+							[readOnly]="
+								dataForm?.value?.status === kycStatus?.APPROVED ||
+								![roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_OPERATION].includes(
+									currentUser?.role
+								)
+							"
+						></textarea>
+						<div class="text-left" *ngFor="let error of errorMessages?.remark">
+							<ng-container
+								*ngIf="
+									form['remark'].hasError(error.type) &&
+									(form['remark'].dirty || form['remark'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="gap-1" *appIsGranted="'EDIT'">
+					<div
+						class="d-flex justify-content-end gap-1"
+						*ngIf="[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN].includes(currentUser?.role)"
+					>
+						<button
+							type="button"
+							class="btn btn-outline-danger text-capitalize"
+							(click)="openConfirmStatus()"
+						>
+							Discrepancy
+						</button>
+						<button
+							type="button"
+							class="btn btn-success"
+							(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+						>
+							Clear Report
+						</button>
+					</div>
+					<div
+						class="d-flex justify-content-between gap-1"
+						*ngIf="[roles.PROTO_OPERATION].includes(currentUser?.role)"
+					>
+						<button
+							type="button"
+							class="btn btn-outline-danger text-capitalize"
+							(click)="openConfirmStatus(verificationLevel.MAJOR_DISCREPANCY)"
+							[disabled]="dataForm.disabled"
+						>
+							Major Discrepancy
+						</button>
+						<button
+							type="button"
+							class="btn btn-outline-primary text-capitalize"
+							(click)="openConfirmStatus('others')"
+							[disabled]="dataForm.disabled"
+						>
+							others
+						</button>
+						<button
+							type="button"
+							class="btn btn-success"
+							(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+							[disabled]="dataForm.disabled"
+						>
+							Clear Report
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</ng-container>
+
+	<div class="d-flex justify-content-end">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+
+	<div class="mt-4" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-verification-status></app-verification-status>
+	</div>
+</div>

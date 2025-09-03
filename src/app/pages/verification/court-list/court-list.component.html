@@ -1,0 +1,250 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span>Crime Check</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<div class="d-flex flex-column justify-content-end mb-1">
+			<label class="text-custom-black">
+				<span class="fw-bold">Candidate's Name:</span>
+				{{ aadharCard?.additionalDetails?.fullName || userData?.name }}
+			</label>
+			<label class="text-custom-black">
+				<span class="fw-bold">Aadhaar Number:</span> {{ aadharCard?.cardNumber || '-' }}
+			</label>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr class="bg-primary">
+						<ng-container *ngFor="let item of headerColumn">
+							<th scope="col" class="text-white text-capitalize">
+								{{ item }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody>
+					<ng-container *ngFor="let _ of dataArray; let j = index">
+						<tr>
+							<td colspan="5" class="text-capitalize fw-bold">
+								<img width="24" src="assets/images/{{ _.category }}.svg" class="me-2 img-fluid" />
+								<span class="text-custom-black">{{ _.category }}</span>
+							</td>
+						</tr>
+
+						<tr
+							[ngClass]="{ 'text-danger': item.status === courtStatus[1].value }"
+							*ngFor="let item of _.data; let i = index"
+						>
+							<td class="text-wrap">
+								{{ item?.court?.label }}
+							</td>
+							<td class="text-wrap">
+								{{ item.court?.jurisdiction }}
+							</td>
+							<td>
+								<select [(ngModel)]="item.yearDate" [disabled]="!canEdit">
+									<option [value]="year" *ngFor="let year of yearList">{{ year }}</option>
+								</select>
+							</td>
+							<td>
+								<select [(ngModel)]="item.status" [disabled]="!canEdit" (change)="resetValue(item)">
+									<option [value]="status.value" *ngFor="let status of courtStatus">
+										{{ status.label }}
+									</option>
+								</select>
+							</td>
+							<!-- <td>
+								<button class="btn" [disabled]="item.status != 'case_found'"
+									(click)="openCourtDetails(item)">
+									<img src="./assets/icons/attachement.svg" />
+								</button>
+							</td> -->
+						</tr>
+					</ng-container>
+				</tbody>
+			</table>
+		</div>
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">
+							<span> Select Vendor* </span>
+						</label>
+						<div class="input-group">
+							<ng-select
+								#select
+								class="form-control text-capitalize bg-white-200 mb-0"
+								[items]="vendorList"
+								[virtualScroll]="true"
+								bindLabel="name"
+								bindValue="id"
+								[dropdownPosition]="'bottom'"
+								[searchable]="false"
+								[clearable]="false"
+								placeholder=""
+								formControlName="vendorId"
+								(scrollToEnd)="onScrollVendor()"
+								(search)="searchVendor($event)"
+							>
+								<ng-template ng-label-tmp let-item="item">
+									{{ item?.name }}
+								</ng-template>
+							</ng-select>
+							<button
+								class="btn btn-outline-send py-1"
+								[disabled]="!id"
+								type="button"
+								(click)="sendEmailToVendor()"
+							>
+								<iconify-icon class="fs-5 pt-1 text-primary" icon="bi:send"></iconify-icon>
+							</button>
+						</div>
+						<div class="text-left" *ngFor="let error of errorMessages.vendorId">
+							<ng-container
+								*ngIf="
+									form['vendorId'].hasError(error.type) &&
+									(form['vendorId'].dirty || form['vendorId'].touched)
+								"
+							>
+								<span class="text-danger"> {{ error.message }} Vendor </span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div formArrayName="verificationMedia">
+				<div class="row justify-content-between align-items-end">
+					<div
+						class="col-lg-6 col-md-6 col-sm-12"
+						[formGroupName]="i"
+						*ngFor="let _ of media.controls; let i = index"
+					>
+						<div class="form-group">
+							<label class="form-label text-custom-black">
+								{{ _.value.label }}
+							</label>
+							<input
+								hidden
+								#fileInput
+								type="file"
+								onclick="this.value = null"
+								class="form-control"
+								[name]="_.value.label"
+								(change)="uploadFile($event, i)"
+								accept="image/jpg,image/png,image/jpeg"
+							/>
+
+							<div class="input-group file-input-group">
+								<input
+									type="text"
+									readonly
+									class="form-control"
+									aria-label="{{ _.value.label }}"
+									[placeholder]="_.value.label"
+									onclick="this.value = null"
+									[ngClass]="
+										!_.value.filePath &&
+										![
+											roles.PROTO_SUPER_ADMIN,
+											roles.PROTO_ADMIN,
+											roles.PROTO_USER,
+											roles.PROTO_OPERATION,
+											roles.EMPLOYEE
+										].includes(currentUser?.role)
+											? 'border-end-1 rounded-end'
+											: 'border-end-0'
+									"
+								/>
+								<span
+									role="button"
+									class="input-group-text bg-transparent border-start-0 border-end-0"
+									*ngIf="_.value.filePath"
+									(click)="downloadDocument(_.value.filePath)"
+									ngbTooltip="Download"
+								>
+									<iconify-icon class="fs-5 text-primary" icon="bi:download"> </iconify-icon>
+								</span>
+								<ng-container *ngIf="[roles.EMPLOYEE].includes(currentUser?.role)">
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="fileInput.click()"
+										*ngIf="!_.value.filePath"
+										ngbTooltip="Upload File"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+										</iconify-icon>
+									</span>
+									<span
+										role="button"
+										class="input-group-text bg-transparent border-start-0 rounded-end"
+										(click)="setControl(_.value, true, i)"
+										*ngIf="
+											_.value.filePath &&
+											![verificationLevel.CLEAR_REPORT].includes(form['status'].value)
+										"
+										ngbTooltip="Remove"
+									>
+										<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+										</iconify-icon>
+									</span>
+								</ng-container>
+								<ng-container *ngIf="![roles.EMPLOYEE, roles.PROTO_LAWYER].includes(currentUser?.role)">
+									<ng-container *appIsGranted="'EDIT'">
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="fileInput.click()"
+											*ngIf="!_.value.filePath"
+											ngbTooltip="Upload File"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment">
+											</iconify-icon>
+										</span>
+										<span
+											role="button"
+											class="input-group-text bg-transparent border-start-0 rounded-end"
+											(click)="setControl(_.value, true, i)"
+											*ngIf="_.value.filePath"
+											ngbTooltip="Remove"
+										>
+											<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+											</iconify-icon>
+										</span>
+									</ng-container>
+								</ng-container>
+							</div>
+						</div>
+						<div class="text-left" [formGroupName]="i" *ngFor="let error of errorMessages.filePath">
+							<ng-container
+								*ngIf="
+									_.controls['filePath'].hasError(error.type) &&
+									(_.controls['filePath'].dirty || _.controls['filePath'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-custom-primary ms-4"
+			[hidden]="!canEdit"
+			*appIsGranted="'EDIT'"
+			(click)="onSubmit()"
+		>
+			Submit
+		</button>
+	</div>
+</div>

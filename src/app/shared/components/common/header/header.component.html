@@ -1,0 +1,73 @@
+<mat-toolbar class="navbar">
+	<mat-toolbar-row class="justify-content-between">
+		<button mat-icon-button (click)="toggleSideBar()">
+			<mat-icon>menu</mat-icon>
+		</button>
+		<div class="d-flex flex-row align-items-center">
+			<div class="clearfix me-3" *ngIf="isRoleAccess && user.role !== role.PROTO_LAWYER">
+				<label class="form-label text-primary fs-6">Switch client</label>
+			</div>
+			<div class="" style="width: 220px" *ngIf="isRoleAccess && user.role !== role.PROTO_LAWYER">
+				<ng-select
+					#select
+					class="form-control text-capitalize bg-white-200 mb-0"
+					[items]="organizationList"
+					[virtualScroll]="true"
+					bindLabel="registeredName"
+					[dropdownPosition]="'bottom'"
+					[searchable]="false"
+					[clearable]="false"
+					appendTo="body"
+					placeholder=""
+					[(ngModel)]="selectedClient"
+					(search)="onSearch($event)"
+					(scrollToEnd)="onScrollClient()"
+					(change)="changeClient($event)"
+				>
+					<ng-template ng-header-tmp>
+						<div class="input-group flex-nowrap">
+							<span class="input-group-text bg-transparent search-input-group" id="addon-wrapping">
+								<mat-icon mat-list-icon>search</mat-icon>
+							</span>
+							<input
+								type="text"
+								style="width: 100%; line-height: 24px; padding-left: 0"
+								class="form-control search-form-control bg-transparent"
+								placeholder="Search"
+								aria-label="search"
+								(input)="select.filter($event.target.value)"
+							/>
+						</div>
+					</ng-template>
+					<ng-template ng-label-tmp let-item="item">
+						{{ item?.registeredName }}
+					</ng-template>
+				</ng-select>
+			</div>
+			<div class="ms-3 d-flex flex-column">
+				<div ngbDropdown class="d-flex align-items-center">
+					<div class="">
+						<img
+							[src]="currentUser?.profilePicture || 'assets/icons/avatar.svg'"
+							class="rounded-circle"
+							width="35"
+							height="35"
+						/>
+					</div>
+					<div>
+						<button mat-button [matMenuTriggerFor]="beforeMenu" class="text-left avatar-name">
+							<div>{{ currentUser?.name | truncate: 12 }}</div>
+							<label class="form-label text-gray">{{ organizationName }}</label>
+						</button>
+					</div>
+					<mat-menu #beforeMenu="matMenu" xPosition="before">
+						<button mat-menu-item [routerLink]="['/profile']" routerLinkActive="router-link-active">
+							Profile
+						</button>
+						<button mat-menu-item (click)="logout()">Logout</button>
+					</mat-menu>
+				</div>
+			</div>
+		</div>
+	</mat-toolbar-row>
+</mat-toolbar>

@@ -1,0 +1,151 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Add Reference</span>
+			<span *ngIf="modelData">Update Reference</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Organization Name*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="organizationName"
+							placeholder=""
+							formControlName="organizationName"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.organizationName">
+							<ng-container
+								*ngIf="
+									form['organizationName'].hasError(error.type) &&
+									(form['organizationName'].dirty || form['organizationName'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Location*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="location"
+							placeholder=""
+							formControlName="location"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.location">
+							<ng-container
+								*ngIf="
+									form['location'].hasError(error.type) &&
+									(form['location'].dirty || form['location'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-check">
+				<p class="gap-1">
+					<input
+						type="checkbox"
+						class="form-check-input form-custom-check-input"
+						formControlName="currentlyWorking"
+					/>
+					<label class="form-label text-custom-black ms-2"> Currently working </label>
+				</p>
+			</div>
+			<label class="form-label text-custom-black fw-bold">Reporting Manager/Colleague Details </label>
+			<div class="row justify-content-start">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Name </label>
+						<input type="text" class="form-control" id="hrName" placeholder="" formControlName="name" />
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									dataForm.get('name').hasError(error.type) &&
+									(dataForm.get('name').dirty || dataForm.get('name').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Email ID </label>
+						<input
+							type="text"
+							class="form-control"
+							id="hremail"
+							placeholder=""
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									dataForm.get('email').hasError(error.type) &&
+									(dataForm.get('email').dirty || dataForm.get('email').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black"> Contact Number </label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-custom-black">Designation</label>
+						<select
+							class="form-select text-capitalize"
+							aria-label="select designation"
+							formControlName="designation"
+						>
+							<option [value]="item" *ngFor="let item of designationList">
+								<span>{{ item }}</span>
+							</option>
+						</select>
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['designation'].hasError(error.type) &&
+									(form['designation'].dirty || form['designation'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Submit</button>
+	</div>
+</div>

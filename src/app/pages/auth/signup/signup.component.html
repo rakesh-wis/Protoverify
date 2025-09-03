@@ -1,0 +1,199 @@
+<div class="container-fluid h-100">
+	<div class="row h-100">
+		<div class="col-lg-5 col-md-4 col-sm-12">
+			<app-auth-side-content></app-auth-side-content>
+		</div>
+		<div class="col-lg-7 col-md-8 col-sm-12">
+			<div class="row" style="height: 90%">
+				<div class="d-flex justify-content-end p-4">
+					<mat-icon class="text-custom-black-50">mail_outline</mat-icon>
+					<span class="text-custom-black-50 ms-2">support&#64;protostaff.com</span>
+				</div>
+				<form [formGroup]="dataForm" (ngSubmit)="onSubmit()">
+					<div class="row justify-content-center">
+						<div class="col-12 text-center py-4">
+							<h3 class="text-custom-black fs-3 fw-normal">Sign up</h3>
+						</div>
+						<div class="col-lg-3 col-md-4 col-sm-12">
+							<div class="form-group">
+								<label for="exampleFormControlInput1" class="form-label text-custom-black">
+									First Name
+								</label>
+								<input
+									type="text"
+									class="form-control bg-white-200"
+									id="firstName"
+									placeholder="Enter"
+									formControlName="firstName"
+									[imask]="alphabetsMask"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.firstName">
+									<ng-container
+										*ngIf="
+											form['firstName'].hasError(error.type) &&
+											(form['firstName'].dirty || form['firstName'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-4 col-sm-12">
+							<div class="form-group">
+								<label for="exampleFormControlInput1" class="form-label text-custom-black">
+									Last Name
+								</label>
+								<input
+									type="text"
+									class="form-control bg-white-200"
+									id="lastName"
+									placeholder="Enter"
+									formControlName="lastName"
+									[imask]="alphabetsMask"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.lastName">
+									<ng-container
+										*ngIf="
+											form['lastName'].hasError(error.type) &&
+											(form['lastName'].dirty || form['lastName'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-lg-6 col-md-8 col-sm-12">
+							<div class="form-group">
+								<label for="exampleFormControlInput1" class="form-label text-custom-black">
+									Mobile Number
+								</label>
+								<app-mobile-number
+									[customClass]="true"
+									[formControlMobileNumber]="dataForm.get('mobileNumber')"
+									[formControlCountryCode]="dataForm.get('countryCode')"
+									[errorValidator]="errorMessages.mobileNumber"
+									(validNumberEvent)="receiveValidNumberEvent($event)"
+								>
+								</app-mobile-number>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-lg-6 col-md-8 col-sm-12">
+							<div class="form-group">
+								<label class="form-label text-custom-black">Registered Business name</label>
+								<input
+									type="text"
+									class="form-control bg-white-200"
+									id="businessName"
+									placeholder="Enter"
+									formControlName="registeredName"
+								/>
+								<div class="text-left" *ngFor="let error of errorMessages.registeredName">
+									<ng-container
+										*ngIf="
+											form['registeredName'].hasError(error.type) &&
+											(form['registeredName'].dirty || form['registeredName'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div class="col-lg-3 col-md-4 col-sm-12">
+							<div class="form-group">
+								<label class="form-label text-custom-black"> Business Entity Type </label>
+								<select
+									class="form-select text-capitalize bg-white-200"
+									aria-label="select entity"
+									formControlName="type"
+								>
+									<option [value]="item" *ngFor="let item of businessType">
+										<span>{{ item }}</span>
+									</option>
+								</select>
+								<div class="text-left" *ngFor="let error of errorMessages.type">
+									<ng-container
+										*ngIf="
+											form['type'].hasError(error.type) &&
+											(form['type'].dirty || form['type'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-4 col-sm-12">
+							<div class="form-group">
+								<label class="form-label text-custom-black"> Industry Type </label>
+								<select
+									class="form-select text-capitalize bg-white-200"
+									aria-label="select industry"
+									formControlName="industry"
+								>
+									<option [value]="item" *ngFor="let item of industryType">
+										<span>{{ item }}</span>
+									</option>
+								</select>
+								<div class="text-left" *ngFor="let error of errorMessages.industry">
+									<ng-container
+										*ngIf="
+											form['industry'].hasError(error.type) &&
+											(form['industry'].dirty || form['industry'].touched)
+										"
+									>
+										<span class="text-danger">{{ error.message }}</span>
+									</ng-container>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row justify-content-center my-4">
+						<div class="col-lg-6 col-md-6 col-sm-12">
+							<button type="submit" class="btn btn-custom-primary border-radius w-100 text-uppercase">
+								Sign up
+							</button>
+						</div>
+					</div>
+					<div class="row justify-content-center my-4">
+						<div class="col-12 text-center">
+							<label class="text-custom-black-80 fs-6">
+								Already have an account?
+								<span class="text-primary fw-bolder text-uppercase" role="button" routerLink="/login"
+									>Login</span
+								>
+							</label>
+						</div>
+					</div>
+					<div class="text-center">
+						<div>
+							<label class="text-custom-black-50">
+								By clicking submit you are agreeing to the following
+							</label>
+						</div>
+						<div>
+							<label
+								class="text-custom-black fw-bolder text-underline"
+								role="button"
+								routerLink="/terms-and-conditions"
+							>
+								<u>Terms & conditions</u>
+							</label>
+						</div>
+					</div>
+				</form>
+				<div class="text-center mt-2">
+					<span class="text-custom-black-50">© Protoverify 2023</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

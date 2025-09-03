@@ -1,0 +1,21 @@
+<div class="container-fluid page-padding">
+	<h2 class="text-primary fs-3 fw-bold">Configuration</h2>
+
+	<div class="mt-3 tabs-general">
+		<nav ngbNav #nav="ngbNav" class="nav-tabs w-100 justify-content-start">
+			<ng-container ngbNavItem>
+				<a ngbNavLink class="text-capitalize">Log details</a>
+				<ng-template ngbNavContent>
+					<app-log-list></app-log-list>
+				</ng-template>
+			</ng-container>
+			<ng-container ngbNavItem>
+				<a ngbNavLink class="text-capitalize">Document template</a>
+				<ng-template ngbNavContent>
+					<app-client-configuration-template></app-client-configuration-template>
+				</ng-template>
+			</ng-container>
+		</nav>
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
+	</div>
+</div>

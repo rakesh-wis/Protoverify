@@ -1,0 +1,34 @@
+<div>
+	<!-- <div class="modal-header border-0">
+        <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.close('Cross click')"></button>
+    </div> -->
+	<div class="modal-body px-4">
+		<div class="text-center mb-2">
+			<img [src]="image" *ngIf="image" />
+		</div>
+		<div class="text-center">
+			<h2 class="text-primary-500 text-capitalize" *ngIf="title">
+				{{ title }}
+			</h2>
+			<p *ngIf="description">{{ description }}</p>
+		</div>
+	</div>
+	<div class="modal-footer border-0 d-flex justify-content-center" matDialogActions>
+		<button
+			type="button"
+			class="btn {{ cancelButtonColor }} px-4"
+			*ngIf="cancelText != null"
+			(click)="dialogRef.close(true)"
+		>
+			{{ cancelText }}
+		</button>
+		<button
+			type="button"
+			class="btn px-4 {{ okButtonColor }}"
+			*ngIf="okText != null"
+			(click)="dialogRef.close(false)"
+		>
+			{{ okText }}
+		</button>
+	</div>
+</div>

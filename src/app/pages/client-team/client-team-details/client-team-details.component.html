@@ -1,0 +1,224 @@
+<div class="m-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span *ngIf="!modelData">Add Team Member</span>
+			<span *ngIf="modelData">Update Team Member</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Name*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="name"
+							placeholder="Enter here"
+							formControlName="name"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.name">
+							<ng-container
+								*ngIf="
+									form['name'].hasError(error.type) && (form['name'].dirty || form['name'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Mobile Number*</label>
+						<app-mobile-number
+							[formControlMobileNumber]="dataForm.get('mobileNumber')"
+							[formControlCountryCode]="dataForm.get('countryCode')"
+							[errorValidator]="errorMessages?.mobileNumber"
+							(validNumberEvent)="receiveValidNumberEvent($event)"
+						>
+						</app-mobile-number>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Email*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="email"
+							placeholder="Enter here"
+							formControlName="email"
+							oninput="this.value = this.value.toLowerCase()"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.email">
+							<ng-container
+								*ngIf="
+									form['email'].hasError(error.type) && (form['email'].dirty || form['email'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12">
+					<div class="form-group">
+						<label class="form-label text-primary">Enter Designation*</label>
+						<input
+							type="text"
+							class="form-control"
+							id="designation"
+							placeholder="Enter here"
+							formControlName="designation"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.designation">
+							<ng-container
+								*ngIf="
+									form['designation'].hasError(error.type) &&
+									(form['designation'].dirty || form['designation'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row" formArrayName="userAssociations">
+				<ng-container *ngFor="let _ of userAssociations.controls; let i = index">
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Select Region* </label>
+							<!-- <select class="form-select text-capitalize" aria-label="select example"
+								formControlName="regionId" placeholder="Select region"
+								(change)="onRegionChangeHandler($event)">
+								<option selected disabled>Select option</option>
+								<option [value]="item.id" *ngFor="let item of regionList">
+									<span>{{ item.title }}</span>
+								</option>
+							</select> -->
+							<ng-select
+								class="form-control text-capitalize"
+								[items]="regionList"
+								[virtualScroll]="true"
+								placeholder="Select option"
+								bindValue="id"
+								bindLabel="title"
+								[dropdownPosition]="'bottom'"
+								(change)="onRegionChangeHandler($event)"
+								formControlName="regionId"
+							>
+							</ng-select>
+							<div class="text-left" *ngFor="let error of errorMessages.regionId">
+								<ng-container
+									*ngIf="
+										_.controls['regionId'].hasError(error.type) &&
+										(_.controls['regionId'].dirty || _.controls['regionId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12">
+						<div class="form-group" [formGroupName]="i" *ngIf="siteList">
+							<label class="form-label text-primary"> Select Site* </label>
+							<ng-select
+								class="form-control text-capitalize"
+								[items]="siteList"
+								[virtualScroll]="true"
+								placeholder="Select option"
+								bindValue="id"
+								bindLabel="name"
+								[dropdownPosition]="'bottom'"
+								[searchable]="true"
+								[editableSearchTerm]="true"
+								formControlName="sitesId"
+								(scrollToEnd)="onScrollToEnd()"
+							>
+							</ng-select>
+							<div class="text-left" *ngFor="let error of errorMessages.sitesId">
+								<ng-container
+									*ngIf="
+										_.controls['sitesId'].hasError(error.type) &&
+										(_.controls['sitesId'].dirty || _.controls['sitesId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</ng-container>
+			</div>
+			<div class="row">
+				<label class="form-label text-primary"> Access* </label>
+				<div
+					class="row"
+					formArrayName="accessManagement"
+					*ngFor="let _ of accessManagement.controls; let i = index"
+				>
+					<div class="d-flex justify-content-between flex-row">
+						<!-- <div class="d-flex w-50">
+									<h3 class="text-primary fw-bold text-capitalize">
+										{{ _.value.label }}
+									</h3>
+								</div> -->
+						<div class="d-flex justify-content-between flex-row w-50">
+							<div class="form-check" [formGroupName]="i">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									formControlName="view"
+									id="view"
+									disabled
+								/>
+								<label class="form-check-label" for="view"> View </label>
+							</div>
+							<div class="form-check" [formGroupName]="i">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									formControlName="add"
+									id="add"
+									(change)="checkView($event, i, 'add')"
+								/>
+								<formControl class="form-check-label" for="add"> Add </formControl>
+							</div>
+							<div class="form-check" [formGroupName]="i">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									formControlName="edit"
+									id="edit"
+									(change)="checkView($event, i, 'edit')"
+								/>
+								<formControl class="form-check-label" for="edit"> Edit </formControl>
+							</div>
+							<div class="form-check" [formGroupName]="i">
+								<input
+									class="form-check-input form-custom-check-input"
+									type="checkbox"
+									formControlName="delete"
+									id="delete"
+								/>
+								<label class="form-check-label" for="delete"> Delete </label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer border-0">
+		<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+		<button type="button" class="btn btn-custom-primary ms-4" (click)="onSubmit()">Save</button>
+	</div>
+</div>

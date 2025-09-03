@@ -1,0 +1,83 @@
+<div class="card">
+	<div class="card-body">
+		<div class="d-flex justify-content-between ign-items-center">
+			<div class="d-flex">
+				<h2 class="text-primary fs-3 fw-bold">Leave Management</h2>
+			</div>
+			<div class="d-flex text-end" (click)="toggleEdit()" *ngIf="dataForm.disabled" role="button">
+				<mat-icon class="text-primary" style="height: 16px" svgIcon="pen-note-edit"></mat-icon>
+				<a class="text-primary">Edit</a>
+			</div>
+		</div>
+		<form [formGroup]="dataForm">
+			<div class="row" formArrayName="leaves" *ngFor="let _ of leaves.controls; let i = index">
+				<label class="form-label text-primary" *ngIf="!_.value.showCheckBox">{{ _.value.label }}</label>
+
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3" *ngIf="!_.value.showCheckBox">
+					<div class="form-group" [formGroupName]="i">
+						<input
+							type="number"
+							class="form-control"
+							id="yearly"
+							placeholder="Yearly"
+							formControlName="yearly"
+						/>
+						<!-- <span class="text-primary">
+							{{ _.value.maxYearly }}
+						</span> -->
+						<div class="text-left" *ngFor="let error of errorMessages.yearly">
+							<ng-container
+								*ngIf="
+									_.controls['yearly'].hasError(error.type) &&
+									(_.controls['yearly'].dirty || _.controls['yearly'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3" *ngIf="!_.value.showCheckBox">
+					<div class="form-group" [formGroupName]="i">
+						<input
+							type="number"
+							class="form-control"
+							id="monthly"
+							placeholder="Monthly"
+							formControlName="monthly"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.monthly">
+							<ng-container
+								*ngIf="
+									_.controls['monthly'].hasError(error.type) &&
+									(_.controls['monthly'].dirty || _.controls['monthly'].touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3" *ngIf="_.value.showCheckBox">
+					<div class="form-check" [formGroupName]="i">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							[disabled]="dataForm.disabled"
+							[checked]="_.value.id && _.value.status === 'active'"
+							id="flexCheckChecked"
+							(change)="updateStatus($event, i)"
+						/>
+						<label class="form-check-label form-label text-primary" for="flexCheckChecked">
+							{{ _.value.label }}
+						</label>
+					</div>
+				</div>
+			</div>
+		</form>
+		<div class="d-flex justify-content-end" *ngIf="!dataForm.disabled">
+			<button type="button" class="btn btn-outline-primary" (click)="toggleEdit()">Cancel</button>
+			<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+		</div>
+	</div>
+</div>

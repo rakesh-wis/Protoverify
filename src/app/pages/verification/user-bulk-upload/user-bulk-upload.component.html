@@ -1,0 +1,143 @@
+<div class="my-3">
+	<div class="modal-header align-items-center">
+		<h2 class="modal-title text-custom-black mb-0" id="modal-basic-title">
+			<span>Bulk Upload Verifications</span>
+		</h2>
+		<button type="button" class="btn-close" aria-label="Close" (click)="dismissModal()"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="dataForm">
+			<div class="row" formArrayName="userAssociations">
+				<ng-container *ngFor="let _ of userAssociations.controls; let i = index">
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Select Region* </label>
+							<select
+								class="form-select text-capitalize"
+								aria-label="select example"
+								formControlName="regionId"
+								(change)="onRegionChangeHandler($event)"
+								required
+							>
+								<option value="" disabled>Select an option</option>
+								<option [value]="item.id" *ngFor="let item of regionList">
+									<span>{{ item.title }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.regionId">
+								<ng-container
+									*ngIf="
+										_.controls['regionId'].hasError(error.type) &&
+										(_.controls['regionId'].dirty || _.controls['regionId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group" [formGroupName]="i">
+							<label class="form-label text-primary"> Select Site* </label>
+							<!-- <ng-select class="form-control text-capitalize" [items]="siteList" [virtualScroll]="true"
+															placeholder="" bindValue="id" bindLabel="name" [dropdownPosition]="'bottom'"
+															[searchable]="true" [editableSearchTerm]="true" formControlName="sitesId"
+															(scrollToEnd)="onScrollToEnd()">
+														</ng-select> -->
+							<select
+								class="form-select text-capitalize"
+								aria-label="select example"
+								formControlName="sitesId"
+								required
+							>
+								<option value="" disabled>Select an option</option>
+								<option [value]="item.id" *ngFor="let item of siteList">
+									<span>{{ item.name }}</span>
+								</option>
+							</select>
+							<div class="text-left" *ngFor="let error of errorMessages.sitesId">
+								<ng-container
+									*ngIf="
+										_.controls['sitesId'].hasError(error.type) &&
+										(_.controls['sitesId'].dirty || _.controls['sitesId'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</ng-container>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-12 col-sm-12">
+					<a class="text-primary" role="button" (click)="downloadTemplate()">
+						<u>Download template</u>
+					</a>
+				</div>
+				<div class="col-lg-6 col-md-12 col-sm-12">
+					<label class="form-label text-custom-black"> File Upload </label>
+					<input
+						hidden
+						#fileInput
+						type="file"
+						class="form-control"
+						(change)="selectFile($event)"
+						accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+					/>
+					<div class="input-group file-input-group">
+						<input
+							type="text"
+							readonly
+							class="form-control border-end-0"
+							aria-label="Upload excel"
+							[placeholder]="form['file'].value ? 'Uploaded' : 'Upload excel'"
+						/>
+						<ng-container *appIsGranted="'EDIT'">
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0 rounded-end"
+								(click)="fileInput.click()"
+								*ngIf="!form['file'].value"
+								ngbTooltip="Upload File"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="iconoir:attachment"> </iconify-icon>
+							</span>
+							<span
+								role="button"
+								class="input-group-text bg-transparent border-start-0 rounded-end"
+								(click)="clearFile()"
+								*ngIf="form['file'].value"
+								ngbTooltip="Remove"
+							>
+								<iconify-icon class="fs-5 text-primary" icon="ant-design:delete-outlined">
+								</iconify-icon>
+							</span>
+						</ng-container>
+					</div>
+					<small class="text-secondary">Note: Upload up to max 100 candidates</small>
+					<div class="text-left" *ngFor="let error of errorMessages.file">
+						<ng-container
+							*ngIf="form['file'].hasError(error.type) && (form['file'].dirty || form['file'].touched)"
+						>
+							<span class="text-danger">{{ error.message }}</span>
+						</ng-container>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="errorMessage && errorMessage.length > 0">
+				<label class="text-primary">
+					Employee not upload as they already exist with same mobile number or email:
+				</label>
+				<span class="text-danger text-capitalize">
+					{{ errorMessage }}
+				</span>
+			</div>
+
+			<div class="modal-footer border-0">
+				<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Cancel</button>
+				<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">Submit</button>
+			</div>
+		</form>
+	</div>
+</div>

@@ -1,0 +1,17 @@
+<div class="card border bg-primary-100">
+	<div class="card-body">
+		<div class="row">
+			<div class="col-lg-3 col-md-4 col-sm-12 g-3" *ngFor="let item of verificationLevelList">
+				<div class="d-flex aling-items-center" role="button"></div>
+				<div class="d-flex">
+					<div class="flex-shrink-0">
+						<img [src]="getVerificationIcon(item)" class="img-fluid" width="24" />
+					</div>
+					<div class="flex-grow-1 ms-3">
+						<label>{{ item.label }}</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

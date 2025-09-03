@@ -1,0 +1,548 @@
+<mat-toolbar class="navbar">
+	<mat-toolbar-row class="justify-content-between">
+		<div class="">
+			<img src="assets/images/logo-black.svg" alt="" height="58" />
+		</div>
+	</mat-toolbar-row>
+</mat-toolbar>
+<div class="container-fluid py-3 page-padding bg-primary-200">
+	<div class="d-flex justify-content-between align-items-center">
+		<label class="text-custom-black-80 fs-4 fw-bold">
+			Past Employment Verification for {{ pastEmploymentData?.user?.name }}</label
+		>
+	</div>
+
+	<div class="card bg-white my-4">
+		<div class="card-body">
+			<label class="text-custom-black-80"> Please help us with below details:</label>
+			<form [formGroup]="dataForm">
+				<div class="table-responsive mt-3">
+					<table class="table table-hover">
+						<thead>
+							<tr class="bg-primary-200">
+								<th scope="col" width="100">Parameters</th>
+								<th scope="col" width="140">Details by candidate</th>
+								<th scope="col">Verified by HR Manager</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr>
+								<td>Employee Name</td>
+								<td>
+									{{ pastEmploymentData?.user?.name }}
+								</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="employeeNameCheck"
+											placeholder="Enter here"
+											formControlName="employeeNameCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.employeeNameCheck">
+											<ng-container
+												*ngIf="
+													form['employeeNameCheck'].hasError(error.type) &&
+													(form['employeeNameCheck'].dirty ||
+														form['employeeNameCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Organization Name</td>
+								<td>{{ pastEmploymentData?.organizationName }}</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="organizationCheck"
+											placeholder="Enter here"
+											formControlName="organizationCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.organizationCheck">
+											<ng-container
+												*ngIf="
+													form['organizationCheck'].hasError(error.type) &&
+													(form['organizationCheck'].dirty ||
+														form['organizationCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Location</td>
+								<td>{{ pastEmploymentData?.location }}</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="locationCheck"
+											placeholder="Enter here"
+											formControlName="locationCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.locationCheck">
+											<ng-container
+												*ngIf="
+													form['locationCheck'].hasError(error.type) &&
+													(form['locationCheck'].dirty || form['locationCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Employee ID</td>
+								<td>{{ pastEmploymentData?.employeeId }}</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="employeeIdCheck"
+											placeholder="Enter here"
+											formControlName="employeeIdCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.employeeIdCheck">
+											<ng-container
+												*ngIf="
+													form['employeeIdCheck'].hasError(error.type) &&
+													(form['employeeIdCheck'].dirty || form['employeeIdCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Employment Dates</td>
+								<td>
+									{{ pastEmploymentData?.fromDate | date: 'dd MMM YYYY' }} to
+									<span
+										[ngClass]="
+											pastEmploymentData?.toDate ? 'text-danger' : 'text-custom-primary-dark'
+										"
+									>
+										<span *ngIf="!pastEmploymentData?.toDate"> Currently working </span>
+										<span *ngIf="pastEmploymentData?.toDate">
+											{{ pastEmploymentData?.toDate | date: 'dd MMM YYYY' }}
+										</span>
+									</span>
+								</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="employeeDateCheck"
+											placeholder="Enter here"
+											formControlName="employeeDateCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.employeeDateCheck">
+											<ng-container
+												*ngIf="
+													form['employeeDateCheck'].hasError(error.type) &&
+													(form['employeeDateCheck'].dirty ||
+														form['employeeDateCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Last Position Held</td>
+								<td>{{ pastEmploymentData?.designation }}</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="designationCheck"
+											placeholder="Enter here"
+											formControlName="designationCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.designationCheck">
+											<ng-container
+												*ngIf="
+													form['designationCheck'].hasError(error.type) &&
+													(form['designationCheck'].dirty || form['designationCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Salary ₹/Annum</td>
+								<td>{{ pastEmploymentData?.salary }}</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="salaryCheck"
+											placeholder="Enter here"
+											formControlName="salaryCheck"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.salaryCheck">
+											<ng-container
+												*ngIf="
+													form['salaryCheck'].hasError(error.type) &&
+													(form['salaryCheck'].dirty || form['salaryCheck'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Reason for discontinuance from service</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="reasonOfDiscontinuance"
+											placeholder="Enter here"
+											formControlName="reasonOfDiscontinuance"
+										/>
+										<div
+											class="text-left"
+											*ngFor="let error of errorMessages.reasonOfDiscontinuance"
+										>
+											<ng-container
+												*ngIf="
+													form['reasonOfDiscontinuance'].hasError(error.type) &&
+													(form['reasonOfDiscontinuance'].dirty ||
+														form['reasonOfDiscontinuance'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Any exit formalities pending?</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="anyExitFormalitiesPending"
+											placeholder="Enter here"
+											formControlName="anyExitFormalitiesPending"
+										/>
+										<div
+											class="text-left"
+											*ngFor="let error of errorMessages.anyExitFormalitiesPending"
+										>
+											<ng-container
+												*ngIf="
+													form['anyExitFormalitiesPending'].hasError(error.type) &&
+													(form['organizationCheck'].dirty ||
+														form['anyExitFormalitiesPending'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>If pending then with whom?</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="formalitiesFromWhom"
+											placeholder="Enter here"
+											formControlName="formalitiesFromWhom"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.formalitiesFromWhom">
+											<ng-container
+												*ngIf="
+													form['formalitiesFromWhom'].hasError(error.type) &&
+													(form['formalitiesFromWhom'].dirty ||
+														form['formalitiesFromWhom'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Performance at work</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="performanceAtWork"
+											placeholder="Enter here"
+											formControlName="performanceAtWork"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.performanceAtWork">
+											<ng-container
+												*ngIf="
+													form['performanceAtWork'].hasError(error.type) &&
+													(form['performanceAtWork'].dirty ||
+														form['performanceAtWork'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="text-wrap">
+									Any integrity/disciplinary issue that the subject was involved in. Please select
+									from the below mentioned options: Misappropriation of funds, Harassment of any kind,
+									Data Integrity
+								</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="disciplinaryIssue"
+											placeholder="Enter here"
+											formControlName="disciplinaryIssue"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.disciplinaryIssue">
+											<ng-container
+												*ngIf="
+													form['disciplinaryIssue'].hasError(error.type) &&
+													(form['disciplinaryIssue'].dirty ||
+														form['disciplinaryIssue'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>Eligibility for rehire</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="eligibilityForRehire"
+											placeholder="Enter here"
+											formControlName="eligibilityForRehire"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.eligibilityForRehire">
+											<ng-container
+												*ngIf="
+													form['eligibilityForRehire'].hasError(error.type) &&
+													(form['eligibilityForRehire'].dirty ||
+														form['eligibilityForRehire'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr *ngIf="isOtherDocumentAdded">
+								<td>
+									Attached
+									<a class="text-primary" role="button" (click)="openDocument('other_document')"
+										>Document</a
+									>
+									is genuine or not?
+								</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="isOtherDocumentCorrect"
+											placeholder="Enter here"
+											formControlName="isOtherDocumentCorrect"
+										/>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Attached
+									<a class="text-primary" role="button" (click)="openDocument('latest_salary_slip')"
+										>Salary Slip</a
+									>
+									is genuine or not?
+								</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="isSalarySlipCorrect"
+											placeholder="Enter here"
+											formControlName="isSalarySlipCorrect"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.isSalarySlipCorrect">
+											<ng-container
+												*ngIf="
+													form['isSalarySlipCorrect'].hasError(error.type) &&
+													(form['isSalarySlipCorrect'].dirty ||
+														form['isSalarySlipCorrect'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Attached
+									<a class="text-primary" role="button" (click)="openDocument('offer_letter')"
+										>Offer Letter</a
+									>
+									is genuine or not?
+								</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="isOfferLetterCorrect"
+											placeholder="Enter here"
+											formControlName="isOfferLetterCorrect"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.isOfferLetterCorrect">
+											<ng-container
+												*ngIf="
+													form['isOfferLetterCorrect'].hasError(error.type) &&
+													(form['isOfferLetterCorrect'].dirty ||
+														form['isOfferLetterCorrect'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>HR’s name</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="hrsName"
+											placeholder="Enter here"
+											formControlName="hrsName"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.hrsName">
+											<ng-container
+												*ngIf="
+													form['hrsName'].hasError(error.type) &&
+													(form['hrsName'].dirty || form['hrsName'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>HR’s designation</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<input
+											type="text"
+											class="form-control"
+											id="hrsDesignation"
+											placeholder="Enter here"
+											formControlName="hrsDesignation"
+										/>
+										<div class="text-left" *ngFor="let error of errorMessages.hrsDesignation">
+											<ng-container
+												*ngIf="
+													form['hrsDesignation'].hasError(error.type) &&
+													(form['hrsDesignation'].dirty || form['hrsDesignation'].touched)
+												"
+											>
+												<span class="text-danger">{{ error.message }}</span>
+											</ng-container>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>HR’s contact number</td>
+								<td>Please Specify</td>
+								<td>
+									<div class="form-group mb-0">
+										<app-mobile-number
+											[formControlMobileNumber]="dataForm.get('hrsMobileNumber')"
+											[formControlCountryCode]="dataForm.get('hrsCountryCode')"
+											[errorValidator]="errorMessages?.hrsMobileNumber"
+											(validNumberEvent)="receiveValidNumberEvent($event)"
+										>
+										</app-mobile-number>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</form>
+
+			<div class="d-flex justify-content-end mt-5 gap-1">
+				<button type="button" class="btn btn-primary" (click)="onSubmit()">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>

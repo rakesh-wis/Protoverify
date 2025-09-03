@@ -1,0 +1,195 @@
+<div class="container-fluid page-padding">
+	<div
+		class="d-flex justify-content-between align-items-center"
+		*ngIf="![roles.EMPLOYEE].includes(currentUser?.role)"
+	>
+		<label class="text-custom-black-80 fs-4 fw-bold"> {{ userData?.name }}'s Verification Details </label>
+	</div>
+	<div *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-status-bar
+			[checkName]="form['type'].value"
+			[inputData]="form['id'].value ? dataForm.getRawValue() : null"
+			[currentUser]="currentUser"
+		></app-status-bar>
+	</div>
+	<div class="card my-4 px-3" [ngClass]="{ 'opacity-50': isFormDisabled }">
+		<div class="card-header bg-transparent">
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex justify-content-start align-items-center py-2">
+					<img src="assets/images/kyc_court_check.svg" class="img-fluid" />
+					<h2 class="text-custom-black-80 fw-bold mb-0 ms-3">Crime Check</h2>
+				</div>
+				<span class="text-custom-black-80" *ngIf="crimeCheck?.updatedAt">
+					Document Submitted on: {{ crimeCheck?.updatedAt | date: 'dd/MM/yyyy' }}
+				</span>
+			</div>
+		</div>
+		<div
+			class="card-body"
+			*ngIf="
+				[roles.CLIENT_SUPER_ADMIN, roles.CLIENT_ADMIN, roles.CLIENT_USER, roles.CLIENT_USER_VIEW].includes(
+					currentUser?.role
+				)
+			"
+		>
+			<div class="my-4 d-flex justify-content-center">Process controlled by Protoverify Team</div>
+		</div>
+		<div
+			class="card-body"
+			*ngIf="
+				![roles.CLIENT_SUPER_ADMIN, roles.CLIENT_ADMIN, roles.CLIENT_USER, roles.CLIENT_USER_VIEW].includes(
+					currentUser?.role
+				)
+			"
+		>
+			<form [formGroup]="dataForm">
+				<p class="text-center my-3">To get the crime check done, you need to click on the court list.</p>
+
+				<div class="d-flex justify-content-center my-2">
+					<button
+						type="button"
+						class="btn btn-custom-primary"
+						(click)="openCourtList()"
+						[disabled]="dataForm.disabled"
+					>
+						<span *ngIf="form['courtCheck'].value">View</span>
+						<span *ngIf="!form['courtCheck'].value && currentUser?.role != roles.PROTO_LAWYER">Add</span>
+						Court list
+					</button>
+				</div>
+				<div class="text-left" *ngFor="let error of errorMessages?.courtCheck">
+					<ng-container
+						*ngIf="
+							form['courtCheck'].hasError(error.type) &&
+							(form['courtCheck'].dirty || form['courtCheck'].touched)
+						"
+					>
+						<span class="text-danger">{{ error.message }}</span>
+					</ng-container>
+				</div>
+
+				<!-- <div
+					class="row"
+					*ngIf="
+						[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_LAWYER].includes(currentUser?.role) &&
+						form['id'].value
+					"
+				>
+					<div class="col-12 mb-3">
+						<div class="form-group">
+							<label class="form-label text-primary">Lawyer's Comment</label>
+							<textarea
+								type="text"
+								class="form-control"
+								id="comment"
+								placeholder=""
+								rows="4"
+								formControlName="comment"
+								[readOnly]="
+									[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN].includes(currentUser?.role) ||
+									form['comment'].value
+								"
+							></textarea>
+						</div>
+					</div>
+				</div> -->
+				<div
+					class="row"
+					*ngIf="
+						[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_OPERATION].includes(
+							currentUser?.role
+						) && form['id'].value
+					"
+				>
+					<div class="col-12 mb-3">
+						<div class="form-group">
+							<label class="form-label text-primary">Remarks</label>
+							<textarea
+								type="text"
+								class="form-control"
+								id="remark"
+								placeholder="Write your remarks here"
+								rows="4"
+								formControlName="remark"
+								[readOnly]="
+									![roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN, roles.PROTO_OPERATION].includes(
+										currentUser?.role
+									)
+								"
+							></textarea>
+							<div class="text-left" *ngFor="let error of errorMessages?.remark">
+								<ng-container
+									*ngIf="
+										form['remark'].hasError(error.type) &&
+										(form['remark'].dirty || form['remark'].touched)
+									"
+								>
+									<span class="text-danger">{{ error.message }}</span>
+								</ng-container>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="gap-1" *appIsGranted="'EDIT'">
+				<div
+					class="d-flex justify-content-end gap-1"
+					*ngIf="[roles.PROTO_SUPER_ADMIN, roles.PROTO_ADMIN].includes(currentUser?.role) && form['id'].value"
+				>
+					<button type="button" class="btn btn-outline-danger text-capitalize" (click)="openConfirmStatus()">
+						Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+					>
+						Clear Report
+					</button>
+				</div>
+				<div
+					class="d-flex justify-content-between gap-1"
+					*ngIf="[roles.PROTO_OPERATION].includes(currentUser?.role) && form['id'].value"
+				>
+					<button
+						type="button"
+						class="btn btn-outline-danger text-capitalize"
+						(click)="openConfirmStatus(verificationLevel.MAJOR_DISCREPANCY)"
+						[disabled]="dataForm.disabled"
+					>
+						Major Discrepancy
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-primary text-capitalize"
+						(click)="openConfirmStatus('others')"
+						[disabled]="dataForm.disabled"
+					>
+						others
+					</button>
+					<button
+						type="button"
+						class="btn btn-success"
+						(click)="openConfirmStatus(verificationLevel.CLEAR_REPORT)"
+						[disabled]="dataForm.disabled"
+					>
+						Clear Report
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-end">
+		<button type="button" class="btn-preview border-0" (click)="goBack()">
+			<img src="assets/icons/arrow-left.svg" class="img-fluid" alt="clip" /> Previous
+		</button>
+		<button type="button" class="btn-next border-0" (click)="goNext()">
+			Next <img src="assets/icons/arrow-right.svg" class="img-fluid" alt="clip" />
+		</button>
+	</div>
+
+	<div class="mt-4" *ngIf="![roles.EMPLOYEE].includes(currentUser?.role)">
+		<app-verification-status></app-verification-status>
+	</div>
+</div>

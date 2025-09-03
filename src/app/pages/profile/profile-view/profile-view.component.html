@@ -1,0 +1,81 @@
+<div class="container-fluid page-padding">
+	<h2 class="text-primary fs-3 fw-bold">Profile Details</h2>
+	<div class="card">
+		<div class="card-body">
+			<form [formGroup]="dataForm">
+				<div class="row justify-content-between align-items-center">
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group">
+							<div class="d-flex align-items-start">
+								<h3 class="form-label fw-bold text-primary mb-0">Name</h3>
+							</div>
+							<span class="form-label text-primary">
+								{{ currentUser?.name || '-' }}
+							</span>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group">
+							<div class="d-flex align-items-start">
+								<h3 class="form-label fw-bold text-primary mb-0">Email</h3>
+								<mat-icon class="text-success ps-1"> check_circle </mat-icon>
+							</div>
+							<span class="form-label text-primary" style="text-transform: lowercase">
+								{{ currentUser?.email || '-' }}
+							</span>
+							<br />
+							<a class="text-primary" role="button" (click)="openChangerEmail()">Change email </a>
+						</div>
+					</div>
+
+					<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+						<div class="form-group">
+							<div class="d-flex align-items-start">
+								<h3 class="form-label fw-bold text-primary mb-0">Mobile Number</h3>
+								<mat-icon class="text-success ps-1"> check_circle </mat-icon>
+							</div>
+							<span class="form-label text-primary">
+								{{ currentUser?.mobileNumber || '-' }}
+							</span>
+							<br />
+							<a class="text-primary" role="button" (click)="openChangeMobileNumber()"
+								>Change mobile number
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="row justify-content-between align-items-center">
+					<div class="col-lg-9 col-md-8 col-sm-12">
+						<button type="button" class="btn btn-outline-primary w-100 px-4">
+							<input
+								hidden
+								#fileInput
+								type="file"
+								class="form-control"
+								(change)="uploadFile($event)"
+								accept="image/png,image/jpg , image/jpeg"
+							/>
+							<div class="d-flex justify-content-start align-items-center">
+								<img
+									[src]="form['profilePicture'].value"
+									*ngIf="form['profilePicture'].value.length > 0"
+									height="80px"
+								/>
+								<span class="ps-3">{{ getImage || 'No image uploaded' }}</span>
+							</div>
+						</button>
+					</div>
+					<div class="col-lg-3 col-md-4 col-sm-12">
+						<button
+							type="button"
+							class="btn btn-primary w-100 px-4"
+							(click)="!didImageChange ? fileInput.click() : onSubmit()"
+						>
+							{{ !didImageChange ? 'Change' : 'Save' }}
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

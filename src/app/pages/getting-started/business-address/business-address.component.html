@@ -1,0 +1,156 @@
+<div>
+	<form [formGroup]="dataForm">
+		<div formArrayName="addresses" *ngFor="let _ of addresses.controls; let i = index">
+			<div class="form-check mb-3" *ngIf="i === 1" [formGroupName]="i">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					id="isSameAsRegistered"
+					(change)="patchOptionalAddress($event)"
+					formControlName="isSameAsRegistered"
+				/>
+				<label class="form-check-label" for="isSameAsRegistered">
+					My operational address is same as my registered address
+				</label>
+			</div>
+
+			<div class="d-flex justify-content-between align-items-center" *ngIf="i === 0">
+				<h3 class="text-primary fw-bold">Registered Address</h3>
+				<button
+					type="button"
+					class="btn btn-primary"
+					(click)="openConfirmStatus(_.value, i)"
+					*ngIf="_.value.status === 'pending' && canVerify"
+				>
+					Verify
+				</button>
+				<button type="button" class="btn btn-outline-primary" *ngIf="_.value.status === 'active'">
+					<div class="d-flex justify-content-center align-items-center">
+						Verified <mat-icon class="text-success ps-1">check_circle</mat-icon>
+					</div>
+				</button>
+			</div>
+			<div class="d-flex justify-content-between align-items-center" *ngIf="i === 1">
+				<h3 class="text-primary fw-bold">Operational Address</h3>
+				<button
+					type="button"
+					class="btn btn-primary"
+					(click)="openConfirmStatus(_.value, i)"
+					*ngIf="_.value.status === 'pending' && canVerify"
+				>
+					Verify
+				</button>
+				<button type="button" class="btn btn-outline-primary" *ngIf="_.value.status === 'active'">
+					<div class="d-flex justify-content-center align-items-center">
+						Verified <mat-icon class="text-success ps-1">check_circle</mat-icon>
+					</div>
+				</button>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group" [formGroupName]="i">
+						<label class="form-label text-primary"> Address line 1 </label>
+						<input
+							type="text"
+							class="form-control"
+							id="addressLine1"
+							placeholder=""
+							formControlName="addressLine1"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.addressLine1">
+							<ng-container
+								*ngIf="
+									_.get('addressLine1').hasError(error.type) &&
+									(_.get('addressLine1').dirty || _.get('addressLine1').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group" [formGroupName]="i">
+						<label class="form-label text-primary"> Address line 2 </label>
+						<input
+							type="text"
+							class="form-control"
+							id="addressLine2"
+							placeholder=""
+							formControlName="addressLine2"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.addressLine2">
+							<ng-container
+								*ngIf="
+									_.get('addressLine2').hasError(error.type) &&
+									(_.get('addressLine2').dirty || _.get('addressLine2').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group" [formGroupName]="i">
+						<label class="form-label text-primary"> PIN code number </label>
+						<input
+							type="text"
+							class="form-control"
+							id="pincode"
+							placeholder=""
+							formControlName="pincode"
+							(keypress)="numberOnly($event)"
+							maxlength="6"
+							(keyup)="searchPincode(i)"
+						/>
+						<div class="text-left" *ngFor="let error of errorMessages.pincode">
+							<ng-container
+								*ngIf="
+									_.get('pincode').hasError(error.type) &&
+									(_.get('pincode').dirty || _.get('pincode').touched)
+								"
+							>
+								<span class="text-danger">{{ error.message }}</span>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group" [formGroupName]="i">
+						<label class="form-label text-primary"> State </label>
+						<input
+							type="text"
+							class="form-control"
+							id="state"
+							placeholder=""
+							formControlName="state"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+					<div class="form-group" [formGroupName]="i">
+						<label class="form-label text-primary"> City </label>
+						<input
+							type="text"
+							class="form-control"
+							id="city"
+							placeholder=""
+							formControlName="city"
+							readonly
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="d-flex justify-content-end my-3" *ngIf="canEdit">
+	<button type="button" class="btn btn-outline-primary" *ngIf="showCancel" routerLink="/getting-started">
+		Cancel
+	</button>
+	<button type="button" class="btn btn-primary ms-4" (click)="onSubmit()">
+		{{ showCancel ? 'Submit' : 'Save' }}
+	</button>
+</div>

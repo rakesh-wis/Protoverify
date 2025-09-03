@@ -1,0 +1,49 @@
+.verification-detail-modal-text h4 {
+	font-family: Roboto;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 28px;
+	text-align: left;
+}
+.verification-detail-modal-text h2 {
+	font-family: Roboto;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+	text-align: left;
+}
+.verification-detail-modal-main button.btn-close {
+	margin-left: auto;
+	right: 0.5rem;
+	top: 0.5rem;
+	position: absolute;
+}
+.verification-detail-modal-text p {
+	font-family: Roboto;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 28px;
+	text-align: left;
+}
+p.item-title {
+	font-family: Roboto;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 28px;
+	text-align: left;
+}
+.verification-detail-item button.btn.btn-outline-primary.rounded-pill {
+	font-family: Roboto;
+	font-size: 11px;
+	font-weight: 400;
+	line-height: 11px;
+	text-align: left;
+	padding: 4px 6px !important;
+	width: auto !important;
+}
+
+.completed {
+  border: 1px solid rgba(18, 183, 106, 1);
+  background-color: rgba(18, 183, 106, 0.1);
+  color: rgba(18, 183, 106, 1) !important;
+}

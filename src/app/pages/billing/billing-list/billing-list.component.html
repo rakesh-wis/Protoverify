@@ -1,0 +1,54 @@
+<div class="container-fluid page-padding">
+	<div class="row justify-content-between align-items-center">
+		<div class="col-lg-6 col-md-6 col-sm-12">
+			<h2 class="text-custom-black fs-3 fw-bold mb-0">Bills</h2>
+		</div>
+	</div>
+	<ng-container>
+		<div class="table-responsive mt-3">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<ng-container *ngFor="let item of headerColumn">
+							<th scope="col">
+								{{ item.label }}
+							</th>
+						</ng-container>
+					</tr>
+				</thead>
+				<tbody *ngIf="dataList['count'] > 0">
+					<tr *ngFor="let item of dataList?.rows">
+						<td class="text-capitalize text-wrap">
+							{{ item?.uniqueId }}
+						</td>
+						<td class="text-capitalize text-wrap">
+							{{ item?.billDate | date: 'dd MMM yyyy' }}
+						</td>
+						<td>₹ {{ item?.totalAmount }}</td>
+						<td class="text-capitalize">
+							{{ item?.paymentMethod || '-' }}
+						</td>
+						<td *ngIf="headerColumn.length > 3">
+							<span role="button" (click)="downLoadInvoice(item.id)" ngbTooltip="Download">
+								<iconify-icon class="fs-5 text-primary" icon="bi:download"></iconify-icon>
+							</span>
+						</td>
+					</tr>
+				</tbody>
+				<tbody *ngIf="dataList['count'] === 0">
+					<tr>
+						<td class="text-center" [attr.colspan]="6">{{ OPTIONS?.noRecord }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<app-pagination
+			[collectionSize]="collectionSize"
+			[(page)]="page"
+			*ngIf="dataList['count'] > 0"
+			[pageSize]="pageSize"
+			(pageChange)="onPageChange($event)"
+			[maxSize]="5"
+		></app-pagination>
+	</ng-container>
+</div>

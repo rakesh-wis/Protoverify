@@ -1,0 +1,25 @@
+<div class="my-3">
+	<div class="modal-header border-0 row justify-content-center">
+		<div class="col-lg-7 col-md-6 text-lg-end text-center">
+			<h2 class="modal-title text-primary fw-bold mb-0 text-capitalize" id="modal-basic-title">
+				{{ modelData?.type.replace('_', ' ') }}
+			</h2>
+		</div>
+		<div class="col-lg-5 col-md-6 text-end">
+			<div class="d-flex justify-content-end" (click)="edit()" role="button">
+				<mat-icon class="text-primary" style="height: 16px" svgIcon="pen-note-edit"></mat-icon>
+				<a class="text-primary">Edit</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal-body">
+		<div class="d-flex">
+			<p [innerHTML]="modelData.description | safe: 'html'" *ngIf="modelData"></p>
+			<p *ngIf="!modelData?.description" class="text-center">No data added</p>
+		</div>
+		<div class="d-flex justify-content-end my-4">
+			<button type="button" class="btn btn-outline-primary" (click)="dismissModal()">Close</button>
+		</div>
+	</div>
+</div>

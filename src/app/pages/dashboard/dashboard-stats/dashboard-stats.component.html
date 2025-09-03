@@ -1,0 +1,39 @@
+<div class="row">
+	<ng-container *ngFor="let item of statsCards">
+		<div
+			class="card-group gx-5 gy-4"
+			[ngClass]="{ 'col-md-6 col-sm-6 col-lg-3': isRoleAccess, 'col-md-6 col-lg-4': !isRoleAccess }"
+			*ngIf="
+				isRoleAccess
+					? item?.walletType?.includes?.(userWallet?.walletType)
+					: true && item.visibleRole?.includes?.(currentUser?.role)
+			"
+		>
+			<div class="card border-0 shadow-color" [ngClass]="{ cursor: !!item.path }" (click)="navigateTo(item.path)">
+				<div class="card-body">
+					<div class="d-flex justify-content-between align-items-center">
+						<div class="d-flex flex-row align-items-center">
+							<div class="">
+								<img [src]="item?.icon" width="40" height="38" />
+							</div>
+							<div class="ms-2">
+								<label class="text-custom-black fw-bold fs-4 ms-1 my-2">
+									{{ item?.prefix }} {{ item?.value }}
+								</label>
+								<p class="text-custom-black-50 fs-6 mb-0">
+									{{ item?.label }}
+								</p>
+								<p class="text-custom-black-50 fs-6 mb-0" *ngIf="item?.subTitle">
+									{{ item?.subTitle }}
+								</p>
+							</div>
+						</div>
+						<div class="text-end" *ngIf="item?.lineIcon">
+							<img [src]="item?.lineIcon" width="40" height="32" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ng-container>
+</div>
